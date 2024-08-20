@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocation/core/bindings/app_binding.dart';
 import 'package:geolocation/core/theme/app_theme.dart';
+import 'package:geolocation/features/home/home_main_page.dart';
 import 'package:geolocation/features/signin/controllers/login_controller.dart';
 import 'package:geolocation/features/signin/login_page.dart';
 import 'package:geolocation/features/signup/signup_page.dart';
@@ -59,10 +60,11 @@ class _GeoLocationAppState extends State<GeoLocationApp>  with WidgetsBindingObs
     return GetMaterialApp(
       theme: AppTheme.UI,
       debugShowCheckedModeBanner: false,
-      home: LoginPage(),
+      home: HomeMainPage(),
       getPages: [
         GetPage(name: '/', page: () => LoginPage()),
         GetPage(name: '/sign-up', page: () => SignupPage()),
+        GetPage(name: '/home-main', page: () => HomeMainPage()),
       ],
     );
   }
