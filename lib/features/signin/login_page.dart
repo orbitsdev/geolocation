@@ -115,7 +115,7 @@ class LoginPage extends StatelessWidget {
                                             10), // Adjust the vertical padding here
                                     focusedBorder: OutlineInputBorder(
                                       borderSide: BorderSide(
-                                          width: 0.5, color: Palette.BLACK),
+                                          width: 0.5, color: Palette.PRIMARY),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     border: OutlineInputBorder(
@@ -162,7 +162,7 @@ class LoginPage extends StatelessWidget {
                                             10), // Adjust the vertical padding here
                                     focusedBorder: OutlineInputBorder(
                                       borderSide: BorderSide(
-                                          width: 0.5, color: Palette.BLACK),
+                                          width: 0.5, color: Palette.PRIMARY),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     border: OutlineInputBorder(

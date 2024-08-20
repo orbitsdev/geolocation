@@ -104,7 +104,7 @@ class SignupPage extends StatelessWidget {
                                             10), // Adjust the vertical padding here
                                     focusedBorder: OutlineInputBorder(
                                       borderSide: BorderSide(
-                                          width: 0.5, color: Palette.BLACK),
+                                          width: 0.5, color: Palette.PRIMARY),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     border: OutlineInputBorder(
@@ -127,7 +127,7 @@ class SignupPage extends StatelessWidget {
                                   ),
                                   validator: FormBuilderValidators.compose([
                                     FormBuilderValidators.required(),
-                                    FormBuilderValidators.email(),
+                                    // FormBuilderValidators.email(),
                                   ]),
                                 ),
                                   Gap(16),
@@ -151,7 +151,7 @@ class SignupPage extends StatelessWidget {
                                             10), // Adjust the vertical padding here
                                     focusedBorder: OutlineInputBorder(
                                       borderSide: BorderSide(
-                                          width: 0.5, color: Palette.BLACK),
+                                          width: 0.5, color: Palette.PRIMARY),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     border: OutlineInputBorder(
@@ -198,7 +198,7 @@ class SignupPage extends StatelessWidget {
                                             10), // Adjust the vertical padding here
                                     focusedBorder: OutlineInputBorder(
                                       borderSide: BorderSide(
-                                          width: 0.5, color: Palette.BLACK),
+                                          width: 0.5, color: Palette.PRIMARY),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     border: OutlineInputBorder(
@@ -243,7 +243,7 @@ class SignupPage extends StatelessWidget {
                                 Gap(2),
                                 FormBuilderTextField(
                                   initialValue: 'password',
-                                  name: 'password_confirm',
+                                  name: 'password_confirmation',
                                   style: Get.textTheme.bodyMedium!.copyWith(),
                                   decoration: InputDecoration(
                                     filled: true,
@@ -255,7 +255,7 @@ class SignupPage extends StatelessWidget {
                                             10), // Adjust the vertical padding here
                                     focusedBorder: OutlineInputBorder(
                                       borderSide: BorderSide(
-                                          width: 0.5, color: Palette.BLACK),
+                                          width: 0.5, color: Palette.PRIMARY),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     border: OutlineInputBorder(
