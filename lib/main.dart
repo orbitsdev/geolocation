@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:geolocation/core/bindings/app_binding.dart';
+import 'package:geolocation/core/theme/app_theme.dart';
 import 'package:geolocation/features/signin/controllers/login_controller.dart';
-import 'package:geolocation/features/signin/login_screen.dart';
+import 'package:geolocation/features/signin/login_page.dart';
+import 'package:geolocation/features/signup/signup_page.dart';
 import 'package:get/get.dart';
 
 void main() async  {
    WidgetsFlutterBinding.ensureInitialized();
-    Get.put(LoginController(), permanent: true);
-  runApp(const GeoLocationApp());
+   AppBinding().dependencies();
+   runApp(const GeoLocationApp());
 }
 
 
@@ -54,10 +57,12 @@ class _GeoLocationAppState extends State<GeoLocationApp>  with WidgetsBindingObs
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      theme: AppTheme.UI,
       debugShowCheckedModeBanner: false,
-      home: LoginScreen(),
+      home: LoginPage(),
       getPages: [
-        GetPage(name: '/', page: () => LoginScreen()),
+        GetPage(name: '/', page: () => LoginPage()),
+        GetPage(name: '/sign-up', page: () => SignupPage()),
       ],
     );
   }
