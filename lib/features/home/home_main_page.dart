@@ -49,7 +49,7 @@ class _HomeMainPageState extends State<HomeMainPage> {
       bottomNavigationBar: BottomNavigationBar(
         elevation: 0,
         backgroundColor: Palette.PRIMARY,
-        unselectedItemColor: Colors.white,
+        unselectedItemColor: Palette.LIGHT_PRIMARY,
         type: BottomNavigationBarType.fixed,
         selectedFontSize: 12,
         selectedItemColor: Colors.white,
@@ -68,9 +68,9 @@ class _HomeMainPageState extends State<HomeMainPage> {
             label: 'Attendance',
           ),
           BottomNavigationBarItem(
-            activeIcon: FaIcon(FontAwesomeIcons.solidMessage,size: 22,),
+            activeIcon: FaIcon(FontAwesomeIcons.commentSms,size: 22,),
 
-            icon: FaIcon(FontAwesomeIcons.message,size: 22,),
+            icon: FaIcon(FontAwesomeIcons.commentSms,size: 22,),
             label: 'message',
           ),
          
