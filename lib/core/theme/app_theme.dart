@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   static ThemeData UI = ThemeData(
-    scaffoldBackgroundColor:Palette.LIGHT_BACKGROUND,
+    scaffoldBackgroundColor:Palette.BACKGROUND,
     textSelectionTheme: TextSelectionThemeData(
       selectionHandleColor: Palette.PRIMARY,
       cursorColor: Palette.PRIMARY,

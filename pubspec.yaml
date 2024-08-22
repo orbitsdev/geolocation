@@ -59,6 +59,8 @@ dependencies:
   form_builder_validators: ^11.0.0
   gradient_elevated_button: ^1.0.0
   awesome_bottom_bar: ^1.2.4
+  timeline_tile: ^2.0.0
+  avatar_glow: ^3.0.1
 
 dev_dependencies:
   flutter_test:

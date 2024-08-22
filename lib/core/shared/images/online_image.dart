@@ -58,7 +58,11 @@ class OnlineImage extends StatelessWidget {
             imageUrl: imageUrl,
             placeholder: (context, url) => shimmer ?? ShimmerWidget(),
             errorWidget: (context, url, error) => Container(
+              decoration: BoxDecoration(
               color: Colors.white,
+              borderRadius: borderRadius??  BorderRadius.circular(2),
+
+              ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
