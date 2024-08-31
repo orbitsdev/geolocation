@@ -1,26 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocation/core/theme/palette.dart';
-import 'package:geolocation/features/home/presentations/dashboard/dashboard_page.dart';
+import 'package:geolocation/features/home/dashboard/dashboard_page.dart';
+import 'package:geolocation/features/management/management_page.dart';
 import 'package:get/get.dart';
 
-class HomeMainPage extends StatefulWidget {
-  const HomeMainPage({Key? key}) : super(key: key);
+class AdminHomeMainPage extends StatefulWidget {
+  const AdminHomeMainPage({Key? key}) : super(key: key);
 
   @override
-  State<HomeMainPage> createState() => _HomeMainPageState();
+  State<AdminHomeMainPage> createState() => _AdminHomeMainPageState();
 }
 
-class _HomeMainPageState extends State<HomeMainPage> {
+class _AdminHomeMainPageState extends State<AdminHomeMainPage> {
   int _selectedIndex = 0;
 
   List<Widget> _pages = [
     DashboardPage(),
-    Container(
-      child: Center(
-        child: Text('Unows'),
-      ),
-    ),
+    ManagementPage(),
     Container(
       child: Center(
         child: Text('Unows'),

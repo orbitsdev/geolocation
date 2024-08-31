@@ -11,6 +11,15 @@ final ButtonStyle ELEVATED_BUTTON_STYLE = ElevatedButton.styleFrom(
   ),
 );
 
+final ButtonStyle ELEVATED_BUTTON_STYLE_DARK = ElevatedButton.styleFrom(
+  backgroundColor: Palette.BG_DARK,
+  foregroundColor: Palette.BG_LIGH_3,
+  shape: const RoundedRectangleBorder(
+    borderRadius: BorderRadius.all(Radius.circular(10)),
+  ),
+);
+
+
 final GradientButtonStyle GRADIENT_ELEVATED_BUTTON_STYLE =
     GradientElevatedButton.styleFrom(
       foregroundColor: Colors.white,

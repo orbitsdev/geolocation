@@ -1,7 +1,7 @@
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:geolocation/core/shared/images/online_image.dart';
+import 'package:geolocation/core/globalwidget/images/online_image.dart';
 import 'package:geolocation/core/theme/palette.dart';
 import 'package:get/get.dart';
 import 'package:timeline_tile/timeline_tile.dart';

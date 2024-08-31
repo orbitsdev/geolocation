@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:geolocation/features/home/admin_home_main_page.dart';
 import 'package:get/get.dart';
 
 class LoginController  extends GetxController{
@@ -11,18 +12,19 @@ class LoginController  extends GetxController{
 
 
    void login(){
-     if (formKey.currentState!.saveAndValidate()) {
-      String email = formKey.currentState?.instantValue['email'];
-      String password = formKey.currentState?.instantValue['password'];
+    Get.to(()=> AdminHomeMainPage(), transition: Transition.cupertino);
+    //  if (formKey.currentState!.saveAndValidate()) {
+    //   String email = formKey.currentState?.instantValue['email'];
+    //   String password = formKey.currentState?.instantValue['password'];
 
-        Map<String ,dynamic> data = {
-          "email": email,
-          "password": password,
+    //     Map<String ,dynamic> data = {
+    //       "email": email,
+    //       "password": password,
          
-        };
+    //     };
 
-        print(data);
-     }
+    //     print(data);
+    //  }
    }
 
    void toggleRememberMe(){

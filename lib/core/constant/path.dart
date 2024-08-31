@@ -9,3 +9,7 @@ String imagePath(String image){
 }
 
 
+String lottiesPath(String image){
+  return 'assets/lotties/$image';
+}
+

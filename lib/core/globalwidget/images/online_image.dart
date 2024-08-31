@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:geolocation/core/shared/shimmer_widget.dart';
+import 'package:geolocation/core/globalwidget/shimmer_widget.dart';
 import 'package:geolocation/core/theme/palette.dart';
 import 'package:get/get.dart';
 
@@ -56,7 +56,7 @@ class OnlineImage extends StatelessWidget {
           )
         : CachedNetworkImage(
             imageUrl: imageUrl,
-            placeholder: (context, url) => shimmer ?? ShimmerWidget(),
+            placeholder: (context, url) => shimmer ?? ShimmerWidget(borderRadius:  borderRadius??  BorderRadius.circular(2),),
             errorWidget: (context, url, error) => Container(
               decoration: BoxDecoration(
               color: Colors.white,

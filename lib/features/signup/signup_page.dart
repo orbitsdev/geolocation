@@ -6,7 +6,7 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:gap/gap.dart';
 import 'package:geolocation/core/constant/path.dart';
 import 'package:geolocation/core/constant/style.dart';
-import 'package:geolocation/core/global_components/image/offline_image.dart';
+import 'package:geolocation/core/globalwidget/image/offline_image.dart';
 import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/signin/controllers/login_controller.dart';
 import 'package:geolocation/features/signup/controllers/signup_controller.dart';

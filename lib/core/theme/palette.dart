@@ -28,6 +28,8 @@ class Palette {
     static Color BLACK_SIMI = Color(0xff1C1C1C); 
     static Color LIGHT_TEXT = Color(0xff999EA1); 
 
+     static Color TEXT_LIGHT = Color(0xff8B8B8B);
+
 
 static Color LIGH_BG2 = Color(0xffF4F4F4);
 static Color lightBgTheme3 = Color(0xffF7F7F7);
@@ -38,4 +40,6 @@ static Color LIGHT_TEXT_PRIMARY = Color(0xFFD7E6E0);
 static Color LIGHT_RED = Color(0xFFFB714A);
 
 
+static Color BG_DARK = Color(0xFF1C404B);
+static Color  BG_LIGH_3 = Color(0xFFF2F5F7);
 }

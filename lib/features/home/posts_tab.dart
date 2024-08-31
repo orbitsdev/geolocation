@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:geolocation/core/shared/sliver_gap.dart';
-import 'package:geolocation/core/shared/to_sliver.dart';
-import 'package:geolocation/features/home/presentations/scroll_container.dart';
+import 'package:geolocation/core/globalwidget/sliver_gap.dart';
+import 'package:geolocation/core/globalwidget/to_sliver.dart';
+import 'package:geolocation/core/globalwidget/scroll_container.dart';
 
 class PostsTab extends StatelessWidget {
 const PostsTab({ Key? key }) : super(key: key);
