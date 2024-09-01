@@ -99,16 +99,21 @@ class _DashboardPageState extends State<DashboardPage>
         count: '39',
       ),
     )),
+
+    ToSliver(child: RippleContainer(
+      onTap: ()=> Get.to(()=> PostPage(),transition: Transition.cupertino),
+      child: OverAllCard(
+        icon: FaIcon(FontAwesomeIcons.bullhorn, size: 34, color: Colors.white), // Posts
+        title: 'Posts',
+        count: '58',
+      ),
+    )),
 ToSliver(child: OverAllCard(
   icon: FaIcon(FontAwesomeIcons.solidFolder, size: 34, color: Colors.white), // Collections
   title: 'Collections',
   count: '180',
 )),
-ToSliver(child: OverAllCard(
-  icon: FaIcon(FontAwesomeIcons.bullhorn, size: 34, color: Colors.white), // Posts
-  title: 'Posts',
-  count: '58',
-)),
+
 ToSliver(child: OverAllCard(
   icon: FaIcon(FontAwesomeIcons.calendarCheck, size: 34, color: Colors.white), // Events
   title: 'Events',

@@ -16,10 +16,10 @@ class AdminTaskCardPage extends StatelessWidget {
 
             flexibleSpace: FlexibleSpaceBar(
               title: Text('Manage Task'),
-              background: Image.network(
-                'https://i.pravatar.cc/600',
-                fit: BoxFit.cover,
-              ),
+              // background: Image.network(
+              //   'https://i.pravatar.cc/600',
+              //   fit: BoxFit.cover,
+              // ),
             ),
             pinned: true,
           ),

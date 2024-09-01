@@ -63,6 +63,8 @@ dependencies:
   avatar_glow: ^3.0.1
   touch_ripple_effect: ^2.5.1
   fluttertoast: ^8.2.8
+  
+  
 
 dev_dependencies:
   flutter_test:
