@@ -11,6 +11,13 @@ final ButtonStyle ELEVATED_BUTTON_STYLE = ElevatedButton.styleFrom(
   ),
 );
 
+final ButtonStyle ELEVATED_BUTTON_STYLE2 = ElevatedButton.styleFrom(
+                backgroundColor: Colors.teal, // Button color
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+              );
+
 final ButtonStyle ELEVATED_BUTTON_STYLE_DARK = ElevatedButton.styleFrom(
   backgroundColor: Palette.BG_DARK,
   foregroundColor: Palette.BG_LIGH_3,

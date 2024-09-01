@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:geolocation/features/home/admin_home_main_page.dart';
+import 'package:geolocation/features/role/login_selection_page.dart';
 import 'package:get/get.dart';
 
 class LoginController  extends GetxController{
@@ -12,7 +13,7 @@ class LoginController  extends GetxController{
 
 
    void login(){
-    Get.to(()=> AdminHomeMainPage(), transition: Transition.cupertino);
+    Get.to(()=> LoginSelectionPage(), transition: Transition.cupertino);
     //  if (formKey.currentState!.saveAndValidate()) {
     //   String email = formKey.currentState?.instantValue['email'];
     //   String password = formKey.currentState?.instantValue['password'];

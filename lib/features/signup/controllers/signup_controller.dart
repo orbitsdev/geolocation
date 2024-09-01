@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:geolocation/features/role/login_selection_page.dart';
 import 'package:get/get.dart';
 
 class SignupController  extends GetxController{
@@ -11,23 +12,24 @@ class SignupController  extends GetxController{
 
 
    void register(){
-     if (formKey.currentState!.saveAndValidate()) {
+        Get.to(()=> LoginSelectionPage(), transition: Transition.cupertino);
+    //  if (formKey.currentState!.saveAndValidate()) {
       
-      String name = formKey.currentState?.instantValue['name'];
-      String email = formKey.currentState?.instantValue['email'];
-      String password = formKey.currentState?.instantValue['password'];
-      String password_confirmation = formKey.currentState?.instantValue['password_confirmation'];
+    //   String name = formKey.currentState?.instantValue['name'];
+    //   String email = formKey.currentState?.instantValue['email'];
+    //   String password = formKey.currentState?.instantValue['password'];
+    //   String password_confirmation = formKey.currentState?.instantValue['password_confirmation'];
 
-        Map<String ,dynamic> data = {
-          "name": name,
-          "email": email,
-          "password": password,
-          "password_confirmation": password_confirmation,
-        };
+    //     Map<String ,dynamic> data = {
+    //       "name": name,
+    //       "email": email,
+    //       "password": password,
+    //       "password_confirmation": password_confirmation,
+    //     };
 
-                print(data);
+      
 
-     }
+    //  }
    }
 
    

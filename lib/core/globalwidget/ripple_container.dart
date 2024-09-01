@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:touch_ripple_effect/touch_ripple_effect.dart';
 
 class RippleContainer extends StatelessWidget {
@@ -19,7 +20,6 @@ Color? color;
   Widget build(BuildContext context){
     return  TouchRippleEffect(
       onTap: onTap,
-                borderRadius: borderRadius ?? BorderRadius.circular(5), 
                 rippleColor: color ??  Colors.white60,
                 child: child,
                 );

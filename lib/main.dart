@@ -5,9 +5,11 @@ import 'package:geolocation/features/event/event_page.dart';
 import 'package:geolocation/features/home/admin_home_main_page.dart';
 import 'package:geolocation/features/members/member_page.dart';
 import 'package:geolocation/features/notification/notification_page.dart';
+import 'package:geolocation/features/role/login_selection_page.dart';
 import 'package:geolocation/features/signin/controllers/login_controller.dart';
 import 'package:geolocation/features/signin/login_page.dart';
 import 'package:geolocation/features/signup/signup_page.dart';
+import 'package:geolocation/features/task/task_page.dart';
 import 'package:get/get.dart';
 
 void main() async  {
@@ -63,9 +65,10 @@ class _GeoLocationAppState extends State<GeoLocationApp>  with WidgetsBindingObs
     return GetMaterialApp(
       theme: AppTheme.UI,
       debugShowCheckedModeBanner: false,
-      home: LoginPage(),
+      home: AdminHomeMainPage(),
       getPages: [
         GetPage(name: '/', page: () => LoginPage()),
+        GetPage(name: '/login-selection', page: () => LoginSelectionPage()),
         GetPage(name: '/sign-up', page: () => SignupPage()),
         GetPage(name: '/home-main', page: () => AdminHomeMainPage()),
         GetPage(name: '/event', page: () => EventPage()),

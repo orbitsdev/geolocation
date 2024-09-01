@@ -1,88 +1,67 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
+import 'package:geolocation/core/theme/game_pallete.dart';
 import 'package:get/get.dart';
-
-import 'package:geolocation/core/theme/palette.dart';
-
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 class OverAllCard extends StatelessWidget {
-final String title;
-final Widget icon;
-   OverAllCard({
+  final String title;
+  final Widget icon;
+  final String count;
+
+  OverAllCard({
     Key? key,
     required this.title,
     required this.icon,
+    required this.count,
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Container(
-            color: Colors.white,
-            padding: EdgeInsets.only(left: 16, right: 16, bottom: 16),
-            child: Container(
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                  color: Palette.LIGH_BACKGROUND_GREEN,
-                  borderRadius: BorderRadius.circular(20)),
-              constraints: BoxConstraints(
-                minHeight: 120,
+      constraints: BoxConstraints(
+      ),
+      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(
+          colors: [
+            GamePalette.darkBackground,
+            GamePalette.tealGreen,
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            offset: Offset(0, 4),
+            blurRadius: 8,
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          icon,
+          SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              title,
+              style: Get.textTheme.titleMedium?.copyWith(
+                color: GamePalette.textWhite,
+                fontWeight: FontWeight.bold,
               ),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        '${title}',
-                        style: Get.textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold
-                        ),
-                      ),
-                      Gap(8),
-                    ],
-                  ),
-
-                    Gap(6),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      
-                      
-                 
-                      Flexible(
-                        child: Text(
-                          '242',
-                          style: Get.textTheme.displaySmall
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                     icon,
-                      // Container(
-                      //   padding: EdgeInsets.all(8),
-                      //   decoration: BoxDecoration(
-                      //       color: Colors.white,
-                      //       borderRadius: BorderRadius.circular(20)),
-                      //   child: Row(
-                      //     children: [
-                      //       Container(
-                      //         height: 14,
-                      //         width: 14,
-                      //         decoration: BoxDecoration(
-                      //             color: Palette.ORANGE_DARK,
-                      //             borderRadius: BorderRadius.circular(20)),
-                      //       ),
-                      //       Gap(8),
-                      //       Text(
-                      //         '24 Not Check',
-                      //         style: Get.textTheme.bodySmall
-                      //             ?.copyWith(fontWeight: FontWeight.bold),
-                      //       ),
-                      //     ],
-                      //   ),
-                      // )
-                    ],
-                  )
-                ],
-              ),
-            ));
+            ),
+          ),
+          Text(
+            count,
+            style: Get.textTheme.headlineSmall?.copyWith(
+              color: GamePalette.textWhite,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
