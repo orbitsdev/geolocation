@@ -1,8 +1,8 @@
 
-import 'package:geolocation/features/members/model/position.dart';
-List<Position> samplePositions = [
-  Position(id:1, name: 'Mayor'),
-  Position(id:1, name: 'Vice Chairperson'),
-  Position(id:1, name: 'Secretary'),
-  Position(id:1, name: 'Treasurer'),
+import 'package:geolocation/features/members/model/concil_position.dart';
+List<CouncilPosition> samplePositions = [
+  CouncilPosition(id:1, name: 'Mayor'),
+  CouncilPosition(id:1, name: 'Vice Chairperson'),
+  CouncilPosition(id:1, name: 'Secretary'),
+  CouncilPosition(id:1, name: 'Treasurer'),
 ];

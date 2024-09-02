@@ -3,6 +3,7 @@ import 'package:geolocation/core/bindings/app_binding.dart';
 import 'package:geolocation/core/theme/app_theme.dart';
 import 'package:geolocation/features/event/event_page.dart';
 import 'package:geolocation/features/home/admin_home_main_page.dart';
+import 'package:geolocation/features/map/sample_map.dart';
 import 'package:geolocation/features/members/member_page.dart';
 import 'package:geolocation/features/notification/notification_page.dart';
 import 'package:geolocation/features/role/login_selection_page.dart';

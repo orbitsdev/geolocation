@@ -12,7 +12,9 @@ import 'package:geolocation/core/globalwidget/to_sliver.dart';
 import 'package:geolocation/core/localdata/sample_data.dart';
 import 'package:geolocation/core/theme/game_pallete.dart';
 import 'package:geolocation/core/theme/palette.dart';
+import 'package:geolocation/features/collections/collection_page.dart';
 import 'package:geolocation/features/event/event_page.dart';
+import 'package:geolocation/features/file/file_page.dart';
 import 'package:geolocation/features/home/all_tab.dart';
 import 'package:geolocation/features/home/attendance_tab.dart';
 import 'package:geolocation/features/home/collections_tab.dart';
@@ -108,22 +110,31 @@ class _DashboardPageState extends State<DashboardPage>
         count: '58',
       ),
     )),
-ToSliver(child: OverAllCard(
-  icon: FaIcon(FontAwesomeIcons.solidFolder, size: 34, color: Colors.white), // Collections
-  title: 'Collections',
-  count: '180',
+ToSliver(child: RippleContainer(
+    onTap: ()=> Get.to(()=> CollectionPage(),transition: Transition.cupertino),
+  child: OverAllCard(
+    icon: FaIcon(FontAwesomeIcons.solidFolder, size: 34, color: Colors.white), // Collections
+    title: 'Collections',
+    count: '180',
+  ),
 )),
 
-ToSliver(child: OverAllCard(
-  icon: FaIcon(FontAwesomeIcons.calendarCheck, size: 34, color: Colors.white), // Events
-  title: 'Events',
+ToSliver(child: RippleContainer(
+     onTap: ()=> Get.to(()=> EventPage(),transition: Transition.cupertino),
+  child: OverAllCard(
+    icon: FaIcon(FontAwesomeIcons.calendarCheck, size: 34, color: Colors.white), // Events
+    title: 'Events',
   count: '16',
+  ),
 )),
 
-ToSliver(child: OverAllCard(
-  icon: FaIcon(FontAwesomeIcons.folderOpen, size: 34, color: Colors.white), // Files
-  title: 'Files',
-  count: '87',
+ToSliver(child: RippleContainer(
+  onTap: ()=> Get.to(()=> FilesPage(),transition: Transition.cupertino),
+  child: OverAllCard(
+    icon: FaIcon(FontAwesomeIcons.folderOpen, size: 34, color: Colors.white), // Files
+    title: 'Files',
+    count: '87',
+  ),
 )),
 
 

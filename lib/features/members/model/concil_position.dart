@@ -1,21 +1,21 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
-class Position {
+class CouncilPosition {
 
   int? id;
   String name;
-  Position({
+  CouncilPosition({
     this.id,
     required this.name,
   });
 
 
-  Position copyWith({
+  CouncilPosition copyWith({
     int? id,
     String? name,
   }) {
-    return Position(
+    return CouncilPosition(
       id: id ?? this.id,
       name: name ?? this.name,
     );
@@ -28,8 +28,8 @@ class Position {
     };
   }
 
-  factory Position.fromMap(Map<String, dynamic> map) {
-    return Position(
+  factory CouncilPosition.fromMap(Map<String, dynamic> map) {
+    return CouncilPosition(
       id: map['id'] != null ? map['id'] as int : null,
       name: map['name'] as String,
     );
@@ -37,10 +37,10 @@ class Position {
 
   String toJson() => json.encode(toMap());
 
-  factory Position.fromJson(String source) => Position.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory CouncilPosition.fromJson(String source) => CouncilPosition.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
-  String toString() => 'Position(id: $id, name: $name)';
+  String toString() => 'CouncilPosition(id: $id, name: $name)';
 
   
 }

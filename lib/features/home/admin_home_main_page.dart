@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocation/core/theme/palette.dart';
+import 'package:geolocation/features/attendance/attendance_page.dart';
+import 'package:geolocation/features/chat/chat_page.dart';
 import 'package:geolocation/features/home/dashboard/dashboard_page.dart';
 import 'package:geolocation/features/management/management_page.dart';
+import 'package:geolocation/features/map/sample_map.dart';
+import 'package:geolocation/features/profile/user_profile_page.dart';
 import 'package:get/get.dart';
 
 class AdminHomeMainPage extends StatefulWidget {
@@ -17,17 +21,9 @@ class _AdminHomeMainPageState extends State<AdminHomeMainPage> {
 
   List<Widget> _pages = [
     DashboardPage(),
-    ManagementPage(),
-    Container(
-      child: Center(
-        child: Text('Unows'),
-      ),
-    ),
-    Container(
-      child: Center(
-        child: Text('Unows'),
-      ),
-    ),
+    MapSample(),
+    ChatboxPage(),
+    UserProfilePage()
     
   ];
 
