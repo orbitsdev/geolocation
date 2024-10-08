@@ -1,5 +1,6 @@
 {
-    "cSpell.words": [
-        "Geolocator"
-    ]
+  "cSpell.words": [
+    "Geolocator"
+  ],
+  "dart.flutterSdkPath": ".fvm/versions/3.24.3"
 }

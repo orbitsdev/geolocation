@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:geolocation/core/bindings/app_binding.dart';
+import 'package:geolocation/core/bindings/global_binding.dart';
 import 'package:geolocation/core/theme/app_theme.dart';
+import 'package:geolocation/features/auth/middleware/auth_middleware.dart';
 import 'package:geolocation/features/event/event_page.dart';
 import 'package:geolocation/features/home/admin_home_main_page.dart';
 import 'package:geolocation/features/map/sample_map.dart';
 import 'package:geolocation/features/members/member_page.dart';
 import 'package:geolocation/features/notification/notification_page.dart';
+import 'package:geolocation/features/playground/login_page_test.dart';
 import 'package:geolocation/features/playground/modal_test_page.dart';
+import 'package:geolocation/features/playground/page1.dart';
+import 'package:geolocation/features/playground/page1_middleware.dart';
+import 'package:geolocation/features/playground/page2.dart';
+import 'package:geolocation/features/playground/page2_middleware.dart';
+import 'package:geolocation/features/playground/page3.dart';
 import 'package:geolocation/features/role/login_selection_page.dart';
 import 'package:geolocation/features/auth/controller/login_controller.dart';
 import 'package:geolocation/features/auth/pages/login_page.dart';
@@ -16,7 +24,7 @@ import 'package:get/get.dart';
 
 void main() async  {
    WidgetsFlutterBinding.ensureInitialized();
-   AppBinding().dependencies();
+   GlobalBinding().dependencies();
    runApp(const GeoLocationApp());
 }
 
@@ -67,15 +75,20 @@ class _GeoLocationAppState extends State<GeoLocationApp>  with WidgetsBindingObs
     return GetMaterialApp(
       theme: AppTheme.UI,
       debugShowCheckedModeBanner: false,
-      home: ModalTestPage(),
+      initialRoute: '/page3', 
       getPages: [
-        GetPage(name: '/', page: () => LoginPage()),
-        GetPage(name: '/login-selection', page: () => LoginSelectionPage()),
-        GetPage(name: '/sign-up', page: () => SignupPage()),
-        GetPage(name: '/home-main', page: () => AdminHomeMainPage()),
-        GetPage(name: '/event', page: () => EventPage()),
-        GetPage(name: '/notifications', page: () => NotificationPage()),
-        GetPage(name: '/members', page: () => MemberPage()),
+        GetPage(name: '/page1', page: () => Page1() , middlewares: [AuthMiddleware()]),  // No middleware, public page
+        GetPage(name: '/page2', page: () => Page2(), middlewares: []),  // Protected by middleware
+        GetPage(name: '/page3', page: () => Page3(), middlewares: [Page1Middleware(),Page2Middleware()]),  // Public page
+        GetPage(name: '/login', page: () => LoginPageTest(), middlewares: []),  // Login page
+
+        // GetPage(name: '/login', page: () => LoginPage()),
+        // GetPage(name: '/login-selection', page: () => LoginSelectionPage()),
+        // GetPage(name: '/sign-up', page: () => SignupPage()),
+        // GetPage(name: '/home-main', page: () => AdminHomeMainPage(), middlewares: [AuthMiddleware()]),
+        // GetPage(name: '/event', page: () => EventPage()),
+        // GetPage(name: '/notifications', page: () => NotificationPage()),
+        // GetPage(name: '/members', page: () => MemberPage()),
       ],
     );
   }
