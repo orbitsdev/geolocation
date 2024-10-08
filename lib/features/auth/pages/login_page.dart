@@ -8,8 +8,8 @@ import 'package:geolocation/core/constant/path.dart';
 import 'package:geolocation/core/constant/style.dart';
 import 'package:geolocation/core/globalwidget/image/offline_image.dart';
 import 'package:geolocation/core/theme/palette.dart';
-import 'package:geolocation/features/signin/controllers/login_controller.dart';
-import 'package:geolocation/features/signup/signup_page.dart';
+import 'package:geolocation/features/auth/controller/login_controller.dart';
+import 'package:geolocation/features/auth/pages/signup_page.dart';
 import 'package:get/get.dart';
 import 'package:gradient_elevated_button/gradient_elevated_button.dart';
 

@@ -9,8 +9,8 @@ import 'package:geolocation/features/members/controller/member_controller.dart';
 import 'package:geolocation/features/notification/controller/notification_controller.dart';
 import 'package:geolocation/features/post/controller/post_controller.dart';
 import 'package:geolocation/features/profile/controller/profile_controller.dart';
-import 'package:geolocation/features/signin/controllers/login_controller.dart';
-import 'package:geolocation/features/signup/controllers/signup_controller.dart';
+import 'package:geolocation/features/auth/controller/login_controller.dart';
+import 'package:geolocation/features/auth/controller/signup_controller.dart';
 import 'package:geolocation/features/task/controller/task_controller.dart';
 import 'package:get/get.dart';
 

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:geolocation/core/constant/path.dart';
 import 'package:geolocation/core/globalwidget/images/local_lottie_image.dart';
 import 'package:geolocation/core/modal/modal.dart';
+import 'package:get/get.dart';
 
 class ModalTestPage extends StatelessWidget {
   @override
@@ -18,7 +20,7 @@ class ModalTestPage extends StatelessWidget {
                 Modal.success(
                   title: Text("Success"),
                   content: Text("This is a success message."),
-                  visualContent: LocalLottieImage( path: lottiesPath('thumbsup.json'),),
+                 
                   buttonText: "Close",
                 );
               },
@@ -28,6 +30,7 @@ class ModalTestPage extends StatelessWidget {
             ElevatedButton(
               onPressed: () {
                 Modal.error(
+                   visualContent: LocalLottieImage( path: lottiesPath('error.json'), repeat: false,),
                   title: Text("Error"),
                   content: Text("This is an error message."),
                   buttonText: "Retry",
@@ -39,13 +42,20 @@ class ModalTestPage extends StatelessWidget {
             ElevatedButton(
               onPressed: () {
                 Modal.loading(
-                  content: Row(
-                    children: [
-                      CircularProgressIndicator(),
-                      SizedBox(width: 20),
-                      Text("Loading data..."),
-                    ],
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+                  content:Row(
+  mainAxisAlignment: MainAxisAlignment.start, // Center items horizontally
+  children: [
+    SizedBox(width: 24), // Add space between the spinner and text
+    CircularProgressIndicator(),
+    SizedBox(width: 36), // Add space between the spinner and text
+    Text(
+      "Loading...",
+      style: Get.textTheme.titleMedium,
+    ),
+  ],
+)
+,
                 );
               },
               child: Text("Show Loading Modal"),
@@ -54,6 +64,7 @@ class ModalTestPage extends StatelessWidget {
             ElevatedButton(
               onPressed: () {
                 Modal.confirmation(
+                    visualContent: LocalLottieImage( path: lottiesPath('question.json'),width: 90,height: 90, repeat: false,),
                   titleText: "Confirm Action",
                   contentText: "Are you sure you want to proceed?",
                   onConfirm: () {

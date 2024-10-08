@@ -54,11 +54,16 @@ static success({
             transitionDuration: Duration(milliseconds: 150),  
 
       AlertDialog(
-        title: title ?? Text("Error", style: TextStyle(color: Colors.red)),
+       
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            Container(width: Get.size.width,),
             if (visualContent != null) visualContent,
+             
+            Text("Error", style: Get.textTheme.titleLarge?.copyWith(
+              color: Colors.red
+            )),
             if (content != null) content,
           ],
         ),
@@ -75,6 +80,7 @@ static success({
 
   // Loading Dialog with optional Lottie/SVG/Image
   static loading({
+    ShapeBorder? shape,    
     Widget? content,
     Widget? visualContent,  // Lottie/SVG/Image widget
     bool barrierDismissible = false,
@@ -83,11 +89,13 @@ static success({
             transitionDuration: Duration(milliseconds: 150),  
 
       AlertDialog(
+        shape: shape,
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+             Container(width: Get.size.width,),
             if (visualContent != null) visualContent,
-            if (content != null) SizedBox(height: 20),
+             
             if (content != null) content,
           ],
         ),
@@ -111,15 +119,32 @@ static success({
             transitionDuration: Duration(milliseconds: 150),  
 
       AlertDialog(
-        title: Text(titleText),
+        
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             if (visualContent != null) visualContent,
-            Text(contentText),
+              Gap(8), // Spacing between title and content
+
+                   Text(
+      titleText,
+      style: Get.textTheme.titleLarge?.copyWith(
+        fontWeight: FontWeight.bold, // Bold title
+      ),
+      textAlign: TextAlign.center, // Center the title
+    ),
+    Text(
+      contentText,
+      style: Get.textTheme.bodyMedium?.copyWith(
+        fontSize: 14, // Smaller font for content
+        color: Colors.grey, // Lighter color for the content
+      ),
+      textAlign: TextAlign.center, // Center the content text
+    ),
           ],
         ),
         actions: [
+ 
           TextButton(
             onPressed: onCancel ?? () => Get.back(),
             child: Text(cancelText),
