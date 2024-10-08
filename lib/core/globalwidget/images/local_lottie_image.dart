@@ -1,27 +1,30 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
 class LocalLottieImage extends StatelessWidget {
+  final String path;
+  final double? width;
+  final double? height;
+  final BoxFit? fit;
+  final bool repeat;
 
-  final String imagePath;
-  double? width;
-  double? height;
-  
   LocalLottieImage({
     Key? key,
-    required this.imagePath,
+    required this.path,
     this.width,
     this.height,
+    this.fit = BoxFit.contain,
+    this.repeat = true, // Default repeat to true
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Lottie.asset(
-  imagePath,
-  width: width?? 200,
-  height: height ?? 200,
-  fit: BoxFit.fill,
-);
+      path,
+      repeat: repeat, // This ensures repeat is true by default
+      width: width ?? 160, // Default width
+      height: height ?? 160, // Default height
+      fit: fit,
+    );
   }
 }

@@ -6,6 +6,7 @@ import 'package:geolocation/features/home/admin_home_main_page.dart';
 import 'package:geolocation/features/map/sample_map.dart';
 import 'package:geolocation/features/members/member_page.dart';
 import 'package:geolocation/features/notification/notification_page.dart';
+import 'package:geolocation/features/playground/modal_test_page.dart';
 import 'package:geolocation/features/role/login_selection_page.dart';
 import 'package:geolocation/features/signin/controllers/login_controller.dart';
 import 'package:geolocation/features/signin/login_page.dart';
@@ -66,7 +67,7 @@ class _GeoLocationAppState extends State<GeoLocationApp>  with WidgetsBindingObs
     return GetMaterialApp(
       theme: AppTheme.UI,
       debugShowCheckedModeBanner: false,
-      home: AdminHomeMainPage(),
+      home: ModalTestPage(),
       getPages: [
         GetPage(name: '/', page: () => LoginPage()),
         GetPage(name: '/login-selection', page: () => LoginSelectionPage()),

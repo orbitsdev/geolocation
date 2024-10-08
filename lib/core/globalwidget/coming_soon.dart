@@ -18,7 +18,7 @@ const ComingSoon({ Key? key }) : super(key: key);
           Gap(16),
           Text('COMING SOON', style: Get.textTheme.titleLarge?.copyWith(),),
           Gap(16),
-          LocalLottieImage(imagePath: lottiesPath('coming-soon.json'),),
+          LocalLottieImage(repeat: false, path: lottiesPath('coming-soon.json'),),
         ],
       );
   }
