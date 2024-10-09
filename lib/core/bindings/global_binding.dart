@@ -19,7 +19,7 @@ import 'package:get/get.dart';
 class GlobalBinding extends Bindings {
   @override
   void dependencies() {
-     Get.put<AuthController>(AuthController(), permanent: true);  // Global dependency
+  Get.put<AuthController>(AuthController(), permanent: true);
     
     // Controllers that might only be used on specific pages
     Get.lazyPut(() => ProfileController(), fenix: true);

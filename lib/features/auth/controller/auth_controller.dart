@@ -13,46 +13,69 @@ import 'package:geolocation/core/localdata/secure_storage.dart';
 import 'package:geolocation/core/api/dio/failure.dart'; // Import your Failure model
 
 class AuthController extends GetxController {
-  // Form keys for login and signup
+  static AuthController controller = Get.find();
+
+
+
   final loginFormKey = GlobalKey<FormBuilderState>();
   final signupFormKey = GlobalKey<FormBuilderState>();
 
-  // Observable for password toggle in login and signup
-  var obscureText = true.obs; // For login page password
-  var obscurePassword = true.obs; // For signup page password
-  var obscureConfirm = true.obs; // For signup page confirm password
+  var obscureText = true.obs;
+  var obscurePassword = true.obs;
+  var obscureConfirm = true.obs;
 
-  // Loading states for login and signup
   var isLoginLoading = false.obs;
   var isSignupLoading = false.obs;
 
-  // Remember me state
   var rememberMe = false.obs;
 
-  // Observable for storing user details
   var user = User().obs;
+  var token = '323'.obs;  //
+    var isTokenLoaded = false.obs;  // Flag to check if the token is loaded
 
-  // Toggle password visibility for login
+  @override
+  void onInit() {
+    super.onInit();
+    loadTokenAndUser();  // Load token and user on init
+  }
+
+  Future<void> loadTokenAndUser() async {
+    String? savedToken = await SecureStorage().readSecureData('token');
+    print('from init');
+    
+    if (savedToken != null) {
+      token.value = savedToken;
+      print(token.value);  // Store the token
+
+      // Fetch user details from storage
+      String? userJson = await SecureStorage().readSecureData('user');
+      if (userJson != null) {
+        user(User.fromJson(jsonDecode(userJson)));  // Store user details
+      }
+    }
+
+    isTokenLoaded.value = true;  // Mark token loading as complete
+  }
+
+  bool isLoggedIn() {
+    return token.isNotEmpty;  // Simple check to see if user is logged in
+  }
   void togglePassword() {
     obscureText.value = !obscureText.value;
   }
 
-  // Toggle password visibility for signup
   void togglePasswordSignup() {
     obscurePassword.value = !obscurePassword.value;
   }
 
-  // Toggle confirm password visibility for signup
   void togglePasswordConfirm() {
     obscureConfirm.value = !obscureConfirm.value;
   }
 
-  // Toggle Remember Me checkbox
   void toggleRememberMe() {
     rememberMe.value = !rememberMe.value;
   }
 
-  // Handle login
   Future<void> login() async {
     if (loginFormKey.currentState?.saveAndValidate() ?? false) {
       final formData = loginFormKey.currentState?.value;
@@ -79,11 +102,11 @@ class AuthController extends GetxController {
         'password': formData?['password'],
       });
 
-      Get.back(); // Dismiss loading modal
+      Get.back();
 
       response.fold(
         (failure) {
-          failure.printError(); // Use Failure's error printing
+          failure.printError();
           Modal.error(
             content: Text(failure.message ?? 'Something went wrong.'),
             visualContent: LocalLottieImage(
@@ -93,19 +116,15 @@ class AuthController extends GetxController {
           );
         },
         (success) async {
-          final data = success.data;
 
-          // Store token and user details
+          final data = success.data;
           await SecureStorage().writeSecureData('token', data['access_token']);
           await SecureStorage().writeSecureData('user', data['user']);
-
-          // Update the user observable
-          user(User.fromJson(data['user']));
-
-          // Navigate to home after login success
+          fetchUserFromStorage();
           Get.offAllNamed('/home-main');
         },
       );
+
       isLoginLoading(false);
     } else {
       Modal.error(content: Text('Please fill all fields.'));
@@ -154,25 +173,11 @@ class AuthController extends GetxController {
         },
         (success) async {
           final data = success.data['data'];
-
-          print(data['access_token']);
-          print(data['user']);
-          // Store token and user details
           await SecureStorage().writeSecureData('token', data['access_token']);
-          await SecureStorage().writeSecureData('user',
-              jsonEncode(data['user'])); // Serialize the user data to JSON
-
-
-          user(User.fromJson(data['user']));
-          print(user.toJson());
-
-        
-
-          // // Update the user observable
-          //  user(User.fromJson(data['user']));
-          // print(user.toJson());
-          // // Navigate to home after signup success
-         // Get.offAllNamed('/home-main');
+          await SecureStorage().writeSecureData('user', jsonEncode(data['user'])); 
+          fetchUserFromStorage();
+          Get.offAllNamed('/home-main');
+         
         },
       );
       isSignupLoading(false);
@@ -197,13 +202,11 @@ class AuthController extends GetxController {
       ),
     );
 
-    // Create an instance of ApiService
     final apiService = ApiService();
 
-    // Call the logout API
     final response = await apiService.postAuthenticatedResource('logout', {});
 
-    Get.back(); // Dismiss loading modal
+    Get.back();
 
     response.fold(
       (failure) {
@@ -214,16 +217,27 @@ class AuthController extends GetxController {
         );
       },
       (success) async {
-        // Clear token and user details
         await SecureStorage().deleteSecureData('token');
         await SecureStorage().deleteSecureData('user');
 
-        // Clear the user observable
         user(User());
 
-        // Navigate to login page
+
         Get.offAllNamed('/login');
       },
     );
+  }
+
+  Future<void> fetchUserFromStorage() async {
+    String? userJson = await SecureStorage().readSecureData('user');
+
+    if (userJson != null) {
+      Map<String, dynamic> userMap = jsonDecode(userJson);
+      user(User.fromJson(userMap));
+
+      print(user.toJson());
+    } else {
+      print('No user found in storage');
+    }
   }
 }
