@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:geolocation/core/api/dio/api_service.dart';
+import 'package:geolocation/core/constant/path.dart';
+import 'package:geolocation/core/globalwidget/images/local_image_widget.dart';
+import 'package:geolocation/core/globalwidget/images/local_lottie_image.dart';
 import 'package:geolocation/core/modal/modal.dart';
 import 'package:geolocation/features/auth/model/user.dart';
 import 'package:get/get.dart';
@@ -81,7 +84,7 @@ class AuthController extends GetxController {
           failure.printError();  // Use Failure's error printing
           Modal.error(
             content: Text(failure.message ?? 'Something went wrong.'),
-            visualContent: failure.icon,
+            visualContent: LocalLottieImage(path: lottiesPath('error.json'), repeat: false,),
           );
         },
         (success) async {
