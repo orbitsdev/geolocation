@@ -54,7 +54,7 @@ class LoginPage extends StatelessWidget {
               Container(
                 padding: EdgeInsets.only(
                   left: 22,
-                  right: 32,
+                  right: 22,
                   top: 34,
                   bottom: 16,
                 ),

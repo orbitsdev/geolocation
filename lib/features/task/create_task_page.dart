@@ -85,49 +85,49 @@ class CreateTaskPage extends StatelessWidget {
                         ?.copyWith(color: Palette.LIGHT_TEXT),
                   ),
                   Gap(2),
-                  FormBuilderDropdown<String>(
-                    dropdownColor: Colors.white,
-                    style: Get.textTheme.bodyMedium!.copyWith(),
-                    name: 'officer',
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Palette.LIGHT_BACKGROUND,
-                      contentPadding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 10),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            width: 0.5, color: Palette.PRIMARY),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      border: OutlineInputBorder(
-                        borderSide: const BorderSide(
-                            width: 1.0, color: Colors.transparent),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(
-                            width: 1.0, color: Colors.transparent),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      errorBorder: OutlineInputBorder(
-                        borderSide:
-                            const BorderSide(width: 1.0, color: Colors.red),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    validator: FormBuilderValidators.compose([
-                      FormBuilderValidators.required(),
-                    ]),
-                    items: samplePositions
-                        .map((position) => DropdownMenuItem(
-                              value: position.name,
-                              child: Text(position.name),
-                            ))
-                        .toList(),
-                    onChanged: (value) {
-                      print('Selected officer: $value');
-                    },
-                  ),
+                  // FormBuilderDropdown<String>(
+                  //   dropdownColor: Colors.white,
+                  //   style: Get.textTheme.bodyMedium!.copyWith(),
+                  //   name: 'officer',
+                  //   decoration: InputDecoration(
+                  //     filled: true,
+                  //     fillColor: Palette.LIGHT_BACKGROUND,
+                  //     contentPadding: const EdgeInsets.symmetric(
+                  //         vertical: 10, horizontal: 10),
+                  //     focusedBorder: OutlineInputBorder(
+                  //       borderSide: BorderSide(
+                  //           width: 0.5, color: Palette.PRIMARY),
+                  //       borderRadius: BorderRadius.circular(12),
+                  //     ),
+                  //     border: OutlineInputBorder(
+                  //       borderSide: const BorderSide(
+                  //           width: 1.0, color: Colors.transparent),
+                  //       borderRadius: BorderRadius.circular(12),
+                  //     ),
+                  //     enabledBorder: OutlineInputBorder(
+                  //       borderSide: const BorderSide(
+                  //           width: 1.0, color: Colors.transparent),
+                  //       borderRadius: BorderRadius.circular(12),
+                  //     ),
+                  //     errorBorder: OutlineInputBorder(
+                  //       borderSide:
+                  //           const BorderSide(width: 1.0, color: Colors.red),
+                  //       borderRadius: BorderRadius.circular(12),
+                  //     ),
+                  //   ),
+                  //   validator: FormBuilderValidators.compose([
+                  //     FormBuilderValidators.required(),
+                  //   ]),
+                  //   items: samplePositions
+                  //       .map((position) => DropdownMenuItem(
+                  //             value: position.name,
+                  //             child: Text(position.name),
+                  //           ))
+                  //       .toList(),
+                  //   onChanged: (value) {
+                  //     print('Selected officer: $value');
+                  //   },
+                  // ),
                   Gap(16),
 
                   // Task Description
