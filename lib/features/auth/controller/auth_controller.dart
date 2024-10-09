@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:geolocation/core/api/dio/api_service.dart';
@@ -8,7 +10,7 @@ import 'package:geolocation/core/modal/modal.dart';
 import 'package:geolocation/features/auth/model/user.dart';
 import 'package:get/get.dart';
 import 'package:geolocation/core/localdata/secure_storage.dart';
-import 'package:geolocation/core/api/dio/failure.dart';  // Import your Failure model
+import 'package:geolocation/core/api/dio/failure.dart'; // Import your Failure model
 
 class AuthController extends GetxController {
   // Form keys for login and signup
@@ -16,9 +18,9 @@ class AuthController extends GetxController {
   final signupFormKey = GlobalKey<FormBuilderState>();
 
   // Observable for password toggle in login and signup
-  var obscureText = true.obs;  // For login page password
-  var obscurePassword = true.obs;  // For signup page password
-  var obscureConfirm = true.obs;  // For signup page confirm password
+  var obscureText = true.obs; // For login page password
+  var obscurePassword = true.obs; // For signup page password
+  var obscureConfirm = true.obs; // For signup page confirm password
 
   // Loading states for login and signup
   var isLoginLoading = false.obs;
@@ -77,14 +79,17 @@ class AuthController extends GetxController {
         'password': formData?['password'],
       });
 
-      Get.back();  // Dismiss loading modal
+      Get.back(); // Dismiss loading modal
 
       response.fold(
         (failure) {
-          failure.printError();  // Use Failure's error printing
+          failure.printError(); // Use Failure's error printing
           Modal.error(
             content: Text(failure.message ?? 'Something went wrong.'),
-            visualContent: LocalLottieImage(path: lottiesPath('error.json'), repeat: false,),
+            visualContent: LocalLottieImage(
+              path: lottiesPath('error.json'),
+              repeat: false,
+            ),
           );
         },
         (success) async {
@@ -137,82 +142,88 @@ class AuthController extends GetxController {
         'password_confirmation': formData?['password_confirmation'],
       });
 
-      Get.back();  // Dismiss loading modal
+      Get.back(); // Dismiss loading modal
 
       response.fold(
         (failure) {
-          failure.printError();  // Use Failure's error printing
+          failure.printError(); // Use Failure's error printing
           Modal.error(
             content: Text(failure.message ?? 'Something went wrong.'),
             visualContent: failure.icon,
           );
         },
         (success) async {
-          final data = success.data;
+          final data = success.data['data'];
 
+          print(data['access_token']);
+          print(data['user']);
           // Store token and user details
           await SecureStorage().writeSecureData('token', data['access_token']);
-          await SecureStorage().writeSecureData('user', data['user']);
+          await SecureStorage().writeSecureData('user',
+              jsonEncode(data['user'])); // Serialize the user data to JSON
 
-          // Update the user observable
+
           user(User.fromJson(data['user']));
+          print(user.toJson());
 
-          // Navigate to home after signup success
-          Get.offAllNamed('/home-main');
+        
+
+          // // Update the user observable
+          //  user(User.fromJson(data['user']));
+          // print(user.toJson());
+          // // Navigate to home after signup success
+         // Get.offAllNamed('/home-main');
         },
       );
       isSignupLoading(false);
-    } else {
-      Modal.error(content: Text('Please fill all fields.'));
     }
   }
 
   // Handle logout with API call
   Future<void> logout() async {
-  Modal.loading(
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
-    content: Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        SizedBox(width: 24),
-        CircularProgressIndicator(),
-        SizedBox(width: 36),
-        Text(
-          "Logging out...",
-          style: Get.textTheme.titleMedium,
-        ),
-      ],
-    ),
-  );
+    Modal.loading(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+      content: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          SizedBox(width: 24),
+          CircularProgressIndicator(),
+          SizedBox(width: 36),
+          Text(
+            "Logging out...",
+            style: Get.textTheme.titleMedium,
+          ),
+        ],
+      ),
+    );
 
-  // Create an instance of ApiService
-  final apiService = ApiService();
-  
-  // Call the logout API
-  final response = await apiService.postAuthenticatedResource('logout', {});
+    // Create an instance of ApiService
+    final apiService = ApiService();
 
-  Get.back();  // Dismiss loading modal
+    // Call the logout API
+    final response = await apiService.postAuthenticatedResource('logout', {});
 
-  response.fold(
-    (failure) {
-      failure.printError();
-      Modal.error(
-        content: Text(failure.message ?? 'Logout failed.'),
-        visualContent: failure.icon,
-      );
-    },
-    (success) async {
-      // Clear token and user details
-      await SecureStorage().deleteSecureData('token');
-      await SecureStorage().deleteSecureData('user');
+    Get.back(); // Dismiss loading modal
 
-      // Clear the user observable
-      user(User());
+    response.fold(
+      (failure) {
+        failure.printError();
+        Modal.error(
+          content: Text(failure.message ?? 'Logout failed.'),
+          visualContent: failure.icon,
+        );
+      },
+      (success) async {
+        // Clear token and user details
+        await SecureStorage().deleteSecureData('token');
+        await SecureStorage().deleteSecureData('user');
 
-      // Navigate to login page
-      Get.offAllNamed('/login');
-    },
-  );
-}
+        // Clear the user observable
+        user(User());
 
+        // Navigate to login page
+        Get.offAllNamed('/login');
+      },
+    );
+  }
 }

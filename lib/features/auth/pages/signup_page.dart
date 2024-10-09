@@ -166,25 +166,7 @@ class SignupPage extends GetView<AuthController> {
                     ],
                   ),
                 ),
-                const Gap(8),
-                RichText(
-                  text: TextSpan(
-                    text: 'Already have an account? ',
-                    style: Get.textTheme.bodyMedium
-                        ?.copyWith(color: Colors.white),
-                    children: <TextSpan>[
-                      TextSpan(
-                          text: ' Login',
-                          style: Get.textTheme.bodyMedium?.copyWith(
-                              color: Palette.PRIMARY,
-                              fontWeight: FontWeight.bold),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () {
-                              Get.back();
-                            }),
-                    ],
-                  ),
-                ),
+               
               ],
             ),
           ),
