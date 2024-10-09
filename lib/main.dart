@@ -20,6 +20,7 @@ import 'package:geolocation/features/role/login_selection_page.dart';
 import 'package:geolocation/features/auth/controller/login_controller.dart';
 import 'package:geolocation/features/auth/pages/login_page.dart';
 import 'package:geolocation/features/auth/pages/signup_page.dart';
+import 'package:geolocation/features/settings/settings_page.dart';
 import 'package:geolocation/features/task/task_page.dart';
 import 'package:get/get.dart';
 
@@ -78,18 +79,15 @@ class _GeoLocationAppState extends State<GeoLocationApp>  with WidgetsBindingObs
       debugShowCheckedModeBanner: false,
       initialRoute: '/login', 
       getPages: [
-        // GetPage(name: '/page1', page: () => Page1() , middlewares: [AuthMiddleware()]),  // No middleware, public page
-        // GetPage(name: '/page2', page: () => Page2(), middlewares: []),  // Protected by middleware
-        // GetPage(name: '/page3', page: () => Page3(), middlewares: [Page1Middleware(),Page2Middleware()]),  // Public page
-        // GetPage(name: '/login', page: () => LoginPageTest(), middlewares: []),  // Login page
-
-        GetPage(name: '/login', page: () => LoginPage(), middlewares:[GuestMiddleware()]),
-        GetPage(name: '/sign-up', page: () => SignupPage(),middlewares:[GuestMiddleware()]),
-        GetPage(name: '/login-selection', page: () => LoginSelectionPage(), middlewares: [AuthMiddleware()]),
-        GetPage(name: '/home-main', page: () => AdminHomeMainPage(), middlewares: [AuthMiddleware()]),
-        GetPage(name: '/event', page: () => EventPage(), middlewares: [AuthMiddleware()]),
-        GetPage(name: '/notifications', page: () => NotificationPage(), middlewares: [AuthMiddleware()]),
-        GetPage(name: '/members', page: () => MemberPage(), middlewares: [AuthMiddleware()]),
+       
+        GetPage(name: '/login', page: () => LoginPage(), middlewares:[]),
+        GetPage(name: '/sign-up', page: () => SignupPage(),middlewares:[]),
+        GetPage(name: '/login-selection', page: () => LoginSelectionPage(), middlewares: []),
+        GetPage(name: '/home-main', page: () => AdminHomeMainPage(), middlewares: []),
+        GetPage(name: '/event', page: () => EventPage(), middlewares: []),
+        GetPage(name: '/notifications', page: () => NotificationPage(), middlewares: []),
+        GetPage(name: '/members', page: () => MemberPage(), middlewares: []),
+        GetPage(name: '/settings', page: () => SettingsPage(), middlewares: []),
       ],
     );
   }

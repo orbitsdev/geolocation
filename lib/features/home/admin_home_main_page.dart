@@ -7,6 +7,7 @@ import 'package:geolocation/features/home/dashboard/dashboard_page.dart';
 import 'package:geolocation/features/management/management_page.dart';
 import 'package:geolocation/features/map/sample_map.dart';
 import 'package:geolocation/features/profile/user_profile_page.dart';
+import 'package:geolocation/features/settings/settings_page.dart';
 import 'package:get/get.dart';
 
 class AdminHomeMainPage extends StatefulWidget {
@@ -23,7 +24,7 @@ class _AdminHomeMainPageState extends State<AdminHomeMainPage> {
     DashboardPage(),
     MapSample(),
     ChatboxPage(),
-    UserProfilePage()
+    SettingsPage()
     
   ];
 

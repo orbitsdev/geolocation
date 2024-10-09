@@ -18,8 +18,8 @@ class AppBinding  extends Bindings{
   @override
   void dependencies() {
 
-    Get.put(LoginController(), permanent: true);
-    Get.put(SignupController(), permanent: true);
+    // Get.put(LoginController(), permanent: true);
+    // Get.put(SignupController(), permanent: true);
     Get.put(ProfileController(), permanent: true);
     Get.put(NotificationController(), permanent: true);
     Get.put(EventController(), permanent: true);

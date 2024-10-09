@@ -25,22 +25,19 @@ class User {
 
   // Factory constructor to create a User from a JSON object
   factory User.fromJson(Map<String, dynamic> json) {
-    return User(
-      id: json['id'],
-      firstName: json['first_name'], // Snake case in the API, camelCase in Dart
-      lastName: json['last_name'],
-      fullName: json['full_name'],
-      email: json['email'],
-      role: json['role'],
-      image: json['image'],
-      councilPositions: (json['council_positions'] as List?)
-          ?.map((position) => CouncilPosition.fromJson(position))
-          .toList(),
-      defaultPosition: json['default_position'] != null
-          ? CouncilPosition.fromJson(json['default_position'])
-          : null,
-    );
-  }
+  return User(
+    id: json['id'],  // Nullable
+    firstName: json['first_name'] ?? null,  // This ensures 'null' is handled correctly
+    lastName: json['last_name'] ?? null,    // This allows for null values
+    fullName: json['full_name'] ?? null,    
+    email: json['email'] ?? null,          
+    role: json['role'] ?? null,            // Null is expected here since role might be null
+    image: json['image'] ?? null,          // Image might be null
+    councilPositions: (json['council_positions'] as List?)?.map((position) => CouncilPosition.fromJson(position)).toList() ?? [],  // Handle null positions list
+    defaultPosition: json['default_position'] != null ? CouncilPosition.fromJson(json['default_position']) : null,  // Handle nullable default position
+  );
+}
+
 
   // Convert User object to JSON for storage if necessary
   Map<String, dynamic> toJson() {
