@@ -31,26 +31,26 @@ class AuthController extends GetxController {
 
   var user = User().obs;
   var token = '323'.obs;  //
-    var isTokenLoaded = false.obs;  // Flag to check if the token is loaded
+  var isTokenLoaded = false.obs;  // Flag to check if the token is loaded
 
-  @override
-  void onInit() {
-    super.onInit();
-    loadTokenAndUser();  // Load token and user on init
-  }
+  // @override
+  // void onInit() {
+  //   super.onInit();
+  //   loadTokenAndUser();  // Load token and user on init
+  // }
 
   Future<void> loadTokenAndUser() async {
     String? savedToken = await SecureStorage().readSecureData('token');
-    print('from init');
+ 
     
     if (savedToken != null) {
       token.value = savedToken;
-      print(token.value);  // Store the token
+     
 
-      // Fetch user details from storage
+     
       String? userJson = await SecureStorage().readSecureData('user');
       if (userJson != null) {
-        user(User.fromJson(jsonDecode(userJson)));  // Store user details
+        user(User.fromJson(jsonDecode(userJson))); 
       }
     }
 

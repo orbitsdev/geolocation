@@ -28,6 +28,9 @@ import 'package:get/get.dart';
 void main() async  {
    WidgetsFlutterBinding.ensureInitialized();
    GlobalBinding().dependencies();
+   await AuthController.controller.loadTokenAndUser();
+   print(AuthController.controller.token.value);
+   print(AuthController.controller.user.toString());
    runApp(const GeoLocationApp());
 }
 

@@ -6,14 +6,13 @@ import 'package:get/get.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
 
 class GuestMiddleware extends GetMiddleware {
-  @override
+   @override
   RouteSettings? redirect(String? route) {
     // Access AuthController
-
-      final AuthController authController = Get.find<AuthController>();
-      print('reidr');
-      print(authController.token.value);
-    return null;
+    final AuthController authController = Get.find<AuthController>();
+ print('from middwlare');
+ print(authController.token);
+ return null;
   }
 
   // @override
