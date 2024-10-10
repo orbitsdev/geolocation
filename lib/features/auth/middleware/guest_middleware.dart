@@ -10,8 +10,10 @@ class GuestMiddleware extends GetMiddleware {
   RouteSettings? redirect(String? route) {
     // Access AuthController
     final AuthController authController = Get.find<AuthController>();
- print('from middwlare');
- print(authController.token);
+   if (authController.token != '') {
+    return const RouteSettings(name: '/home-main');
+    }
+
  return null;
   }
 
