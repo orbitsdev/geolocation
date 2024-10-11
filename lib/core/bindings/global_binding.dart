@@ -1,5 +1,6 @@
 
 
+import 'package:geolocation/core/api/globalcontroller/modal_controller.dart';
 import 'package:geolocation/features/attendance/controller/attendance_controller.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:geolocation/features/collections/controller/collection_controller.dart';
@@ -20,6 +21,7 @@ class GlobalBinding extends Bindings {
   @override
   void dependencies() {
   Get.put<AuthController>(AuthController(), permanent: true);
+  Get.put<ModalController>(ModalController(), permanent: true);
     
     // Controllers that might only be used on specific pages
     Get.lazyPut(() => ProfileController(), fenix: true);

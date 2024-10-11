@@ -25,18 +25,24 @@ class ErrorHandler {
 
         case 401:
           // Handle unauthorized access and check if token exists
-          final AuthController authController = Get.find<AuthController>();
-          if (authController.token.value.isNotEmpty) {
-            // If token exists, call logout and clear data
-            _handleLogout();
-          }
           return Failure(
             exception: exception,
             icon: FaIcon(
               FontAwesomeIcons.triangleExclamation,
               size: 40,
             ),
-            message: "Unauthorized. Logging out...",
+            message: exception.response!.data['message'],
+            statusCode: exception.response?.statusCode?.toInt(),
+          );
+        case 422:
+          // Handle unauthorized access and check if token exists
+          return Failure(
+            exception: exception,
+            icon: FaIcon(
+              FontAwesomeIcons.triangleExclamation,
+              size: 40,
+            ),
+            message: exception.response!.data['message'],
             statusCode: exception.response?.statusCode?.toInt(),
           );
 
@@ -96,43 +102,4 @@ class ErrorHandler {
     }
   }
 
-  // Handle logout when 401 error occurs
-  static Future<void> _handleLogout() async {
-    final AuthController authController = Get.find<AuthController>();
-    
-    // Show loading modal
-    Modal.loading(
-      content: Row(
-        children: [
-          CircularProgressIndicator(),
-          SizedBox(width: 12),
-          Text("Logging out..."),
-        ],
-      ),
-    );
-    
-    try {
-      // Call logout API
-      final response = await authController.logout();
-      
-      if (response) {
-        // If logout API call succeeds, clear local storage
-        await SecureStorage().deleteSecureData('token');
-        await SecureStorage().deleteSecureData('user');
-
-        // Clear user observable
-        authController.user.value = User();
-        authController.token.value = '';
-
-        // Redirect to login page
-        Get.offAllNamed('/login');
-      }
-    } catch (error) {
-      // Handle logout API failure
-      print('Error during logout: $error');
-    } finally {
-      // Dismiss loading modal
-      Get.back();
-    }
-  }
 }

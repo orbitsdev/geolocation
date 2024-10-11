@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gap/gap.dart';
+import 'package:geolocation/core/api/globalcontroller/modal_controller.dart';
+import 'package:geolocation/core/constant/style.dart';
 import 'package:get/get.dart';
 class Modal {
 
@@ -13,6 +15,8 @@ static success({
     VoidCallback? onDismiss,
     bool barrierDismissible = false,
   }) {
+
+
     Get.dialog(
       transitionDuration: Duration(milliseconds: 150),  
       AlertDialog(
@@ -42,7 +46,7 @@ static success({
   }
 
   // Error Dialog with optional Lottie/SVG/Image
-  static error({
+ static error({
     Widget? title,
     Widget? content,
     Widget? visualContent,  // Lottie/SVG/Image widget
@@ -50,33 +54,52 @@ static success({
     VoidCallback? onDismiss,
     bool barrierDismissible = false,
   }) {
-    Get.dialog(
-            transitionDuration: Duration(milliseconds: 150),  
 
+    // Prevent showing multiple dialogs
+    if (ModalController.controller.isDialogVisible.value) {
+        return;
+    }
+
+    // Mark the dialog as visible
+    ModalController.controller.setDialog(true);
+
+    Get.dialog(
       AlertDialog(
-       
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(width: Get.size.width,),
             if (visualContent != null) visualContent,
-             
-            Text("Error", style: Get.textTheme.titleLarge?.copyWith(
-              color: Colors.red
-            )),
+            Text(
+              "Error",
+              style: Get.textTheme.titleLarge?.copyWith(
+                color: Colors.red,
+              ),
+            ),
             if (content != null) content,
           ],
         ),
         actions: [
-          TextButton(
-            onPressed: onDismiss ?? () => Get.back(),
-            child: Text(buttonText ?? "Try Again"),
-          ),
+          SizedBox(
+  width: double.infinity, // Full width
+  child: ElevatedButton(
+    style: ELEVATED_BUTTON_STYLE,
+    onPressed: onDismiss ?? () {
+      ModalController.controller.setDialog(false);
+      Get.back();
+    },
+    child: Text(buttonText ?? "Try Again", style: TextStyle(color: Colors.white) ,),
+  ),
+),
+
         ],
       ),
       barrierDismissible: barrierDismissible,
-    );
+    ).then((_) {
+      // Ensure the dialog visibility is reset even if the dialog is dismissed in other ways
+      ModalController.controller.setDialog(false);
+    });
   }
+
 
   // Loading Dialog with optional Lottie/SVG/Image
   static loading({

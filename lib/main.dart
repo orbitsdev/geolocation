@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocation/core/bindings/app_binding.dart';
 import 'package:geolocation/core/bindings/global_binding.dart';
+import 'package:geolocation/core/localdata/secure_storage.dart';
 import 'package:geolocation/core/theme/app_theme.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:geolocation/features/auth/middleware/auth_middleware.dart';
@@ -28,8 +29,9 @@ import 'package:get/get.dart';
 void main() async  {
    WidgetsFlutterBinding.ensureInitialized();
    GlobalBinding().dependencies();
-   await AuthController.controller.loadTokenAndUser();
+  //   await SecureStorage().writeSecureData('token', '59|EGZxIiwt7PZCGtLUIV2c8SVJGUuSTzjw8GmyzLKFc704c200');
    
+    await AuthController.controller.loadTokenAndUser(showModal: false);
    runApp(const GeoLocationApp());
 }
 
@@ -51,8 +53,16 @@ class _GeoLocationAppState extends State<GeoLocationApp>  with WidgetsBindingObs
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     
+    Future.delayed(Duration.zero, () async {
+      if(AuthController.controller.token.value.isNotEmpty){
+      
+        await AuthController.controller.fetchAndUpdateUserDetails(showModal: true);
+      }
+    });  
     
   }
+
+
   
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {

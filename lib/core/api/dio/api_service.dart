@@ -4,7 +4,9 @@ import 'package:geolocation/core/api/dio/failure.dart';
 import 'package:geolocation/core/error/error_handler.dart';
 import 'package:geolocation/core/api/dio/typedef.dart';
 import 'package:geolocation/core/localdata/secure_storage.dart';
-
+import 'package:geolocation/features/auth/controller/auth_controller.dart';
+import 'package:get/get.dart';
+import 'package:dio/dio.dart' as D;
 // EitherModel typedef for response type
 typedef EitherModel<T> = Either<Failure, T>;
 
@@ -15,7 +17,7 @@ class ApiService {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
     },
-  ));
+  ))..interceptors.add(_getInterceptor());  // Add the interceptor to Dio
 
   // Retrieve the token from SecureStorage for authenticated requests
   static Future<Map<String, dynamic>> _getAuthHeaders({Map<String, dynamic>? additionalHeaders}) async {
@@ -31,19 +33,19 @@ class ApiService {
   }
 
   // GET request for public resources
-  static Future<EitherModel<Response>> getPublicResource(String endpoint) async {
+  static Future<EitherModel<D.Response>> getPublicResource(String endpoint) async {
     try {
-      Response response = await _dio.get(endpoint);
-      return right(response);  // On success, return the response
+      D.Response response = await _dio.get(endpoint);
+      return right(response); // On success, return the response
     } on DioException catch (e) {
-      return left(ErrorHandler.handleError(e));  // On error, return Failure
+      return left(ErrorHandler.handleError(e)); // On error, return Failure
     }
   }
 
   // POST request for public resources
-  static Future<EitherModel<Response>> postPublicResource(String endpoint, dynamic data) async {
+  static Future<EitherModel<D.Response>> postPublicResource(String endpoint, dynamic data) async {
     try {
-      Response response = await _dio.post(endpoint, data: data);
+      D.Response response = await _dio.post(endpoint, data: data);
       return right(response);
     } on DioException catch (e) {
       return left(ErrorHandler.handleError(e));
@@ -51,7 +53,7 @@ class ApiService {
   }
 
   // GET request for authenticated resources
-  static Future<EitherModel<Response>> getAuthenticatedResource(
+  static Future<EitherModel<D.Response>> getAuthenticatedResource(
     String endpoint, {
     Map<String, dynamic>? additionalHeaders,
     Object? data,
@@ -59,7 +61,7 @@ class ApiService {
   }) async {
     try {
       final options = Options(headers: await _getAuthHeaders(additionalHeaders: additionalHeaders));
-      Response response = await _dio.get(endpoint, options: options, queryParameters: queryParameters, data: data);
+      D.Response response = await _dio.get(endpoint, options: options, queryParameters: queryParameters, data: data);
       return right(response);
     } on DioException catch (e) {
       return left(ErrorHandler.handleError(e));
@@ -67,16 +69,74 @@ class ApiService {
   }
 
   // POST request for authenticated resources
-  static Future<EitherModel<Response>> postAuthenticatedResource(
+  static Future<EitherModel<D.Response>> postAuthenticatedResource(
     String endpoint, dynamic data, {
     Map<String, dynamic>? headers,
   }) async {
     try {
       final options = Options(headers: await _getAuthHeaders(additionalHeaders: headers));
-      Response response = await _dio.post(endpoint, data: data, options: options);
+      D.Response response = await _dio.post(endpoint, data: data, options: options);
       return right(response);
     } on DioException catch (e) {
       return left(ErrorHandler.handleError(e));
     }
+  }
+
+  // PUT request for authenticated resources
+  static Future<EitherModel<D.Response>> putAuthenticatedResource(
+    String endpoint, dynamic data, {
+    Map<String, dynamic>? headers,
+  }) async {
+    try {
+      final options = Options(headers: await _getAuthHeaders(additionalHeaders: headers));
+      D.Response response = await _dio.put(endpoint, data: data, options: options);
+      return right(response);
+    } on DioException catch (e) {
+      return left(ErrorHandler.handleError(e));
+    }
+  }
+
+  // PATCH request for authenticated resources
+  static Future<EitherModel<D.Response>> patchAuthenticatedResource(
+    String endpoint, dynamic data, {
+    Map<String, dynamic>? headers,
+  }) async {
+    try {
+      final options = Options(headers: await _getAuthHeaders(additionalHeaders: headers));
+      D.Response response = await _dio.patch(endpoint, data: data, options: options);
+      return right(response);
+    } on DioException catch (e) {
+      return left(ErrorHandler.handleError(e));
+    }
+  }
+
+  // DELETE request for authenticated resources
+  static Future<EitherModel<D.Response>> deleteAuthenticatedResource(
+    String endpoint, {
+    Map<String, dynamic>? headers,
+  }) async {
+    try {
+      final options = Options(headers: await _getAuthHeaders(additionalHeaders: headers));
+      D.Response response = await _dio.delete(endpoint, options: options);
+      return right(response);
+    } on DioException catch (e) {
+      return left(ErrorHandler.handleError(e));
+    }
+  }
+
+  // Global interceptor for handling 401 Unauthorized errors
+  static Interceptor _getInterceptor() {
+    return InterceptorsWrapper(
+      onError: (DioException e, ErrorInterceptorHandler handler) async {
+        if (e.response?.statusCode == 401) {
+          // Token expired or session unauthorized
+          print('401 Unauthorized detected, performing auto logout...');
+          AuthController authController = Get.find<AuthController>();
+          Failure failure = Failure(exception: e);
+          authController.localLogout(failure:failure ); // Call the logout function
+        }
+        return handler.next(e); // Continue with error handling
+      },
+    );
   }
 }
