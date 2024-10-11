@@ -33,34 +33,58 @@ class AuthController extends GetxController {
   var token = ''.obs;  //
   var isTokenLoaded = false.obs;  // Flag to check if the token is loaded
 
-  Future<void> loadTokenAndUser() async {
-  try {
-    // Retrieve token from SecureStorage
-    String? savedToken = await SecureStorage().readSecureData('token');
-    
-    if (savedToken != null && savedToken.isNotEmpty) {
-      token.value = savedToken;
+   Future<void> loadTokenAndUser() async {
+    try {
+      String? savedToken = await SecureStorage().readSecureData('token');
 
-      // Retrieve user data if token exists
-      String? userJson = await SecureStorage().readSecureData('user');
-      
-      if (userJson != null && userJson.isNotEmpty) {
-        // Parse and update user data
-        user(User.fromJson(jsonDecode(userJson))); 
-      } else {
-        print("User data is missing in SecureStorage");
+      if (savedToken != null && savedToken.isNotEmpty) {
+        token.value = savedToken;
+
+        String? userJson = await SecureStorage().readSecureData('user');
+        if (userJson != null && userJson.isNotEmpty) {
+          user(User.fromJson(jsonDecode(userJson)));
+        }
       }
-    } else {
-      print("Token not found or empty");
+    } catch (e) {
+      print("Error loading token and user: $e");
+    } finally {
+      isTokenLoaded.value = true;
+      // After loading the token and user, fetch the latest user details
+      await fetchAndUpdateUserDetails();
     }
-  } catch (e) {
-    print("Error loading token and user: $e");
-  } finally {
-    // Ensure this flag is always set, even if errors occur
-    isTokenLoaded.value = true;  // Mark token loading as complete
   }
-}
 
+Future<void> fetchAndUpdateUserDetails() async {
+    // Ensure token is available before making the API call
+    if (token.value.isNotEmpty) {
+      final response = await ApiService.getAuthenticatedResource('user');
+
+      response.fold(
+        (failure) {
+          print('Error fetching user details: ${failure.message}');
+        },
+        (success) async {
+          final updatedUser = User.fromJson(success.data);
+
+          // Compare the fetched user details with the local one
+          if (updatedUser.toJson() != user.value.toJson()) {
+            // Update the local user observable
+            user(updatedUser);
+
+            // Update user details in SecureStorage
+            await SecureStorage().writeSecureData(
+              'user',
+              jsonEncode(updatedUser.toJson()),
+            );
+
+            print('User details updated locally.');
+          } else {
+            print('No updates in user details.');
+          }
+        },
+      );
+    }
+  }
 
   bool isLoggedIn() {
     return token.isNotEmpty;  // Simple check to see if user is logged in
@@ -207,9 +231,9 @@ class AuthController extends GetxController {
       ),
     );
 
-    final apiService = ApiService();
+    
 
-    final response = await apiService.postAuthenticatedResource('logout', {});
+    final response = await ApiService.postAuthenticatedResource('logout', {});
 
     Get.back();
 
