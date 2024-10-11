@@ -30,32 +30,37 @@ class AuthController extends GetxController {
   var rememberMe = false.obs;
 
   var user = User().obs;
-  var token = '323'.obs;  //
+  var token = ''.obs;  //
   var isTokenLoaded = false.obs;  // Flag to check if the token is loaded
 
-  // @override
-  // void onInit() {
-  //   super.onInit();
-  //   loadTokenAndUser();  // Load token and user on init
-  // }
-
   Future<void> loadTokenAndUser() async {
+  try {
+    // Retrieve token from SecureStorage
     String? savedToken = await SecureStorage().readSecureData('token');
- 
     
-    if (savedToken != null) {
+    if (savedToken != null && savedToken.isNotEmpty) {
       token.value = savedToken;
-     
 
-     
+      // Retrieve user data if token exists
       String? userJson = await SecureStorage().readSecureData('user');
-      if (userJson != null) {
+      
+      if (userJson != null && userJson.isNotEmpty) {
+        // Parse and update user data
         user(User.fromJson(jsonDecode(userJson))); 
+      } else {
+        print("User data is missing in SecureStorage");
       }
+    } else {
+      print("Token not found or empty");
     }
-
+  } catch (e) {
+    print("Error loading token and user: $e");
+  } finally {
+    // Ensure this flag is always set, even if errors occur
     isTokenLoaded.value = true;  // Mark token loading as complete
   }
+}
+
 
   bool isLoggedIn() {
     return token.isNotEmpty;  // Simple check to see if user is logged in

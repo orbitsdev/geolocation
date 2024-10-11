@@ -8,13 +8,16 @@ import 'package:geolocation/features/auth/controller/auth_controller.dart';
 class GuestMiddleware extends GetMiddleware {
    @override
   RouteSettings? redirect(String? route) {
-    // Access AuthController
     final AuthController authController = Get.find<AuthController>();
-   if (authController.token != '') {
-    return const RouteSettings(name: '/home-main');
-    }
 
- return null;
+    // Check if the token is not empty, meaning the user is already logged in
+    if (authController.token.value.isNotEmpty) {
+      // Redirect authenticated users to the home page
+      return RouteSettings(name: '/home-main');
+    } else {
+      // If the token is empty, allow access to guest routes
+      return null;
+    }
   }
 
   // @override

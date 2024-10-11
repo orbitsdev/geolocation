@@ -78,22 +78,22 @@ class _GeoLocationAppState extends State<GeoLocationApp>  with WidgetsBindingObs
     super.dispose();
   }
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) { 
     return GetMaterialApp(
       theme: AppTheme.UI,
       debugShowCheckedModeBanner: false,
       initialRoute: '/login', 
       getPages: [
        
-        GetPage(name: '/loading', page: () => Page1(), middlewares:[GuestMiddleware()]),
-        GetPage(name: '/login', page: () => LoginPage(), middlewares:[GuestMiddleware()]),
-        GetPage(name: '/sign-up', page: () => SignupPage(),middlewares:[GuestMiddleware()]),
-        GetPage(name: '/login-selection', page: () => LoginSelectionPage(), middlewares: [AuthMiddleware()]),
-        GetPage(name: '/home-main', page: () => AdminHomeMainPage(), middlewares: [AuthMiddleware()]),
-        GetPage(name: '/event', page: () => EventPage(), middlewares: [AuthMiddleware()]),
-        GetPage(name: '/notifications', page: () => NotificationPage(), middlewares: [AuthMiddleware()]),
-        GetPage(name: '/members', page: () => MemberPage(), middlewares: [AuthMiddleware()]),
-        GetPage(name: '/settings', page: () => SettingsPage(), middlewares: [AuthMiddleware()]),
+        GetPage(name: '/loading', page: () => Page1(), middlewares:[]),
+        GetPage(name: '/login', page: () => LoginPage(), middlewares:[]),
+        GetPage(name: '/sign-up', page: () => SignupPage(),middlewares:[]),
+        GetPage(name: '/login-selection', page: () => LoginSelectionPage(), middlewares: []),
+        GetPage(name: '/home-main', page: () => AdminHomeMainPage(), middlewares: []),
+        GetPage(name: '/event', page: () => EventPage(), middlewares: []),
+        GetPage(name: '/notifications', page: () => NotificationPage(), middlewares: []),
+        GetPage(name: '/members', page: () => MemberPage(), middlewares: []),
+        GetPage(name: '/settings', page: () => SettingsPage(), middlewares: []),
       ],
     );
   }
