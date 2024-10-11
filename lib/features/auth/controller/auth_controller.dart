@@ -64,23 +64,23 @@ Future<void> fetchAndUpdateUserDetails() async {
           print('Error fetching user details: ${failure.message}');
         },
         (success) async {
-          final updatedUser = User.fromJson(success.data);
-
+          final updatedUser = User.fromJson(success.data['data']);
+          print(updatedUser);
           // Compare the fetched user details with the local one
-          if (updatedUser.toJson() != user.value.toJson()) {
-            // Update the local user observable
-            user(updatedUser);
+          // if (updatedUser.toJson() != user.value.toJson()) {
+          //   // Update the local user observable
+          //   user(updatedUser);
 
-            // Update user details in SecureStorage
-            await SecureStorage().writeSecureData(
-              'user',
-              jsonEncode(updatedUser.toJson()),
-            );
+          //   // Update user details in SecureStorage
+          //   await SecureStorage().writeSecureData(
+          //     'user',
+          //     jsonEncode(updatedUser.toJson()),
+          //   );
 
-            print('User details updated locally.');
-          } else {
-            print('No updates in user details.');
-          }
+          //   print('User details updated locally.');
+          // } else {
+          //   print('No updates in user details.');
+          // }
         },
       );
     }
