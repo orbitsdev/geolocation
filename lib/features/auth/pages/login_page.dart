@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:geolocation/core/constant/style.dart';
+import 'package:geolocation/core/modal/modal.dart';
 import 'package:geolocation/features/auth/pages/signup_page.dart';
 import 'package:get/get.dart';
 import 'package:gap/gap.dart';
@@ -13,6 +14,7 @@ import 'package:gradient_elevated_button/gradient_elevated_button.dart';
 class LoginPage extends GetView<AuthController> {
   @override
   Widget build(BuildContext context) {
+      final loginFormKey = GlobalKey<FormBuilderState>();
     return Scaffold(
       backgroundColor: Palette.PRIMARY,
       body: SafeArea(
@@ -74,13 +76,14 @@ class LoginPage extends GetView<AuthController> {
                     ),
                     Gap(32),
                       FormBuilder(
-                        key: controller.loginFormKey,
+                        key: loginFormKey,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text('Email', style: Get.textTheme.bodyMedium),
                             const Gap(2),
                             FormBuilderTextField(
+                              initialValue: '@gmail.com',
                               name: 'email',
                               decoration: _inputDecoration('Enter your email'),
                               validator: FormBuilderValidators.compose([
@@ -92,6 +95,7 @@ class LoginPage extends GetView<AuthController> {
                             Text('Password', style: Get.textTheme.bodyMedium),
                             const Gap(2),
                             Obx(() => FormBuilderTextField(
+                              initialValue: 'password',
                                   name: 'password',
                                   obscureText: controller.obscureText.value,
                                   decoration: _inputDecoration('Enter your password').copyWith(
@@ -135,9 +139,14 @@ class LoginPage extends GetView<AuthController> {
                                   height: 50,
                                   width: Get.size.width,
                                   child: GradientElevatedButton(
-                                    onPressed: controller.isLoginLoading.value
+                                   onPressed: controller.isLoginLoading.value
                                         ? null
-                                        : () => controller.login(),
+                                        : () async {
+                                            if (loginFormKey.currentState?.saveAndValidate() == true) {
+                                              final formData = loginFormKey.currentState?.value;
+                                              await controller.login(formData);
+                                            }
+                                          },
                                     style: GRADIENT_ELEVATED_BUTTON_STYLE,
                                     child: controller.isLoginLoading.value
                                         ? CircularProgressIndicator(

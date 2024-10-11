@@ -13,8 +13,6 @@ class LoginPageTest extends StatelessWidget {
       body: Center(
         child: ElevatedButton(
           onPressed: () {
-            authController.login();  // Simulate login
-            Get.offNamed('/page2');  // Navigate to Page2 (protected)
           },
           child: Text('Login'),
         ),

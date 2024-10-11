@@ -1,3 +1,8 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart';
+
 import 'package:geolocation/features/members/model/concil_position.dart';
 
 class User {
@@ -33,8 +38,13 @@ class User {
     email: json['email'] ?? null,          
     role: json['role'] ?? null,            // Null is expected here since role might be null
     image: json['image'] ?? null,          // Image might be null
-    councilPositions: (json['council_positions'] as List?)?.map((position) => CouncilPosition.fromJson(position)).toList() ?? [],  // Handle null positions list
-    defaultPosition: json['default_position'] != null ? CouncilPosition.fromJson(json['default_position']) : null,  // Handle nullable default position
+     councilPositions: (json['council_positions'] as List?)
+            ?.map((position) => CouncilPosition.fromJson(position))
+            .toList() ??
+        [],
+    defaultPosition: json['default_position'] != null
+        ? CouncilPosition.fromJson(json['default_position'])
+        : null, // Handle null default positionndle nullable default position
   );
 }
 
@@ -52,5 +62,95 @@ class User {
       'council_positions': councilPositions?.map((e) => e.toJson()).toList(),
       'default_position': defaultPosition?.toJson(),
     };
+  }
+
+  User copyWith({
+    int? id,
+    String? firstName,
+    String? lastName,
+    String? fullName,
+    String? email,
+    String? role,
+    String? image,
+    List<CouncilPosition>? councilPositions,
+    CouncilPosition? defaultPosition,
+  }) {
+    return User(
+      id: id ?? this.id,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
+      fullName: fullName ?? this.fullName,
+      email: email ?? this.email,
+      role: role ?? this.role,
+      image: image ?? this.image,
+      councilPositions: councilPositions ?? this.councilPositions,
+      defaultPosition: defaultPosition ?? this.defaultPosition,
+    );
+  }
+
+  @override
+  String toString() {
+    return 'User(id: $id, firstName: $firstName, lastName: $lastName, fullName: $fullName, email: $email, role: $role, image: $image, councilPositions: $councilPositions, defaultPosition: $defaultPosition)';
+  }
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'id': id,
+      'firstName': firstName,
+      'lastName': lastName,
+      'fullName': fullName,
+      'email': email,
+      'role': role,
+      'image': image,
+      'councilPositions': councilPositions!= null?  councilPositions?.map((x) => x.toMap()).toList() : [],
+      'defaultPosition': defaultPosition?.toMap(),
+    };
+  }
+
+  factory User.fromMap(Map<String, dynamic> map) {
+    return User(
+      id: map['id'] != null ? map['id'] as int : null,
+      firstName: map['firstName'] != null ? map['firstName'] as String : null,
+      lastName: map['lastName'] != null ? map['lastName'] as String : null,
+      fullName: map['fullName'] != null ? map['fullName'] as String : null,
+      email: map['email'] != null ? map['email'] as String : null,
+      role: map['role'] != null ? map['role'] as String : null,
+      image: map['image'] != null ? map['image'] as String : null,
+      councilPositions: map['councilPositions'] != null ? List<CouncilPosition>.from((map['councilPositions'] as List<int>).map<CouncilPosition?>((x) => CouncilPosition.fromMap(x as Map<String,dynamic>),),) : null,
+      defaultPosition: map['defaultPosition'] != null ? CouncilPosition.fromMap(map['defaultPosition'] as Map<String,dynamic>) : null,
+    );
+  }
+
+
+
+
+
+  @override
+  bool operator ==(covariant User other) {
+    if (identical(this, other)) return true;
+  
+    return 
+      other.id == id &&
+      other.firstName == firstName &&
+      other.lastName == lastName &&
+      other.fullName == fullName &&
+      other.email == email &&
+      other.role == role &&
+      other.image == image &&
+      listEquals(other.councilPositions, councilPositions) &&
+      other.defaultPosition == defaultPosition;
+  }
+
+  @override
+  int get hashCode {
+    return id.hashCode ^
+      firstName.hashCode ^
+      lastName.hashCode ^
+      fullName.hashCode ^
+      email.hashCode ^
+      role.hashCode ^
+      image.hashCode ^
+      councilPositions.hashCode ^
+      defaultPosition.hashCode;
   }
 }

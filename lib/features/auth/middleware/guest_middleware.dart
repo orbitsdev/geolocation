@@ -9,15 +9,19 @@ class GuestMiddleware extends GetMiddleware {
    @override
   RouteSettings? redirect(String? route) {
     final AuthController authController = Get.find<AuthController>();
+    print('GUEST MIDDLWARE-------------');
+    print('${authController.token.value}');
+    print('${authController.token.value.isNotEmpty}');
 
     // Check if the token is not empty, meaning the user is already logged in
     if (authController.token.value.isNotEmpty) {
       // Redirect authenticated users to the home page
       return RouteSettings(name: '/home-main');
-    } else {
-      // If the token is empty, allow access to guest routes
-      return null;
     }
+      // If the token is empty, allow access to guest routes
+    print('GUEST MIDDLWARE----------------');
+    
+      return null;
   }
 
   // @override

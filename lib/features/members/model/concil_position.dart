@@ -88,4 +88,145 @@ class CouncilPosition {
       'total_blocked_tasks': totalBlockedTasks,
     };
   }
+
+  CouncilPosition copyWith({
+    int? id,
+    int? councilId,
+    String? councilName,
+    int? userId,
+    String? fullname,
+    String? image,
+    String? position,
+    bool? isLogin,
+    bool? grantAccess,
+    int? totalToDoTasks,
+    int? totalInProgressTasks,
+    int? totalCompletedTasks,
+    int? totalCompletedLateTasks,
+    int? totalDueTasks,
+    int? totalOnHoldTasks,
+    int? totalCancelledTasks,
+    int? totalReviewTasks,
+    int? totalBlockedTasks,
+  }) {
+    return CouncilPosition(
+      id: id ?? this.id,
+      councilId: councilId ?? this.councilId,
+      councilName: councilName ?? this.councilName,
+      userId: userId ?? this.userId,
+      fullname: fullname ?? this.fullname,
+      image: image ?? this.image,
+      position: position ?? this.position,
+      isLogin: isLogin ?? this.isLogin,
+      grantAccess: grantAccess ?? this.grantAccess,
+      totalToDoTasks: totalToDoTasks ?? this.totalToDoTasks,
+      totalInProgressTasks: totalInProgressTasks ?? this.totalInProgressTasks,
+      totalCompletedTasks: totalCompletedTasks ?? this.totalCompletedTasks,
+      totalCompletedLateTasks: totalCompletedLateTasks ?? this.totalCompletedLateTasks,
+      totalDueTasks: totalDueTasks ?? this.totalDueTasks,
+      totalOnHoldTasks: totalOnHoldTasks ?? this.totalOnHoldTasks,
+      totalCancelledTasks: totalCancelledTasks ?? this.totalCancelledTasks,
+      totalReviewTasks: totalReviewTasks ?? this.totalReviewTasks,
+      totalBlockedTasks: totalBlockedTasks ?? this.totalBlockedTasks,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'id': id,
+      'councilId': councilId,
+      'councilName': councilName,
+      'userId': userId,
+      'fullname': fullname,
+      'image': image,
+      'position': position,
+      'isLogin': isLogin,
+      'grantAccess': grantAccess,
+      'totalToDoTasks': totalToDoTasks,
+      'totalInProgressTasks': totalInProgressTasks,
+      'totalCompletedTasks': totalCompletedTasks,
+      'totalCompletedLateTasks': totalCompletedLateTasks,
+      'totalDueTasks': totalDueTasks,
+      'totalOnHoldTasks': totalOnHoldTasks,
+      'totalCancelledTasks': totalCancelledTasks,
+      'totalReviewTasks': totalReviewTasks,
+      'totalBlockedTasks': totalBlockedTasks,
+    };
+  }
+
+  factory CouncilPosition.fromMap(Map<String, dynamic> map) {
+    return CouncilPosition(
+      id: map['id'] != null ? map['id'] as int : null,
+      councilId: map['councilId'] != null ? map['councilId'] as int : null,
+      councilName: map['councilName'] != null ? map['councilName'] as String : null,
+      userId: map['userId'] != null ? map['userId'] as int : null,
+      fullname: map['fullname'] != null ? map['fullname'] as String : null,
+      image: map['image'] != null ? map['image'] as String : null,
+      position: map['position'] != null ? map['position'] as String : null,
+      isLogin: map['isLogin'] != null ? map['isLogin'] as bool : null,
+      grantAccess: map['grantAccess'] != null ? map['grantAccess'] as bool : null,
+      totalToDoTasks: map['totalToDoTasks'] != null ? map['totalToDoTasks'] as int : null,
+      totalInProgressTasks: map['totalInProgressTasks'] != null ? map['totalInProgressTasks'] as int : null,
+      totalCompletedTasks: map['totalCompletedTasks'] != null ? map['totalCompletedTasks'] as int : null,
+      totalCompletedLateTasks: map['totalCompletedLateTasks'] != null ? map['totalCompletedLateTasks'] as int : null,
+      totalDueTasks: map['totalDueTasks'] != null ? map['totalDueTasks'] as int : null,
+      totalOnHoldTasks: map['totalOnHoldTasks'] != null ? map['totalOnHoldTasks'] as int : null,
+      totalCancelledTasks: map['totalCancelledTasks'] != null ? map['totalCancelledTasks'] as int : null,
+      totalReviewTasks: map['totalReviewTasks'] != null ? map['totalReviewTasks'] as int : null,
+      totalBlockedTasks: map['totalBlockedTasks'] != null ? map['totalBlockedTasks'] as int : null,
+    );
+  }
+
+ 
+  @override
+  String toString() {
+    return 'CouncilPosition(id: $id, councilId: $councilId, councilName: $councilName, userId: $userId, fullname: $fullname, image: $image, position: $position, isLogin: $isLogin, grantAccess: $grantAccess, totalToDoTasks: $totalToDoTasks, totalInProgressTasks: $totalInProgressTasks, totalCompletedTasks: $totalCompletedTasks, totalCompletedLateTasks: $totalCompletedLateTasks, totalDueTasks: $totalDueTasks, totalOnHoldTasks: $totalOnHoldTasks, totalCancelledTasks: $totalCancelledTasks, totalReviewTasks: $totalReviewTasks, totalBlockedTasks: $totalBlockedTasks)';
+  }
+
+  @override
+  bool operator ==(covariant CouncilPosition other) {
+    if (identical(this, other)) return true;
+  
+    return 
+      other.id == id &&
+      other.councilId == councilId &&
+      other.councilName == councilName &&
+      other.userId == userId &&
+      other.fullname == fullname &&
+      other.image == image &&
+      other.position == position &&
+      other.isLogin == isLogin &&
+      other.grantAccess == grantAccess &&
+      other.totalToDoTasks == totalToDoTasks &&
+      other.totalInProgressTasks == totalInProgressTasks &&
+      other.totalCompletedTasks == totalCompletedTasks &&
+      other.totalCompletedLateTasks == totalCompletedLateTasks &&
+      other.totalDueTasks == totalDueTasks &&
+      other.totalOnHoldTasks == totalOnHoldTasks &&
+      other.totalCancelledTasks == totalCancelledTasks &&
+      other.totalReviewTasks == totalReviewTasks &&
+      other.totalBlockedTasks == totalBlockedTasks;
+  }
+
+  @override
+  int get hashCode {
+    return id.hashCode ^
+      councilId.hashCode ^
+      councilName.hashCode ^
+      userId.hashCode ^
+      fullname.hashCode ^
+      image.hashCode ^
+      position.hashCode ^
+      isLogin.hashCode ^
+      grantAccess.hashCode ^
+      totalToDoTasks.hashCode ^
+      totalInProgressTasks.hashCode ^
+      totalCompletedTasks.hashCode ^
+      totalCompletedLateTasks.hashCode ^
+      totalDueTasks.hashCode ^
+      totalOnHoldTasks.hashCode ^
+      totalCancelledTasks.hashCode ^
+      totalReviewTasks.hashCode ^
+      totalBlockedTasks.hashCode;
+  }
 }

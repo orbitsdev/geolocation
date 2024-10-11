@@ -7,14 +7,15 @@ class AuthMiddleware extends GetMiddleware {
   @override
   RouteSettings? redirect(String? route) {
     
-    final AuthController authController = Get.find<AuthController>();
+    var  authController = Get.find<AuthController>();
+  print('AUTH MIDDLEWAURE-------------------');
+    print('${authController.token.value}');
+    // print('${!authController.token.value.isEmpty}');
 
-    // Check if the token is not empty
-    if (authController.token.value.isNotEmpty) {
-      return null; // Let the user proceed
-    } else {
-      // If the token is empty, redirect to the login page
-      return RouteSettings(name: '/login');
-    }
+  
+  if(authController.token.value.isEmpty == true){
+   return RouteSettings(name: '/login');  }
+   print('AUTH MIDDLEWAURE---------------------');
+    return null;
   }
 }

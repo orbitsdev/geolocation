@@ -10,6 +10,7 @@ import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:gradient_elevated_button/gradient_elevated_button.dart';
 
 class SignupPage extends GetView<AuthController> {
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(

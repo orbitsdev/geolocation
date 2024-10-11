@@ -16,8 +16,6 @@ class AuthController extends GetxController {
   static AuthController controller = Get.find();
 
 
-
-  final loginFormKey = GlobalKey<FormBuilderState>();
   final signupFormKey = GlobalKey<FormBuilderState>();
 
   var obscureText = true.obs;
@@ -30,10 +28,10 @@ class AuthController extends GetxController {
   var rememberMe = false.obs;
 
   var user = User().obs;
-  var token = ''.obs;  //
-  var isTokenLoaded = false.obs;  // Flag to check if the token is loaded
+  var token = ''.obs; 
+  var isTokenLoaded = false.obs; 
 
-   Future<void> loadTokenAndUser() async {
+  Future<void> loadTokenAndUser() async {
     try {
       String? savedToken = await SecureStorage().readSecureData('token');
 
@@ -49,13 +47,13 @@ class AuthController extends GetxController {
       print("Error loading token and user: $e");
     } finally {
       isTokenLoaded.value = true;
-      // After loading the token and user, fetch the latest user details
+   
       await fetchAndUpdateUserDetails();
     }
   }
 
-Future<void> fetchAndUpdateUserDetails() async {
-    // Ensure token is available before making the API call
+  Future<void> fetchAndUpdateUserDetails() async {
+   
     if (token.value.isNotEmpty) {
       final response = await ApiService.getAuthenticatedResource('user');
 
@@ -64,31 +62,38 @@ Future<void> fetchAndUpdateUserDetails() async {
           print('Error fetching user details: ${failure.message}');
         },
         (success) async {
-          final updatedUser = User.fromJson(success.data['data']);
-          print(updatedUser);
-          // Compare the fetched user details with the local one
-          // if (updatedUser.toJson() != user.value.toJson()) {
-          //   // Update the local user observable
-          //   user(updatedUser);
+           final updatedUser = User.fromJson(success.data['data']);
+  
 
-          //   // Update user details in SecureStorage
-          //   await SecureStorage().writeSecureData(
-          //     'user',
-          //     jsonEncode(updatedUser.toJson()),
-          //   );
+  print('Fetched user: ${updatedUser.toJson()}');
+  print('Local stored user: ${user.value.toJson()}');
+  
 
-          //   print('User details updated locally.');
-          // } else {
-          //   print('No updates in user details.');
-          // }
+  if (updatedUser != user.value) {
+    print('User details are different. Updating local user...');
+    
+
+    user(updatedUser);
+
+  
+    await SecureStorage().writeSecureData(
+      'user',
+      jsonEncode(updatedUser.toJson()),  
+    );
+
+    print('User details updated locally.');
+  } else {
+    print('No updates in user details.');
+  }
         },
       );
     }
   }
 
   bool isLoggedIn() {
-    return token.isNotEmpty;  // Simple check to see if user is logged in
+    return token.isNotEmpty;
   }
+
   void togglePassword() {
     obscureText.value = !obscureText.value;
   }
@@ -105,62 +110,61 @@ Future<void> fetchAndUpdateUserDetails() async {
     rememberMe.value = !rememberMe.value;
   }
 
-  Future<void> login() async {
-    if (loginFormKey.currentState?.saveAndValidate() ?? false) {
-      final formData = loginFormKey.currentState?.value;
+  Future<void> login(Map<String, dynamic>? formData) async {
+    
+    
+    isLoginLoading(true);
+    Modal.loading(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+      content: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          SizedBox(width: 24),
+          CircularProgressIndicator(),
+          SizedBox(width: 36),
+          Text(
+            "Logging in...",
+            style: Get.textTheme.titleMedium,
+          ),
+        ],
+      ),
+    );
 
-      isLoginLoading(true);
-      Modal.loading(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
-        content: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            SizedBox(width: 24),
-            CircularProgressIndicator(),
-            SizedBox(width: 36),
-            Text(
-              "Logging in...",
-              style: Get.textTheme.titleMedium,
-            ),
-          ],
-        ),
-      );
+    final response = await ApiService.postPublicResource('login', {
+      'email': formData!['email'],
+      'password': formData['password'],
+    });
 
-      final response = await ApiService.postPublicResource('login', {
-        'email': formData?['email'],
-        'password': formData?['password'],
-      });
+    Get.back();
 
-      Get.back();
+    response.fold(
+      (failure) {
+        failure.printError();
+        Modal.error(
+          content: Text(failure.message ?? 'Something went wrong.'),
+          visualContent: LocalLottieImage(
+            path: lottiesPath('error.json'),
+            repeat: false,
+          ),
+        );
+      },
+      (success) async {
+        final data = success.data['data'];
+        print('DATA----------------');
+        print(data);
+        print('DATA--------------');
+        await SecureStorage().writeSecureData('token', data['access_token']);
+        await SecureStorage().writeSecureData('user', jsonEncode(data['user']));
+      //  await fetchUserFromStorage();
+      await loadTokenAndUser();
+       Get.offAllNamed('/home-main');
+      },
+    );
 
-      response.fold(
-        (failure) {
-          failure.printError();
-          Modal.error(
-            content: Text(failure.message ?? 'Something went wrong.'),
-            visualContent: LocalLottieImage(
-              path: lottiesPath('error.json'),
-              repeat: false,
-            ),
-          );
-        },
-        (success) async {
-
-          final data = success.data;
-          await SecureStorage().writeSecureData('token', data['access_token']);
-          await SecureStorage().writeSecureData('user', data['user']);
-          fetchUserFromStorage();
-          Get.offAllNamed('/home-main');
-        },
-      );
-
-      isLoginLoading(false);
-    } else {
-      Modal.error(content: Text('Please fill all fields.'));
-    }
+    isLoginLoading(false);
   }
 
-  // Handle signup
+ 
   Future<void> register() async {
     if (signupFormKey.currentState?.saveAndValidate() ?? false) {
       final formData = signupFormKey.currentState?.value;
@@ -194,7 +198,7 @@ Future<void> fetchAndUpdateUserDetails() async {
 
       response.fold(
         (failure) {
-          failure.printError(); // Use Failure's error printing
+          failure.printError(); 
           Modal.error(
             content: Text(failure.message ?? 'Something went wrong.'),
             visualContent: failure.icon,
@@ -203,18 +207,24 @@ Future<void> fetchAndUpdateUserDetails() async {
         (success) async {
           final data = success.data['data'];
           await SecureStorage().writeSecureData('token', data['access_token']);
-          await SecureStorage().writeSecureData('user', jsonEncode(data['user'])); 
-          fetchUserFromStorage();
+          await SecureStorage() .writeSecureData('user', jsonEncode(data['user']));
+         await loadTokenAndUser();
           Get.offAllNamed('/home-main');
-         
         },
       );
       isSignupLoading(false);
     }
   }
+ Future<void> clearLocalData() async {
+    await SecureStorage().deleteSecureData('token');
+    await SecureStorage().deleteSecureData('user');
+    user.value = User();  // Clear user data in-memory
+    token.value = '';     // Clear token in-memory
+  }
 
-  // Handle logout with API call
-  Future<void> logout() async {
+  // Logout function that returns a bool (true for success, false for failure)
+  Future<bool> logout() async {
+    // Show loading modal
     Modal.loading(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
       content: Row(
@@ -231,28 +241,30 @@ Future<void> fetchAndUpdateUserDetails() async {
       ),
     );
 
-    
-
+    // Call the logout API
     final response = await ApiService.postAuthenticatedResource('logout', {});
 
+    // Close the loading modal
     Get.back();
 
-    response.fold(
+    // Handle success or failure response
+    return response.fold(
       (failure) {
+        // Handle logout failure and show error modal
         failure.printError();
         Modal.error(
           content: Text(failure.message ?? 'Logout failed.'),
           visualContent: failure.icon,
         );
+        return false;  // Return false indicating failure
       },
       (success) async {
-        await SecureStorage().deleteSecureData('token');
-        await SecureStorage().deleteSecureData('user');
+        // Clear local data on successful logout
+        await clearLocalData();
 
-        user(User());
-
-
+        // Redirect to login page after successful logout
         Get.offAllNamed('/login');
+        return true;  // Return true indicating success
       },
     );
   }
@@ -269,4 +281,24 @@ Future<void> fetchAndUpdateUserDetails() async {
       print('No user found in storage');
     }
   }
+
+  Future<void> updateUserDetailsLocal(User updatedUser) async {
+  
+  user.value = user.value.copyWith(
+    firstName: updatedUser.firstName ?? user.value.firstName,
+    lastName: updatedUser.lastName ?? user.value.lastName,
+    email: updatedUser.email ?? user.value.email,
+    image: updatedUser.image ?? user.value.image,
+   
+  );
+
+ 
+  await SecureStorage().writeSecureData(
+    'user',
+    jsonEncode(user.value.toJson()), 
+  );
+
+  print('User details updated locally with selected fields.');
+}
+
 }
