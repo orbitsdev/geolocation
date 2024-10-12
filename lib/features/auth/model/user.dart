@@ -96,13 +96,13 @@ class User {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'id': id,
-      'firstName': firstName,
-      'lastName': lastName,
-      'fullName': fullName,
+      'first_name': firstName,
+      'last_name': lastName,
+      'full_name': fullName,
       'email': email,
       'role': role,
       'image': image,
-      'councilPositions': councilPositions!= null?  councilPositions?.map((x) => x.toMap()).toList() : [],
+      'council_position': councilPositions!= null?  councilPositions?.map((x) => x.toMap()).toList() : [],
       'defaultPosition': defaultPosition?.toMap(),
     };
   }
@@ -110,13 +110,13 @@ class User {
   factory User.fromMap(Map<String, dynamic> map) {
     return User(
       id: map['id'] != null ? map['id'] as int : null,
-      firstName: map['firstName'] != null ? map['firstName'] as String : null,
-      lastName: map['lastName'] != null ? map['lastName'] as String : null,
-      fullName: map['fullName'] != null ? map['fullName'] as String : null,
+      firstName: map['first_name'] != null ? map['first_name'] as String : null,
+      lastName: map['last_name'] != null ? map['last_name'] as String : null,
+      fullName: map['full_name'] != null ? map['full_name'] as String : null,
       email: map['email'] != null ? map['email'] as String : null,
       role: map['role'] != null ? map['role'] as String : null,
       image: map['image'] != null ? map['image'] as String : null,
-      councilPositions: map['councilPositions'] != null ? List<CouncilPosition>.from((map['councilPositions'] as List<int>).map<CouncilPosition?>((x) => CouncilPosition.fromMap(x as Map<String,dynamic>),),) : null,
+      councilPositions: map['council_position'] != null ? List<CouncilPosition>.from((map['council_position'] as List<CouncilPosition>).map<CouncilPosition?>((x) => CouncilPosition.fromMap(x as Map<String,dynamic>),),) : null,
       defaultPosition: map['defaultPosition'] != null ? CouncilPosition.fromMap(map['defaultPosition'] as Map<String,dynamic>) : null,
     );
   }
