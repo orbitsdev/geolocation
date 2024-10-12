@@ -4,6 +4,7 @@ import 'package:geolocation/core/api/globalcontroller/modal_controller.dart';
 import 'package:geolocation/features/attendance/controller/attendance_controller.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:geolocation/features/collections/controller/collection_controller.dart';
+import 'package:geolocation/features/councils/controller/council_controller.dart';
 import 'package:geolocation/features/event/controller/event_controller.dart';
 import 'package:geolocation/features/file/controller/files_controller.dart';
 import 'package:geolocation/features/map/controller/sample_map_controller.dart';
@@ -24,6 +25,7 @@ class GlobalBinding extends Bindings {
   Get.put<ModalController>(ModalController(), permanent: true);
     
     // Controllers that might only be used on specific pages
+    Get.lazyPut(() => CouncilController(), fenix: true);
     Get.lazyPut(() => ProfileController(), fenix: true);
     Get.lazyPut(() => NotificationController(), fenix: true);
     Get.lazyPut(() => EventController(), fenix: true);

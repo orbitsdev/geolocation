@@ -13,6 +13,8 @@ import 'package:geolocation/core/localdata/sample_data.dart';
 import 'package:geolocation/core/theme/game_pallete.dart';
 import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/collections/collection_page.dart';
+import 'package:geolocation/features/councils/controller/council_controller.dart';
+import 'package:geolocation/features/councils/pages/council_list_page.dart';
 import 'package:geolocation/features/event/event_page.dart';
 import 'package:geolocation/features/file/file_page.dart';
 import 'package:geolocation/features/home/all_tab.dart';
@@ -46,7 +48,7 @@ class DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<DashboardPage>
     with SingleTickerProviderStateMixin {
   final ScrollController scrollController = ScrollController();
-
+  final councilController = Get.find<CouncilController>();
   late TabController _tabController;
   @override
   void initState() {
@@ -85,6 +87,21 @@ class _DashboardPageState extends State<DashboardPage>
             ),)),
           ),
           SliverGap(16),
+    ToSliver(
+  child: RippleContainer(
+    onTap: () => Get.to(() => CouncilListPage(), transition: Transition.cupertino),
+    child: Obx(() {
+    
+      return OverAllCard(
+        icon: FaIcon(FontAwesomeIcons.users, size: 34, color: Colors.white), // Members
+        title: 'Councils',
+        // Dynamic count using the observable list length
+        count: '${councilController.councils.length}', // Dynamic council count
+      );
+    }),
+  ),
+),
+
     ToSliver(child: RippleContainer(
       onTap: ()=> Get.to(()=> MemberPage(),transition: Transition.cupertino),
       child: OverAllCard(
