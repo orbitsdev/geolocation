@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geolocation/features/councils/pages/council_form_page.dart';
 import 'package:get/get.dart';
 import 'package:geolocation/features/councils/controller/council_controller.dart';
 
@@ -15,7 +16,7 @@ class CouncilListPage extends StatelessWidget {
             icon: Icon(Icons.add),
             onPressed: () {
               // Navigate to the council creation form (to be implemented later)
-              // Get.to(() => CouncilFormPage(), transition: Transition.cupertino);
+               Get.to(() => CouncilFormPage(isEdit: false), transition: Transition.cupertino);
             },
           ),
         ],
@@ -59,9 +60,8 @@ class CouncilListPage extends StatelessWidget {
                   children: [
                     IconButton(
                       icon: Icon(Icons.edit),
-                      onPressed: () {
-                        // Navigate to the edit form (to be implemented later)
-                        // Get.to(() => CouncilFormPage(council: council), transition: Transition.cupertino);
+                      onPressed: () {// Navigate to the edit form (to be implemented later)
+                       Get.to(() => CouncilFormPage(isEdit: true, councilId: council.id!), transition: Transition.cupertino);
                       },
                     ),
                     IconButton(

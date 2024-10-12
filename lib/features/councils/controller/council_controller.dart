@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:geolocation/core/constant/path.dart';
+import 'package:geolocation/core/globalwidget/images/local_lottie_image.dart';
 import 'package:get/get.dart';
 import 'package:geolocation/features/councils/model/council.dart';
 import 'package:geolocation/core/api/dio/api_service.dart';
@@ -21,6 +23,7 @@ class CouncilController extends GetxController {
 
   // Fetch councils from the API with pagination
   Future<void> fetchCouncils({int page = 1}) async {
+    print('called');
     if (isFetchingMore.value || isLastPage.value) return;
 
     isLoading(page == 1); // Show main loading for first page, otherwise, it's fetching more
@@ -68,18 +71,84 @@ class CouncilController extends GetxController {
   }
 
   // Delete a council by ID
-  Future<void> deleteCouncil(int id) async {
-    isLoading(true);
-    final response = await ApiService.deleteAuthenticatedResource('councils/$id');
-    response.fold(
-      (failure) {
-        Modal.error(content: Text(failure.message ?? 'Failed to delete council.'));
+ Future<void> deleteCouncil(int id) async {
+    // Show confirmation dialog before deleting
+    Modal.confirmation(
+      titleText: 'Delete Council',
+      contentText: 'Are you sure you want to delete this council?',
+      onConfirm: () async {
+        // Show loading modal
+        Modal.loading(content: Text('Deleting council...'));
+
+        final response = await ApiService.deleteAuthenticatedResource('councils/$id');
+
+        // Close loading modal
+        Get.back();
+
+        response.fold(
+          (failure) {
+            Modal.error(content: Text(failure.message ?? 'Failed to delete council.'));
+          },
+          (success) {
+            councils.removeWhere((council) => council.id == id); // Remove from local list
+            Modal.success(content: Text('Council deleted successfully.'));
+          },
+        );
       },
-      (success) {
-        councils.removeWhere((council) => council.id == id); // Remove from local list
-        Modal.success(content: Text('Council deleted successfully.'));
+      onCancel: () {
+        // Optional: handle cancel action if needed
       },
     );
-    isLoading(false);
   }
+
+  Future<void> createCouncil(String name) async {
+  // Show the loading modal
+
+
+  final response = await ApiService.postAuthenticatedResource(
+    'councils',
+    {
+      'name': name,
+    },
+  );
+
+  // Close the loading modal
+
+
+  response.fold(
+    (failure) {
+      Modal.error(content: Text(failure.message ?? 'Failed to create council.'));
+    },
+    (success) {
+      fetchCouncils(); // Refresh the list of councils after creation
+     Modal.success(visualContent: LocalLottieImage(repeat:false, path: lottiesPath('success.json')), content: Text('Council created successfully.'));
+    },
+  );
+}
+
+
+  // Update existing council
+  Future<void> updateCouncil(int id, String name) async {
+  // Show the loading modal
+ 
+
+  final response = await ApiService.putAuthenticatedResource(
+    'councils/$id',
+    {
+      'name': name,
+    },
+  );
+
+
+  response.fold(
+    (failure) {
+      Modal.error(content: Text(failure.message ?? 'Failed to update council.'));
+    },
+    (success) {
+      fetchCouncils(); // Refresh the list of councils after update
+      Modal.success(visualContent: LocalLottieImage(repeat:false, path: lottiesPath('success.json')), content: Text('Council updated successfully.'));
+    },
+  );
+}
+
 }
