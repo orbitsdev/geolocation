@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:geolocation/features/members/create_member_page.dart';
+import 'package:geolocation/features/council_positions/pages/create_or_edit_council_member_page.dart';
 import 'package:get/get.dart';
 
 class ManagementPage extends StatelessWidget {

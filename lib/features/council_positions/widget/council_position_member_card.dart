@@ -5,13 +5,13 @@ import 'package:geolocation/core/constant/style.dart';
 import 'package:geolocation/core/globalwidget/images/online_image.dart';
 import 'package:geolocation/core/theme/palette.dart';
 
-import 'package:geolocation/features/members/model/member.dart';
+import 'package:geolocation/features/council_positions/model/member.dart';
 import 'package:get/get.dart';
 import 'package:gradient_elevated_button/gradient_elevated_button.dart';
 
-class MemberCard extends StatelessWidget {
+class CouncilPositionMemberCard extends StatelessWidget {
   final Member member;
-  const MemberCard({
+  const CouncilPositionMemberCard({
     Key? key,
     required this.member,
   }) : super(key: key);

@@ -6,10 +6,11 @@ import 'package:geolocation/core/theme/app_theme.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:geolocation/features/auth/middleware/auth_middleware.dart';
 import 'package:geolocation/features/auth/middleware/guest_middleware.dart';
+import 'package:geolocation/features/councils/pages/council_list_page.dart';
 import 'package:geolocation/features/event/event_page.dart';
 import 'package:geolocation/features/home/admin_home_main_page.dart';
 import 'package:geolocation/features/map/sample_map.dart';
-import 'package:geolocation/features/members/member_page.dart';
+import 'package:geolocation/features/council_positions/pages/council_member_position_list_page.dart';
 import 'package:geolocation/features/notification/notification_page.dart';
 import 'package:geolocation/features/playground/login_page_test.dart';
 import 'package:geolocation/features/playground/modal_test_page.dart';
@@ -101,8 +102,9 @@ class _GeoLocationAppState extends State<GeoLocationApp>  with WidgetsBindingObs
         GetPage(name: '/home-main', page: () => AdminHomeMainPage(), middlewares: [AuthMiddleware()]),
         GetPage(name: '/event', page: () => EventPage(), middlewares: []),
         GetPage(name: '/notifications', page: () => NotificationPage(), middlewares: []),
-        GetPage(name: '/members', page: () => MemberPage(), middlewares: []),
+        GetPage(name: '/members', page: () => CouncilListPage(), middlewares: []),
         GetPage(name: '/settings', page: () => SettingsPage(), middlewares: []),
+        GetPage(name: '/councils', page: () => CouncilListPage(), middlewares: []),
       ],
     );
   }

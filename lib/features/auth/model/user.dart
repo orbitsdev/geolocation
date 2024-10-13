@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 
-import 'package:geolocation/features/members/model/concil_position.dart';
+import 'package:geolocation/features/council_positions/model/concil_position.dart';
 
 class User {
   final int? id;

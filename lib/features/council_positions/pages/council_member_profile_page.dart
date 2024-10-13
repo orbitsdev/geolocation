@@ -7,7 +7,7 @@ import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/task/task_page.dart';
 import 'package:get/get.dart';
 
-class MemberProfilePage extends StatelessWidget {
+class CouncilMemberProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

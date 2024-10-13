@@ -5,7 +5,7 @@ import 'package:geolocation/features/collections/controller/collection_controlle
 import 'package:geolocation/features/event/controller/event_controller.dart';
 import 'package:geolocation/features/file/controller/files_controller.dart';
 import 'package:geolocation/features/map/controller/sample_map_controller.dart';
-import 'package:geolocation/features/members/controller/member_controller.dart';
+import 'package:geolocation/features/council_positions/controller/council_position_controller.dart';
 import 'package:geolocation/features/notification/controller/notification_controller.dart';
 import 'package:geolocation/features/post/controller/post_controller.dart';
 import 'package:geolocation/features/profile/controller/profile_controller.dart';
@@ -23,7 +23,7 @@ class AppBinding  extends Bindings{
     Get.put(ProfileController(), permanent: true);
     Get.put(NotificationController(), permanent: true);
     Get.put(EventController(), permanent: true);
-    Get.put(MemberController(), permanent: true);
+    Get.put(CouncilPositionController(), permanent: true);
     Get.put(TaskController(), permanent: true);
     Get.put(PostController(), permanent: true);
     Get.put(CollectionController(), permanent: true);

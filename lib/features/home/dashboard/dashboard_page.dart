@@ -28,7 +28,7 @@ import 'package:geolocation/features/home/dashboard/widget/profile_section.dart'
 import 'package:geolocation/features/home/files_tab.dart';
 import 'package:geolocation/features/home/posts_tab.dart';
 import 'package:geolocation/core/globalwidget/scroll_container.dart';
-import 'package:geolocation/features/members/member_page.dart';
+import 'package:geolocation/features/council_positions/pages/council_member_position_list_page.dart';
 import 'package:geolocation/features/notification/notification_page.dart';
 import 'package:geolocation/features/post/post_page.dart';
 import 'package:geolocation/features/post/widget/post_card.dart';
@@ -110,14 +110,14 @@ class _DashboardPageState extends State<DashboardPage>
           ),
         ),
         
-            ToSliver(child: RippleContainer(
-        onTap: ()=> Get.to(()=> MemberPage(),transition: Transition.cupertino),
-        child: OverAllCard(
-          icon: FaIcon(FontAwesomeIcons.users, size: 34, color: Colors.white), // Members
-          title: 'Members',
-          count: '242',
-        ),
-            )),
+        //     ToSliver(child: RippleContainer(
+        // onTap: ()=> Get.to(()=> CouncilPositionListPage(),transition: Transition.cupertino),
+        // child: OverAllCard(
+        //   icon: FaIcon(FontAwesomeIcons.users, size: 34, color: Colors.white), // Members
+        //   title: 'Members',
+        //   count: '242',
+        // ),
+        //     )),
             ToSliver(child: RippleContainer(
          onTap: ()=> Get.to(()=> MemberTaskPage(),transition: Transition.cupertino),
         child: OverAllCard(
