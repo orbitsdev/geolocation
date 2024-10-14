@@ -5,7 +5,14 @@ import 'package:flutter/foundation.dart';
 
 import 'package:geolocation/features/council_positions/model/concil_position.dart';
 
+class Role  {
+    static String ADMIN = 'admin';
+    static String User = 'user';
+}
+
 class User {
+
+
   final int? id;
   final String? firstName;
   final String? lastName;
@@ -152,5 +159,9 @@ class User {
       image.hashCode ^
       councilPositions.hashCode ^
       defaultPosition.hashCode;
+  }
+  
+  bool isAdmin(){
+    return this.role == Role.ADMIN;
   }
 }

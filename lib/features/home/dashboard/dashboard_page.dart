@@ -12,6 +12,7 @@ import 'package:geolocation/core/globalwidget/to_sliver.dart';
 import 'package:geolocation/core/localdata/sample_data.dart';
 import 'package:geolocation/core/theme/game_pallete.dart';
 import 'package:geolocation/core/theme/palette.dart';
+import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:geolocation/features/collections/collection_page.dart';
 import 'package:geolocation/features/councils/controller/council_controller.dart';
 import 'package:geolocation/features/councils/pages/council_list_page.dart';
@@ -36,6 +37,7 @@ import 'package:geolocation/features/task/member_task_page.dart';
 import 'package:geolocation/features/task/task_page.dart';
 import 'package:get/get.dart';
 import 'package:heroicons/heroicons.dart';
+import 'package:sliver_tools/sliver_tools.dart';
 import 'package:timeline_tile/timeline_tile.dart';
 
 class DashboardPage extends StatefulWidget {
@@ -49,6 +51,7 @@ class _DashboardPageState extends State<DashboardPage>
     with SingleTickerProviderStateMixin {
   final ScrollController scrollController = ScrollController();
   final councilController = Get.find<CouncilController>();
+  final authcontroller = Get.find<AuthController>();
   late TabController _tabController;
   @override
   void initState() {
@@ -58,9 +61,7 @@ class _DashboardPageState extends State<DashboardPage>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollController.addListener(() {
         if (scrollController.position.pixels ==
-            scrollController.position.maxScrollExtent) {
-          
-        }
+            scrollController.position.maxScrollExtent) {}
       });
     });
   }
@@ -70,8 +71,9 @@ class _DashboardPageState extends State<DashboardPage>
     _tabController.dispose();
     super.dispose();
   }
+
   Future<void> loadData() async {
-      councilController.fetchCouncils();
+    councilController.fetchCouncils();
   }
 
   @override
@@ -79,8 +81,8 @@ class _DashboardPageState extends State<DashboardPage>
     return Scaffold(
       backgroundColor: Palette.BACKGROUND,
       body: RefreshIndicator(
-         triggerMode: RefreshIndicatorTriggerMode.anywhere,
-      onRefresh: ()=> loadData(),
+        triggerMode: RefreshIndicatorTriggerMode.anywhere,
+        onRefresh: () => loadData(),
         child: CustomScrollView(
           physics: AlwaysScrollableScrollPhysics(),
           controller: scrollController,
@@ -89,81 +91,105 @@ class _DashboardPageState extends State<DashboardPage>
             ProfileSection(),
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              sliver: ToSliver(child: Text('Dashboard', style: Get.textTheme.headlineMedium
-              ?.copyWith(
-                fontWeight: FontWeight.bold
-              ),)),
+              sliver: ToSliver(
+                  child: Text(
+                'Dashboard',
+                style: Get.textTheme.headlineMedium
+                    ?.copyWith(fontWeight: FontWeight.bold),
+              )),
             ),
             SliverGap(16),
-            ToSliver(
-          child: RippleContainer(
-            onTap: () => Get.to(() => CouncilListPage(), transition: Transition.cupertino),
-            child: Obx(() {
-            
-        return OverAllCard(
-          icon: FaIcon(FontAwesomeIcons.users, size: 34, color: Colors.white), // Members
-          title: 'Councils',
-          // Dynamic count using the observable list length
-          count: '${councilController.councils.length}', // Dynamic council count
-        );
-            }),
-          ),
+           GetBuilder<AuthController>(
+  builder: (authController) {
+    return authController.user.value.isAdmin() ? ToSliver(
+      child: RippleContainer(
+        onTap: () => Get.to(() => CouncilListPage(), transition: Transition.cupertino),
+        child: GetBuilder<CouncilController>(
+          builder: (councilController) {
+            return OverAllCard(
+              icon: FaIcon(FontAwesomeIcons.users, size: 34, color: Colors.white), // Members
+              title: 'Councils',
+              // Dynamic count using the observable list length
+              count: '${councilController.councils.length}', // Dynamic council count
+            );
+          },
         ),
-        
-        //     ToSliver(child: RippleContainer(
-        // onTap: ()=> Get.to(()=> CouncilPositionListPage(),transition: Transition.cupertino),
-        // child: OverAllCard(
-        //   icon: FaIcon(FontAwesomeIcons.users, size: 34, color: Colors.white), // Members
-        //   title: 'Members',
-        //   count: '242',
-        // ),
-        //     )),
-            ToSliver(child: RippleContainer(
-         onTap: ()=> Get.to(()=> MemberTaskPage(),transition: Transition.cupertino),
-        child: OverAllCard(
-          icon: FaIcon(FontAwesomeIcons.tasks, size: 34, color:Colors.white), // Tasks
-          title: 'Tasks',
-          count: '39',
-        ),
-            )),
-        
-            ToSliver(child: RippleContainer(
-        onTap: ()=> Get.to(()=> PostPage(),transition: Transition.cupertino),
-        child: OverAllCard(
-          icon: FaIcon(FontAwesomeIcons.bullhorn, size: 34, color: Colors.white), // Posts
-          title: 'Posts',
-          count: '58',
-        ),
-            )),
-        ToSliver(child: RippleContainer(
-            onTap: ()=> Get.to(()=> CollectionPage(),transition: Transition.cupertino),
-          child: OverAllCard(
-            icon: FaIcon(FontAwesomeIcons.solidFolder, size: 34, color: Colors.white), // Collections
-            title: 'Collections',
-            count: '180',
-          ),
-        )),
-        
-        ToSliver(child: RippleContainer(
-             onTap: ()=> Get.to(()=> EventPage(),transition: Transition.cupertino),
-          child: OverAllCard(
-            icon: FaIcon(FontAwesomeIcons.calendarCheck, size: 34, color: Colors.white), // Events
-            title: 'Events',
-          count: '16',
-          ),
-        )),
-        
-        ToSliver(child: RippleContainer(
-          onTap: ()=> Get.to(()=> FilesPage(),transition: Transition.cupertino),
-          child: OverAllCard(
-            icon: FaIcon(FontAwesomeIcons.folderOpen, size: 34, color: Colors.white), // Files
-            title: 'Files',
-            count: '87',
-          ),
-        )),
-        
-        
-            
+      ),
+    ) : ToSliver(child: Container());
+  },
+),
+
+          
+             Obx((){
+              return  !authcontroller.user.value.isAdmin() ?  MultiSliver(children: [
+                ToSliver(
+                    child: RippleContainer(
+                  onTap: () => Get.to(() => MemberTaskPage(),
+                      transition: Transition.cupertino),
+                  child: OverAllCard(
+                    icon: FaIcon(FontAwesomeIcons.tasks,
+                        size: 34, color: Colors.white), // Tasks
+                    title: 'Tasks',
+                    count: '39',
+                  ),
+                )),
+                ToSliver(
+                    child: RippleContainer(
+                  onTap: () =>
+                      Get.to(() => PostPage(), transition: Transition.cupertino),
+                  child: OverAllCard(
+                    icon: FaIcon(FontAwesomeIcons.bullhorn,
+                        size: 34, color: Colors.white), // Posts
+                    title: 'Posts',
+                    count: '58',
+                  ),
+                )),
+                ToSliver(
+                    child: RippleContainer(
+                  onTap: () => Get.to(() => CollectionPage(),
+                      transition: Transition.cupertino),
+                  child: OverAllCard(
+                    icon: FaIcon(FontAwesomeIcons.solidFolder,
+                        size: 34, color: Colors.white), // Collections
+                    title: 'Collections',
+                    count: '180',
+                  ),
+                )),
+                ToSliver(
+                    child: RippleContainer(
+                  onTap: () =>
+                      Get.to(() => EventPage(), transition: Transition.cupertino),
+                  child: OverAllCard(
+                    icon: FaIcon(FontAwesomeIcons.calendarCheck,
+                        size: 34, color: Colors.white), // Events
+                    title: 'Events',
+                    count: '16',
+                  ),
+                )),
+                ToSliver(
+                    child: RippleContainer(
+                  onTap: () =>
+                      Get.to(() => FilesPage(), transition: Transition.cupertino),
+                  child: OverAllCard(
+                    icon: FaIcon(FontAwesomeIcons.folderOpen,
+                        size: 34, color: Colors.white), // Files
+                    title: 'Files',
+                    count: '87',
+                  ),
+                )),
+              ]) : ToSliver(child: Container());
+            }
+              
+            ),
+            //     ToSliver(child: RippleContainer(
+            // onTap: ()=> Get.to(()=> CouncilPositionListPage(),transition: Transition.cupertino),
+            // child: OverAllCard(
+            //   icon: FaIcon(FontAwesomeIcons.users, size: 34, color: Colors.white), // Members
+            //   title: 'Members',
+            //   count: '242',
+            // ),
+            //     )),
+
             // SliverPadding(
             //   padding: EdgeInsets.symmetric(
             //     horizontal: 16,
@@ -171,7 +197,7 @@ class _DashboardPageState extends State<DashboardPage>
             //   sliver: ToSliver(
             //     child: Container(
             //       height: 90, // Explicit height
-        
+
             //       child: ListView.builder(
             //         scrollDirection: Axis.horizontal,
             //         itemCount: 10,
@@ -190,13 +216,13 @@ class _DashboardPageState extends State<DashboardPage>
             //     Get.to(() => EventPage(), transition: Transition.cupertino);
             //   },
             // )),
-        
+
             // SliverPadding(
             //   padding: EdgeInsets.symmetric(
             //     horizontal: 16,
             //   ),
             //   sliver: SliverAlignedGrid.count(
-        
+
             //       //  SliverMasonryGrid.count(
             //       crossAxisSpacing: 0,
             //       mainAxisSpacing: 6,
@@ -211,7 +237,7 @@ class _DashboardPageState extends State<DashboardPage>
             //         }
             //       }),
             // ),
-        
+
             // SliverGap(24),
             // ToSliver(
             //     child: TittleWithIconAction(
@@ -220,13 +246,13 @@ class _DashboardPageState extends State<DashboardPage>
             //     Get.to(() => PostPage(), transition: Transition.cupertino);
             //   },
             // )),
-        
+
             // SliverPadding(
             //   padding: EdgeInsets.symmetric(
             //     horizontal: 16,
             //   ),
             //   sliver: SliverAlignedGrid.count(
-        
+
             //       //  SliverMasonryGrid.count(
             //       crossAxisSpacing: 0,
             //       mainAxisSpacing: 6,
@@ -237,7 +263,7 @@ class _DashboardPageState extends State<DashboardPage>
             //         return PostCard();
             //         })
             // ),
-        
+
             // SliverGap(24),
             // SliverPadding(
             //   padding: const EdgeInsets.only(left: 16),
@@ -295,7 +321,7 @@ class _DashboardPageState extends State<DashboardPage>
             //         ]),
             //   ),
             // ),
-        
+
             // SliverFillRemaining(
             //     child: Container(
             //   height: 300,
@@ -310,7 +336,7 @@ class _DashboardPageState extends State<DashboardPage>
             //     ],
             //   ),
             // ))
-        
+
             SliverGap(Get.size.height * 0.05)
           ],
         ),

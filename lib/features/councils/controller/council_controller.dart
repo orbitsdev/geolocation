@@ -9,14 +9,14 @@ import 'package:geolocation/core/api/dio/api_service.dart';
 import 'package:geolocation/core/modal/modal.dart';
 
 class CouncilController extends GetxController {
-  static CouncilController controller = Get.find();
-  var isLoading = false.obs; // For the initial load
-  var isFetchingMore = false.obs; // For paginated loading (infinite scroll)
-  var isLastPage = false.obs; // Flag to check if we have reached the last page
-  var councils = <Council>[].obs; // List of councils
-  var errorMessage = ''.obs; // Error message holder
+  bool isLoading = false; // For the initial load
+  bool isFetchingMore = false; // For paginated loading (infinite scroll)
+  bool isLastPage = false; // Flag to check if we have reached the last page
+  List<Council> councils = []; // List of councils
+  String errorMessage = ''; // Error message holder
 
-  var currentPage = 1.obs; // Tracks the current page being fetched
+  int currentPage = 1; // Tracks the current page being fetched
+  final int perPage = 10; // Number of items to load per page
 
   @override
   void onInit() {
@@ -24,60 +24,63 @@ class CouncilController extends GetxController {
     fetchCouncils(); // Automatically fetch councils when controller is initialized
   }
 
-  void goToCouncilMembers(int councilId){
-      CouncilPositionController.controller.councilId.value = councilId; // Set the new council ID
-CouncilPositionController.controller.clearCouncilPositions(); // Clear previous council data
-Get.to(() => CouncilMemberPositionListPage(), transition: Transition.cupertino);
+  void goToCouncilMembers(int councilId) {
+    CouncilPositionController.controller.councilId.value = councilId; // Set the new council ID
+    CouncilPositionController.controller.clearCouncilPositions(); // Clear previous council data
+    Get.to(() => CouncilMemberPositionListPage(), transition: Transition.cupertino);
   }
 
   // Fetch councils with pagination
   Future<void> fetchCouncils({int page = 1}) async {
-    if (isFetchingMore.value || isLastPage.value) return; // Don't fetch more if already fetching or last page reached
+    if (isFetchingMore || isLastPage) return; // Don't fetch more if already fetching or last page reached
 
-    isLoading(page == 1); // Show main loading for the first page
-    errorMessage(''); // Clear error messages
+    isLoading = page == 1;
+    errorMessage = ''; // Clear error messages
+    update(); // Update the UI
 
     final response = await ApiService.getAuthenticatedResource(
       'councils',
       queryParameters: {
         'page': page,
-        'perPage': 10, // Customize this if needed
+        'perPage': perPage,
       },
     );
 
     response.fold(
       (failure) {
         // Handle error
-        errorMessage(failure.message ?? 'Failed to fetch councils.');
-        Modal.error(content: Text(errorMessage.value));
+        errorMessage = failure.message ?? 'Failed to fetch councils.';
+        Modal.error(content: Text(errorMessage));
+        isLoading = false;
+        update();
       },
       (success) {
         List<dynamic> data = success.data['data'];
         var fetchedCouncils = data.map((json) => Council.fromMap(json)).toList();
 
         if (fetchedCouncils.isEmpty) {
-          isLastPage(true); // No more data, set the last page flag
+          isLastPage = true; // No more data, set the last page flag
         } else {
           if (page == 1) {
-            councils.value = fetchedCouncils; // Replace data on first load
+            councils = fetchedCouncils; // Replace data on first load
           } else {
             councils.addAll(fetchedCouncils); // Append data on subsequent loads
           }
         }
-        currentPage.value = page; // Update the current page number
+        currentPage = page; // Update the current page number
+        isLoading = false;
+        isFetchingMore = false;
+        update();
       },
     );
-
-    // Update the page number and reset loading flags
-    isLoading(false);
-    isFetchingMore(false);
   }
 
   // Load more councils (triggered when the user scrolls to the bottom)
   Future<void> loadMoreCouncils() async {
-    if (!isFetchingMore.value && !isLastPage.value) {
-      isFetchingMore(true);
-      await fetchCouncils(page: currentPage.value + 1); // Increment page for loading more
+    if (!isFetchingMore && !isLastPage) {
+      isFetchingMore = true;
+      update();
+      await fetchCouncils(page: currentPage + 1); // Increment page for loading more
     }
   }
 
@@ -99,6 +102,7 @@ Get.to(() => CouncilMemberPositionListPage(), transition: Transition.cupertino);
           },
           (success) {
             councils.removeWhere((council) => council.id == id); // Remove the deleted council
+            update();
             Modal.success(content: Text('Council deleted successfully.'));
           },
         );
@@ -158,6 +162,33 @@ Get.to(() => CouncilMemberPositionListPage(), transition: Transition.cupertino);
           visualContent: LocalLottieImage(repeat: false, path: lottiesPath('success.json')),
           content: Text('Council updated successfully.'),
         );
+      },
+    );
+  }
+
+  // Reload councils
+  Future<void> loadCouncils() async {
+    isLoading = true;
+    errorMessage = '';
+    update();
+
+    var response = await ApiService.getAuthenticatedResource(
+      'councils',
+      queryParameters: {'page': 1, 'perPage': perPage},
+    );
+
+    response.fold(
+      (failure) {
+        isLoading = false;
+        errorMessage = failure.message ?? 'Failed to load councils';
+        update();
+      },
+      (success) {
+        var councilData = (success.data['data'] as List<dynamic>);
+        councils = councilData.map((json) => Council.fromJson(json)).toList();
+        isLoading = false;
+        isLastPage = councils.length < perPage;
+        update();
       },
     );
   }
