@@ -1,4 +1,4 @@
-
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:geolocation/core/modal/modal.dart';
@@ -6,110 +6,118 @@ import 'package:geolocation/features/auth/model/available_user.dart';
 import 'package:geolocation/features/auth/model/council_position.dart';
 import 'package:geolocation/core/api/dio/api_service.dart';
 import 'package:geolocation/features/auth/model/position_option.dart';
+import 'package:geolocation/features/council_positions/model/member.dart';
 import 'package:geolocation/features/council_positions/pages/council_member_position_list_page.dart';
 import 'package:get/get.dart';
 
 class CouncilPositionController extends GetxController {
   static CouncilPositionController controller = Get.find();
-  var positions = <CouncilPosition>[].obs;
-  var availablePositions = <PositionOption>[].obs;
-  
-  // Separate loading variables
-  var isLoadingCouncilPositions = false.obs;
-  var isLoadingAvailableUsers = false.obs;
-  var isLoadingAvailablePositions = false.obs;
-  var createOrUpdateLoading = false.obs;
+ var isFetchingCouncilPositions = false.obs;
+  var isFetchingUsers = false.obs;
+  var isFetchingAvailablePositions = false.obs;
+  var isCreatingOrUpdating = false.obs;
   var isSearchingUsers = false.obs;
-  
-  
-  var isFetchingMore = false.obs;
-  var isLastPage = false.obs;
-  var errorMessage = ''.obs;
-  var page = 1.obs;
-  var perPage = 20.obs;
-  var councilId = 0.obs;
 
-  // To manage available users and search
-  var availableUsers = <AvailableUser>[].obs;
-  var filteredAvailableUsers = <AvailableUser>[].obs;
+  var isPageLoading = false.obs;
+  var isScrollLoading = false.obs;
+  var currentPage = 1.obs;
+  var itemsPerPage = 20.obs;
+  var totalItems = 0.obs;
+  var councilMembers = <CouncilPosition>[].obs;
+  var selectedCouncilId = 0.obs;
+  var usersAvailableForSelection = <AvailableUser>[].obs;
+  var filteredUsers = <AvailableUser>[].obs;
+  var positionOptions = <PositionOption>[].obs;
+  var chosenUser = Rx<AvailableUser?>(null);
+  var councilPositionFormKey = GlobalKey<FormBuilderState>();
 
 
-  // Selected user and form key for creating/editing council positions
-  var selectedUser = Rx<AvailableUser?>(null);
-  var formKey = GlobalKey<FormBuilderState>();
+void selectAndNavigateToCouncilMemberPage(int id) {
+  if(selectedCouncilId.value != id){
+    print(true);
+    councilMembers.clear();
 
-  // Method to load initial council positions
-  void clearCouncilPositions() {
-    positions.clear();
-    page(1);
-    isLastPage(false);
-    isLoadingCouncilPositions(false);
-    isFetchingMore(false);
-    errorMessage('');
   }
+  selectedCouncilId(id);
+  print('Selected Council ID: ${selectedCouncilId.value}');
+  Get.to(() => CouncilMemberPositionListPage(), transition: Transition.cupertino);
+}
 
-  Future<void> loadCouncilPositions() async {
-    isLoadingCouncilPositions(true);
-    errorMessage('');
-    page(1);
-    isLastPage(false);
-    positions.clear();
+  // Fetch council members
+  Future<void> fetchCouncilMembers() async {
+    isPageLoading(true);
+    currentPage(1);
+    update(); // Using GetBuilder
 
     var response = await ApiService.getAuthenticatedResource(
-      'councils/${councilId.value}/positions',
-      queryParameters: {'page': page.value, 'perPage': perPage.value},
+      'councils/${selectedCouncilId.value}/positions',
+      queryParameters: {'page': currentPage.value, 'perPage': itemsPerPage.value},
     );
 
     response.fold(
       (failure) {
-        isLoadingCouncilPositions(false);
-        errorMessage(failure.message ?? 'Failed to load council positions');
+        isPageLoading(false);
+        Modal.error(content: Text('${failure.message}'));
+        update();
       },
       (success) {
-        var positionData = (success.data['data'] as List<dynamic>);
-        var fetchedPositions = positionData.map((json) => CouncilPosition.fromJson(json)).toList();
+          
 
-        positions.addAll(fetchedPositions);
-        isLastPage(fetchedPositions.length < perPage.value);
-        page.value++;
-        isLoadingCouncilPositions(false);
+        var data = success.data;
+        print(selectedCouncilId.value);
+        print(data['data']);
+        var newData = (data['data'] as List<dynamic>)
+            .map((json) => CouncilPosition.fromJson(json))
+            .toList();
+        councilMembers(newData);
+        currentPage.value++;
+        totalItems.value = data['pagination']['total'];
+        isPageLoading(false);
+          //   print('______________________________________');
+          // newData.forEach((e){
+          //   print(e);
+          // });
+        update();
       },
     );
   }
 
-  // Method to load more council positions for infinite scroll
-  Future<void> loadMoreCouncilPositions() async {
-    if (isLastPage.value || isFetchingMore.value) return;
-
-    isFetchingMore(true);
+  // Fetch council members on scroll
+  Future<void> fetchCouncilMembersOnScroll() async {
+    if (isScrollLoading.value) return;
+    isScrollLoading(true);
+    update(); // Using GetBuilder
 
     var response = await ApiService.getAuthenticatedResource(
-      'councils/${councilId.value}/positions',
-      queryParameters: {'page': page.value, 'perPage': perPage.value},
+      'councils/${selectedCouncilId.value}/positions',
+      queryParameters: {'page': currentPage.value, 'perPage': itemsPerPage.value},
     );
 
     response.fold(
       (failure) {
-        isFetchingMore(false);
-        errorMessage(failure.message ?? 'Failed to load more council positions');
+        isScrollLoading(false);
+        Modal.error(content: Text('${failure.message}'));
+        update();
       },
       (success) {
-        var positionData = success.data['data'] as List<dynamic>;
-        var fetchedPositions = positionData.map((json) => CouncilPosition.fromJson(json)).toList();
-
-        positions.addAll(fetchedPositions);
-        isLastPage(fetchedPositions.length < perPage.value);
-        page.value++;
-        isFetchingMore(false);
+        isScrollLoading(false);
+        var data = success.data;
+        var newData = (data['data'] as List<dynamic>)
+            .map((json) => CouncilPosition.fromJson(json))
+            .toList();
+        councilMembers.addAll(newData);
+        currentPage.value++;
+        totalItems.value = data['pagination']['total'];
+        update();
+      
       },
     );
   }
 
-  // Method to delete a council position
   Future<void> deleteCouncilPosition(int positionId) async {
     Modal.loading(content: const Text('Deleting position...'));
     var response = await ApiService.deleteAuthenticatedResource(
-      'councils/${councilId.value}/positions/$positionId',
+      'councils/${selectedCouncilId.value}/positions/$positionId',
     );
 
     response.fold(
@@ -119,173 +127,163 @@ class CouncilPositionController extends GetxController {
       },
       (success) {
         Get.back(); // Close the modal
-        positions.removeWhere((p) => p.id == positionId);
-        Modal.success(content: const Text('Council position deleted successfully!'));
+        councilMembers.removeWhere((p) => p.id == positionId);
+        update();
+        Modal.success(
+        content: const Text('Council position deleted successfully!'));
       },
     );
   }
 
-  // Method to create a council position
- // Controller methods
 Future<void> createCouncilPosition() async {
-  if (formKey.currentState!.saveAndValidate()) {
-    if (selectedUser.value == null) {
+  if (councilPositionFormKey.currentState!.saveAndValidate()) {
+    if (chosenUser.value == null) {
       Modal.error(content: const Text('Please select a user.'));
       return;
     }
 
     var positionData = {
-      'council_id': councilId.value,
-      'user_id': selectedUser.value!.id,
-      'position': formKey.currentState?.fields['position']?.value,
+      'council_id': selectedCouncilId.value, // Ensure correct council ID
+      'user_id': chosenUser.value!.id,
+      'position': councilPositionFormKey.currentState?.fields['position']?.value,
     };
 
-    // Set loading to true
-    createOrUpdateLoading(true);
-    
+    isCreatingOrUpdating(true);
+
     var response = await ApiService.postAuthenticatedResource(
-      'councils/${councilId.value}/positions',
+      'councils/${selectedCouncilId.value}/positions',
       positionData,
     );
 
     response.fold(
       (failure) {
-        createOrUpdateLoading(false); // Stop loading on failure
+        isCreatingOrUpdating(false);
         Modal.error(content: Text(failure.message!));
       },
-      (success) async{
-        createOrUpdateLoading(false); // Stop loading on success
-        
-        await loadCouncilPositions(); 
-        Get.offUntil(
-          MaterialPageRoute(builder: (_) => CouncilMemberPositionListPage()),
-          (route) => route.isFirst, // Keep removing until we reach the first route (list page)
-        );
-        // Refresh the council positions list after creation
+      (success) async {
+        isCreatingOrUpdating(false);
+        clearSelectedUser();
+        await fetchCouncilMembers(); // Refresh council members
+        // No need to reset selectedCouncilId
+      Get.offNamedUntil('/councils', (route) => route.isFirst);
+
       },
     );
   }
 }
 
-Future<void> updateCouncilPosition(int positionId) async {
-  if (formKey.currentState!.saveAndValidate()) {
-    if (selectedUser.value == null) {
-      Modal.error(content: const Text('Please select a user.'));
-      return;
+
+
+  Future<void> updateCouncilPosition(int positionId) async {
+    if (councilPositionFormKey.currentState!.saveAndValidate()) {
+      if (chosenUser.value == null) {
+        Modal.error(content: const Text('Please select a user.'));
+        return;
+      }
+
+      var positionData = {
+        'council_id': selectedCouncilId.value,
+        'user_id': chosenUser.value!.id,
+        'position': councilPositionFormKey.currentState?.fields['position']?.value,
+      };
+
+      isCreatingOrUpdating(true);
+
+      var response = await ApiService.putAuthenticatedResource(
+        'councils/${selectedCouncilId.value}/positions/$positionId',
+        positionData,
+      );
+
+      response.fold(
+        (failure) {
+          isCreatingOrUpdating(false);
+          update();
+          Modal.error(content: Text(failure.message!));
+        },
+        (success) {
+          isCreatingOrUpdating(false);
+          update();
+          clearSelectedUser();
+          fetchCouncilMembers();
+          Get.offNamedUntil( '/councils', (route) => Get.currentRoute == '/create-or-edit');
+          Get.to(()=>CouncilMemberPositionListPage(),  transition: Transition.cupertino);
+          Modal.success(content: const Text('Position updated successfully!'));
+        },
+      );
     }
+  }
 
-    var positionData = {
-      'council_id': councilId.value,
-      'user_id': selectedUser.value!.id,
-      'position': formKey.currentState?.fields['position']?.value,
-    };
-
-    // Set loading to true
-    createOrUpdateLoading(true);
-    
-    var response = await ApiService.putAuthenticatedResource(
-      'councils/${councilId.value}/positions/$positionId',
-      positionData,
+  Future<void> fetchAvailableUsers() async {
+    isFetchingUsers(true);
+    update();
+    var response = await ApiService.getAuthenticatedResource(
+      'councils/$selectedCouncilId/available-users',
     );
 
     response.fold(
       (failure) {
-        createOrUpdateLoading(false); // Stop loading on failure
+        isFetchingUsers(false);
+        update();
         Modal.error(content: Text(failure.message!));
       },
       (success) {
-        createOrUpdateLoading(false); // Stop loading on success
-        Modal.success(content: const Text('Council position updated successfully!'));
-        loadCouncilPositions(); // Refresh the council positions list after updating
+        isFetchingUsers(false);
+        update();
+        var userData = (success.data['data'] as List<dynamic>);
+        usersAvailableForSelection.value = userData
+            .map((json) => AvailableUser.fromMap(json as Map<String, dynamic>))
+            .toList();
+        filteredUsers.value = usersAvailableForSelection;
+
+        isFetchingUsers(false);
       },
     );
   }
-}
 
-
-  // Method to fetch available users for assigning to a position
-  Future<void> fetchAvailableUsers() async {
-  var response = await ApiService.getAuthenticatedResource(
-    'councils/$councilId/available-users',
-  );
-
-  response.fold(
-    (failure) {
-      // Handle the failure case
-      print('Failed to load available users');
-    },
-    (success) {
-      var userData = (success.data['data'] as List<dynamic>);
-      
-      // This ensures each item in the list is treated as a Map<String, dynamic>
-      availableUsers.value = userData.map((json) => AvailableUser.fromMap(json as Map<String, dynamic>)).toList();
-      filteredAvailableUsers.value = availableUsers;
-
-      // Update loading state
-      isLoadingAvailableUsers(false);
-    },
-  );
-}
-
-
-
-  // Method to fetch available positions for dropdown
-  Future<void> fetchPositions() async {
-    isLoadingAvailablePositions(true);
+  Future<void> fetchAvailablePositions() async {
+    isFetchingAvailablePositions(true);
     var response = await ApiService.getAuthenticatedResource('positions');
     response.fold(
       (failure) {
-        isLoadingAvailablePositions(false);
-        errorMessage(failure.message ?? 'Failed to load positions');
+        isFetchingAvailablePositions(false);
       },
       (success) {
         var positionData = success.data['data'] as List<dynamic>;
-        availablePositions.value = positionData.map((e) => PositionOption.fromJson(e)).toList();
-        isLoadingAvailablePositions(false);
+        positionOptions.value =
+            positionData.map((e) => PositionOption.fromJson(e)).toList();
+        isFetchingAvailablePositions(false);
       },
     );
   }
 
-  // Method to search available users based on input
   Future<void> searchUsersInDatabase(String query) async {
-  // isSearchingUsers(true); // Start loading state
+    var response = await ApiService.getAuthenticatedResource(
+      'councils/$selectedCouncilId/available-users',
+      queryParameters: {
+        'search': query,
+      },
+    );
 
-  var response = await ApiService.getAuthenticatedResource(
-    'councils/$councilId/available-users',
-    queryParameters: {
-      'search': query, // Assuming 'search' is the query parameter for searching users on the server
-    },
-  );
-
-  response.fold(
-    (failure) {
-      isSearchingUsers(false); // Stop loading on failure
-      Modal.error(content: Text(failure.message!));
-    },
-    (success) {
-      print(success.data);
-      // var userData = (success.data['data'] as List<dynamic>);
-      
-      // // This ensures each item in the list is treated as a Map<String, dynamic>
-      // availableUsers.value = userData.map((json) => AvailableUser.fromMap(json as Map<String, dynamic>)).toList();
-      // filteredAvailableUsers.value = availableUsers;
-      // print('_________SErch');
-      // print(userData);
-      
-      // isSearchingUsers(false); // Stop loading on success
-    },
-  );
-}
-
-// Method to decide whether to fetch or search users
-Future<void> searchAvailableUsers(String query) async {
-  if (query.isEmpty) {
-    // Fetch the full list of users when the query is empty
-    await fetchAvailableUsers();
-  } else {
-    // Search in the database when a query is provided
-    await searchUsersInDatabase(query);
+    response.fold(
+      (failure) {
+        isSearchingUsers(false);
+        Modal.error(content: Text(failure.message!));
+      },
+      (success) {
+        print(success.data);
+      },
+    );
   }
-}
 
+  Future<void> searchAvailableUsers(String query) async {
+    if (query.isEmpty) {
+      await fetchAvailableUsers();
+    } else {
+      await searchUsersInDatabase(query);
+    }
+  }
+
+  void clearSelectedUser() {
+    chosenUser.value = null;
+  }
 }

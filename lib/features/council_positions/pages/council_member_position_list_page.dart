@@ -15,23 +15,28 @@ class CouncilMemberPositionListPage extends StatefulWidget {
 
 class _CouncilMemberPositionListPageState extends State<CouncilMemberPositionListPage> {
   final CouncilPositionController _controller = Get.put(CouncilPositionController());
-  final ScrollController _scrollController = ScrollController();
+  final ScrollController newScrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Load initial council positions if the list is empty
-      if (_controller.positions.isEmpty) {
-        _controller.loadCouncilPositions();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (_controller.councilMembers.isEmpty) {
+         
+       _controller.fetchCouncilMembers();
       }
 
-      // Add scroll listener for infinite scrolling
-      _scrollController.addListener(() {
-        if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200 &&
-            !_controller.isFetchingMore.value &&
-            !_controller.isLastPage.value) {
-          _controller.loadMoreCouncilPositions(); // Load more positions on scroll
+      newScrollController.addListener(() async  {
+        if (newScrollController.position.pixels ==  newScrollController.position.maxScrollExtent) {
+
+          
+          double threshold = 200.0;
+
+         if (newScrollController.position.pixels >= newScrollController.position.maxScrollExtent - threshold) {
+           
+              _controller.fetchCouncilMembersOnScroll();
+            
+          }
         }
       });
     });
@@ -55,80 +60,65 @@ class _CouncilMemberPositionListPageState extends State<CouncilMemberPositionLis
           ),
         ],
       ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          await _controller.loadCouncilPositions(); // Reload positions on pull-down refresh
-        },
-        child: Obx(() {
-          if (_controller.isLoadingCouncilPositions .value && _controller.positions.isEmpty) {
-            return const Center(child: CircularProgressIndicator()); // Initial loading
-          } else if (_controller.errorMessage.isNotEmpty) {
-            return Center(child: Text(_controller.errorMessage.value)); // Show error message
-          } else if (_controller.positions.isEmpty) {
-            return const Center(child: Text('No members found')); // No data available
-          } else {
-            return NotificationListener<ScrollNotification>(
-              onNotification: (scrollInfo) {
-                if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent &&
-                    !_controller.isFetchingMore.value &&
-                    !_controller.isLastPage.value) {
-                  _controller.loadMoreCouncilPositions(); // Load more positions when scrolled to the end
-                  return true;
-                }
-                return false;
-              },
-              child: ListView.builder(
-                controller: _scrollController,
-                physics: const AlwaysScrollableScrollPhysics(), // Ensure it's always scrollable
-                itemCount: _controller.positions.length + 1, // +1 for loading indicator at the end
-                itemBuilder: (context, index) {
-                  if (index == _controller.positions.length) {
-                    // Show loading indicator at the bottom while fetching more data
-                    return _controller.isFetchingMore.value
-                        ? const Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Center(child: CircularProgressIndicator()),
-                          )
-                        : const SizedBox.shrink(); // Empty space if not fetching more
-                  }
+      body: Obx(() {
+        if (_controller.isPageLoading.value) {
+          return const Center(child: CircularProgressIndicator()); // Show loading indicator
+        }
+        if (_controller.councilMembers.isEmpty) {
+          return const Center(child: Text('No members found')); // Show empty state
+        }
 
-                  final position = _controller.positions[index];
+        return RefreshIndicator(
+          triggerMode: RefreshIndicatorTriggerMode.anywhere,
+          onRefresh: () async {
+            _controller.fetchCouncilMembers(); // Refresh the list on pull down
+          },
+          child: ListView.builder(
+            controller: newScrollController,
 
-                  // Ensure position.id is passed correctly for delete
-                  return RippleContainer(
-                    onTap: () => Get.to(
-                      () => CouncilMemberProfilePage(),
-                      transition: Transition.cupertino,
-                    ),
-                    child: CouncilPositionCard(
-                      position: position,
-                      onEdit: () {
-                        Get.to(() => CreateOrEditCouncilMemberPage(position: position));
-                      },
-                      onDelete: () {
-  if (position.id != null) {
-    Modal.confirmation(
-      titleText: "Confirm Delete",
-      contentText: "Are you sure you want to delete this council position?",
-      onConfirm: () {
-        _controller.deleteCouncilPosition(position.id!); // Proceed with deletion if confirmed
-      },
-      onCancel: () {
-        Get.back();
-      },
-    );
-  }
+            physics: const AlwaysScrollableScrollPhysics(), // Ensure always scrollable
+            itemCount: _controller.councilMembers.length + 1, // +1 for the loading indicator at the end
+            itemBuilder: (context, index) {
+              if (index == _controller.councilMembers.length) {
+                return _controller.isScrollLoading.value
+                    ? const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Center(child: CircularProgressIndicator()), // Show loading indicator at the end
+                      )
+                    : const SizedBox.shrink(); // No additional data to load
+              }
 
-
-                      },
-                    ),
-                  );
-                },
-              ),
-            );
-          }
-        }),
-      ),
+              final position = _controller.councilMembers[index];
+              return RippleContainer(
+                onTap: () => Get.to(
+                  () => CouncilMemberProfilePage(),
+                  transition: Transition.cupertino,
+                ),
+                child: CouncilPositionCard(
+                  position: position,
+                  onEdit: () {
+                    Get.to(() => CreateOrEditCouncilMemberPage(position: position));
+                  },
+                  onDelete: () {
+                    if (position.id != null) {
+                      Modal.confirmation(
+                        titleText: "Confirm Delete",
+                        contentText: "Are you sure you want to delete this council position?",
+                        onConfirm: () {
+                          _controller.deleteCouncilPosition(position.id!);
+                        },
+                        onCancel: () {
+                          Get.back();
+                        },
+                      );
+                    }
+                  },
+                ),
+              );
+            },
+          ),
+        );
+      }),
     );
   }
 }

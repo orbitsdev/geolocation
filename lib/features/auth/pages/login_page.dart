@@ -14,13 +14,17 @@ import 'package:gradient_elevated_button/gradient_elevated_button.dart';
 class LoginPage extends GetView<AuthController> {
   @override
   Widget build(BuildContext context) {
-      final loginFormKey = GlobalKey<FormBuilderState>();
+    final loginFormKey = GlobalKey<FormBuilderState>();
+
     return Scaffold(
       backgroundColor: Palette.PRIMARY,
       body: SafeArea(
         child: GestureDetector(
-          onTap: (){
+          onTap: () {
+            // Only unfocus if the current focus is not on any form field
+            if (FocusScope.of(context).hasPrimaryFocus) {
               FocusScope.of(context).unfocus();
+            }
           },
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 60),
@@ -54,27 +58,28 @@ class LoginPage extends GetView<AuthController> {
                         style: Get.textTheme.displaySmall
                             ?.copyWith(fontWeight: FontWeight.bold, height: 0),
                       ),
-                    
-                  
-                        Gap(16),
-                    RichText(
-                      text: TextSpan(
+                      Gap(16),
+                      RichText(
+                        text: TextSpan(
                           text: 'Don\'t have an account? ',
                           style: Get.textTheme.bodyMedium
                               ?.copyWith(color: Palette.BLACK_SIMI),
                           children: <TextSpan>[
                             TextSpan(
-                                text: ' Signup',
-                                style: Get.textTheme.bodyMedium?.copyWith(
-                                    color: Palette.PRIMARY,
-                                    fontWeight: FontWeight.bold),
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () {
-                                    Get.to(()=> SignupPage(), transition: Transition.cupertino);
-                                  }),
-                          ]),
-                    ),
-                    Gap(32),
+                              text: ' Signup',
+                              style: Get.textTheme.bodyMedium?.copyWith(
+                                  color: Palette.PRIMARY,
+                                  fontWeight: FontWeight.bold),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  Get.to(() => SignupPage(),
+                                      transition: Transition.cupertino);
+                                },
+                            ),
+                          ],
+                        ),
+                      ),
+                      Gap(32),
                       FormBuilder(
                         key: loginFormKey,
                         child: Column(
@@ -95,10 +100,12 @@ class LoginPage extends GetView<AuthController> {
                             Text('Password', style: Get.textTheme.bodyMedium),
                             const Gap(2),
                             Obx(() => FormBuilderTextField(
-                              initialValue: 'password',
+                                  initialValue: 'password',
                                   name: 'password',
                                   obscureText: controller.obscureText.value,
-                                  decoration: _inputDecoration('Enter your password').copyWith(
+                                  decoration: _inputDecoration(
+                                          'Enter your password')
+                                      .copyWith(
                                     suffixIcon: IconButton(
                                       icon: Icon(controller.obscureText.value
                                           ? Icons.visibility
@@ -128,7 +135,8 @@ class LoginPage extends GetView<AuthController> {
                                 GestureDetector(
                                   onTap: () {},
                                   child: Text("Forgot Password?",
-                                      style: Get.textTheme.bodyMedium!.copyWith(
+                                      style: Get.textTheme.bodyMedium!
+                                          .copyWith(
                                         color: Palette.PRIMARY,
                                       )),
                                 ),
@@ -139,11 +147,15 @@ class LoginPage extends GetView<AuthController> {
                                   height: 50,
                                   width: Get.size.width,
                                   child: GradientElevatedButton(
-                                   onPressed: controller.isLoginLoading.value
+                                    onPressed: controller.isLoginLoading.value
                                         ? null
                                         : () async {
-                                            if (loginFormKey.currentState?.saveAndValidate() == true) {
-                                              final formData = loginFormKey.currentState?.value;
+                                            if (loginFormKey.currentState
+                                                    ?.saveAndValidate() ==
+                                                true) {
+                                              final formData =
+                                                  loginFormKey.currentState
+                                                      ?.value;
                                               await controller.login(formData);
                                             }
                                           },
@@ -164,7 +176,6 @@ class LoginPage extends GetView<AuthController> {
                     ],
                   ),
                 ),
-                
               ],
             ),
           ),

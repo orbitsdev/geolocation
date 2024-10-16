@@ -2,86 +2,92 @@ import 'package:flutter/material.dart';
 import 'package:geolocation/core/constant/path.dart';
 import 'package:geolocation/core/globalwidget/images/local_lottie_image.dart';
 import 'package:geolocation/features/council_positions/controller/council_position_controller.dart';
-import 'package:geolocation/features/council_positions/pages/council_member_position_list_page.dart';
-import 'package:get/get.dart';
 import 'package:geolocation/features/councils/model/council.dart';
 import 'package:geolocation/core/api/dio/api_service.dart';
 import 'package:geolocation/core/modal/modal.dart';
-
+import 'package:get/get.dart';
 class CouncilController extends GetxController {
-  bool isLoading = false; // For the initial load
-  bool isFetchingMore = false; // For paginated loading (infinite scroll)
-  bool isLastPage = false; // Flag to check if we have reached the last page
-  List<Council> councils = []; // List of councils
-  String errorMessage = ''; // Error message holder
-
-  int currentPage = 1; // Tracks the current page being fetched
-  final int perPage = 10; // Number of items to load per page
+  var isLoading = false.obs; // For the initial load
+  var isFetchingMore = false.obs; // For paginated loading (infinite scroll)
+  var councils = <Council>[].obs; // List of councils
+  var currentPage = 1.obs; // Tracks the current page being fetched
+  var itemsPerPage = 10.obs; // Number of items to load per page
+  var totalItems = 0.obs; // Total number of councils from the server
 
   @override
   void onInit() {
     super.onInit();
-    fetchCouncils(); // Automatically fetch councils when controller is initialized
+    fetchCouncils(); // Automatically fetch councils when the controller is initialized
   }
 
-  void goToCouncilMembers(int councilId) {
-    CouncilPositionController.controller.councilId.value = councilId; // Set the new council ID
-    CouncilPositionController.controller.clearCouncilPositions(); // Clear previous council data
-    Get.to(() => CouncilMemberPositionListPage(), transition: Transition.cupertino);
-  }
+  // Fetch councils
+  Future<void> fetchCouncils() async {
+    isLoading(true);
+    currentPage(1); // Reset to the first page when fetching initially
+    update();
 
-  // Fetch councils with pagination
-  Future<void> fetchCouncils({int page = 1}) async {
-    if (isFetchingMore || isLastPage) return; // Don't fetch more if already fetching or last page reached
-
-    isLoading = page == 1;
-    errorMessage = ''; // Clear error messages
-    update(); // Update the UI
-
-    final response = await ApiService.getAuthenticatedResource(
+    var response = await ApiService.getAuthenticatedResource(
       'councils',
-      queryParameters: {
-        'page': page,
-        'perPage': perPage,
-      },
+      queryParameters: {'page': currentPage.value, 'perPage': itemsPerPage.value},
     );
 
     response.fold(
       (failure) {
-        // Handle error
-        errorMessage = failure.message ?? 'Failed to fetch councils.';
-        Modal.error(content: Text(errorMessage));
-        isLoading = false;
+        isLoading(false);
+        Modal.error(content: Text(failure.message ?? 'Failed to fetch councils.'));
         update();
       },
       (success) {
-        List<dynamic> data = success.data['data'];
-        var fetchedCouncils = data.map((json) => Council.fromMap(json)).toList();
+        var data = success.data;
+        var newData = (data['data'] as List<dynamic>)
+            .map((json) => Council.fromMap(json))
+            .toList();
 
-        if (fetchedCouncils.isEmpty) {
-          isLastPage = true; // No more data, set the last page flag
-        } else {
-          if (page == 1) {
-            councils = fetchedCouncils; // Replace data on first load
-          } else {
-            councils.addAll(fetchedCouncils); // Append data on subsequent loads
-          }
-        }
-        currentPage = page; // Update the current page number
-        isLoading = false;
-        isFetchingMore = false;
+        councils(newData);
+        currentPage.value++;
+        totalItems.value = data['pagination']['total']; // Get the total number of councils
+        isLoading(false);
         update();
       },
     );
   }
 
-  // Load more councils (triggered when the user scrolls to the bottom)
-  Future<void> loadMoreCouncils() async {
-    if (!isFetchingMore && !isLastPage) {
-      isFetchingMore = true;
-      update();
-      await fetchCouncils(page: currentPage + 1); // Increment page for loading more
-    }
+  // Fetch councils on scroll (pagination)
+  Future<void> fetchCouncilsOnScroll() async {
+    if (isFetchingMore.value || councils.length >= totalItems.value) return;
+
+    isFetchingMore(true);
+    update();
+
+    var response = await ApiService.getAuthenticatedResource(
+      'councils',
+      queryParameters: {'page': currentPage.value, 'perPage': itemsPerPage.value},
+    );
+
+    response.fold(
+      (failure) {
+        isFetchingMore(false);
+        Modal.error(content: Text(failure.message ?? 'Failed to fetch more councils.'));
+        update();
+      },
+      (success) {
+        var data = success.data;
+        var newData = (data['data'] as List<dynamic>)
+            .map((json) => Council.fromMap(json))
+            .toList();
+
+        councils.addAll(newData);
+        currentPage.value++;
+        totalItems.value = data['pagination']['total']; // Update total items count
+        isFetchingMore(false);
+        update();
+      },
+    );
+  }
+
+  // Reload councils (used for pull-to-refresh)
+  Future<void> reloadCouncils() async {
+    await fetchCouncils();
   }
 
   // Delete a council
@@ -92,7 +98,7 @@ class CouncilController extends GetxController {
       onConfirm: () async {
         Modal.loading(content: Text('Deleting council...'));
 
-        final response = await ApiService.deleteAuthenticatedResource('councils/$id');
+        var response = await ApiService.deleteAuthenticatedResource('councils/$id');
 
         Get.back(); // Close the loading modal
 
@@ -110,30 +116,23 @@ class CouncilController extends GetxController {
     );
   }
 
-  // Create a new council
   Future<void> createCouncil(String name) async {
     Modal.loading(content: Text('Creating council...')); // Show loading modal
 
     final response = await ApiService.postAuthenticatedResource(
       'councils',
-      {
-        'name': name,
-      },
+      {'name': name},
     );
 
-    // Close the loading modal
-    Get.back();
+    Get.back(); // Close the loading modal
 
     response.fold(
       (failure) {
         Modal.error(content: Text(failure.message ?? 'Failed to create council.'));
       },
       (success) {
-        fetchCouncils(); // Refresh the list of councils after creation
-        Modal.success(
-          visualContent: LocalLottieImage(repeat: false, path: lottiesPath('success.json')),
-          content: Text('Council created successfully.'),
-        );
+        fetchCouncils(); // Reload the council list after successful creation
+        Modal.success(content: Text('Council created successfully.'));
       },
     );
   }
@@ -144,51 +143,18 @@ class CouncilController extends GetxController {
 
     final response = await ApiService.putAuthenticatedResource(
       'councils/$id',
-      {
-        'name': name,
-      },
+      {'name': name},
     );
 
-    // Close the loading modal
-    Get.back();
+    Get.back(); // Close the loading modal
 
     response.fold(
       (failure) {
         Modal.error(content: Text(failure.message ?? 'Failed to update council.'));
       },
       (success) {
-        fetchCouncils(); // Refresh the list of councils after update
-        Modal.success(
-          visualContent: LocalLottieImage(repeat: false, path: lottiesPath('success.json')),
-          content: Text('Council updated successfully.'),
-        );
-      },
-    );
-  }
-
-  // Reload councils
-  Future<void> loadCouncils() async {
-    isLoading = true;
-    errorMessage = '';
-    update();
-
-    var response = await ApiService.getAuthenticatedResource(
-      'councils',
-      queryParameters: {'page': 1, 'perPage': perPage},
-    );
-
-    response.fold(
-      (failure) {
-        isLoading = false;
-        errorMessage = failure.message ?? 'Failed to load councils';
-        update();
-      },
-      (success) {
-        var councilData = (success.data['data'] as List<dynamic>);
-        councils = councilData.map((json) => Council.fromJson(json)).toList();
-        isLoading = false;
-        isLastPage = councils.length < perPage;
-        update();
+        fetchCouncils(); // Reload the council list after successful update
+        Modal.success(content: Text('Council updated successfully.'));
       },
     );
   }

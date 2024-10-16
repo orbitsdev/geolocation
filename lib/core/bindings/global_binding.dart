@@ -23,13 +23,16 @@ class GlobalBinding extends Bindings {
   void dependencies() {
   Get.put<AuthController>(AuthController(), permanent: true);
   Get.put<ModalController>(ModalController(), permanent: true);
+  Get.put<CouncilController>(CouncilController(), permanent: true);
+  Get.put<CouncilPositionController>(CouncilPositionController(), permanent: true);
+  Get.put<NotificationController>(NotificationController(), permanent: true);
+    
     
     // Controllers that might only be used on specific pages
-    Get.lazyPut(() => CouncilController(), fenix: true);
+    // Get.lazyPut(() => CouncilController(), fenix: true);
+    // Get.lazyPut(() => CouncilPositionController(), fenix: true);
     Get.lazyPut(() => ProfileController(), fenix: true);
-    Get.lazyPut(() => NotificationController(), fenix: true);
     Get.lazyPut(() => EventController(), fenix: true);
-    Get.lazyPut(() => CouncilPositionController(), fenix: true);
     Get.lazyPut(() => TaskController(), fenix: true);
     Get.lazyPut(() => PostController(), fenix: true);
     Get.lazyPut(() => CollectionController(), fenix: true);

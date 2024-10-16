@@ -10,7 +10,6 @@ import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:gradient_elevated_button/gradient_elevated_button.dart';
 
 class SignupPage extends GetView<AuthController> {
-  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,13 +17,15 @@ class SignupPage extends GetView<AuthController> {
       body: SafeArea(
         child: GestureDetector(
           onTap: () {
-            FocusScope.of(context).unfocus();
+            // Ensure keyboard dismisses only if not focused on a form field
+            // if (FocusScope.of(context).hasPrimaryFocus) {
+            //   FocusScope.of(context).unfocus();
+            // }
           },
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 40),
             child: Column(
               children: [
-                
                 Container(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 22, vertical: 34),
@@ -33,7 +34,7 @@ class SignupPage extends GetView<AuthController> {
                       borderRadius: BorderRadius.circular(14)),
                   child: Column(
                     children: [
-                       Text(
+                      Text(
                         'SIGN UP',
                         style: Get.textTheme.displaySmall
                             ?.copyWith(fontWeight: FontWeight.bold, height: 0),
@@ -64,7 +65,6 @@ class SignupPage extends GetView<AuthController> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            
                             Text('First name', style: Get.textTheme.bodyMedium),
                             const Gap(2),
                             FormBuilderTextField(
@@ -77,7 +77,7 @@ class SignupPage extends GetView<AuthController> {
                             Text('Last name', style: Get.textTheme.bodyMedium),
                             const Gap(2),
                             FormBuilderTextField(
-                                                            initialValue: 'Tirado',
+                              initialValue: 'Tirado',
                               name: 'last_name',
                               decoration: _inputDecoration('Enter your last name'),
                               validator: FormBuilderValidators.required(),
@@ -86,7 +86,7 @@ class SignupPage extends GetView<AuthController> {
                             Text('Email', style: Get.textTheme.bodyMedium),
                             const Gap(2),
                             FormBuilderTextField(
-                                                            initialValue: '@gmail.com',
+                              initialValue: '@gmail.com',
                               name: 'email',
                               decoration: _inputDecoration('Enter your email'),
                               validator: FormBuilderValidators.compose([
@@ -98,7 +98,7 @@ class SignupPage extends GetView<AuthController> {
                             Text('Password', style: Get.textTheme.bodyMedium),
                             const Gap(2),
                             Obx(() => FormBuilderTextField(
-                                                            initialValue: 'password',
+                                  initialValue: 'password',
                                   name: 'password',
                                   obscureText:
                                       controller.obscurePassword.value,
@@ -121,8 +121,7 @@ class SignupPage extends GetView<AuthController> {
                             Text('Confirm Password', style: Get.textTheme.bodyMedium),
                             const Gap(2),
                             Obx(() => FormBuilderTextField(
-                                                                                          initialValue: 'password',
-
+                                  initialValue: 'password',
                                   name: 'password_confirmation',
                                   obscureText:
                                       controller.obscureConfirm.value,
@@ -167,7 +166,6 @@ class SignupPage extends GetView<AuthController> {
                     ],
                   ),
                 ),
-               
               ],
             ),
           ),
