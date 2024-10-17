@@ -12,6 +12,7 @@ import 'package:get/get.dart';
 
 class CouncilPositionController extends GetxController {
   static CouncilPositionController controller = Get.find();
+    var grantAccess = false.obs;
  var isFetchingCouncilPositions = false.obs;
   var isFetchingUsers = false.obs;
   var isFetchingAvailablePositions = false.obs;
@@ -146,6 +147,7 @@ Future<void> createCouncilPosition() async {
       'council_id': selectedCouncilId.value, // Ensure correct council ID
       'user_id': chosenUser.value!.id,
       'position': councilPositionFormKey.currentState?.fields['position']?.value,
+      'grant_access': councilPositionFormKey.currentState?.fields['grant_access']?.value ?? false, 
     };
 
     isCreatingOrUpdating(true);
@@ -185,6 +187,7 @@ Future<void> createCouncilPosition() async {
         'council_id': selectedCouncilId.value,
         'user_id': chosenUser.value!.id,
         'position': councilPositionFormKey.currentState?.fields['position']?.value,
+         'grant_access': councilPositionFormKey.currentState?.fields['grant_access']?.value ?? false,
       };
 
       isCreatingOrUpdating(true);
@@ -286,4 +289,43 @@ Future<void> createCouncilPosition() async {
   void clearSelectedUser() {
     chosenUser.value = null;
   }
+
+  Future<void> switchPosition(int positionId) async {
+ 
+  Modal.loading(
+    content: Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        CircularProgressIndicator(),
+        const SizedBox(width: 16),
+        Text('Switching position...'),
+      ],
+    ),
+  );
+
+  // Send the PUT request to switch the is_login status
+  var response = await ApiService.putAuthenticatedResource(
+    '/council-positions/$positionId/switch',
+    {},
+  );
+
+  // Close the loading modal
+  Get.back();
+
+  response.fold(
+    (failure) {
+      // Show an error message if the API request failed
+      Modal.error(content: Text(failure.message ?? 'Failed to switch position.'));
+    },
+    (success) {
+
+      var data = success.data['data'];
+      
+      Modal.success(content: const Text('Position switched successfully!'));
+      
+
+    },
+  );
+}
+
 }

@@ -8,7 +8,6 @@ import 'package:geolocation/features/auth/model/council_position.dart';
 import 'package:geolocation/features/council_positions/pages/available_user_selection.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
-
 class CreateOrEditCouncilMemberPage extends StatelessWidget {
   final CouncilPosition? position; // Null for creating, non-null for editing
   final bool isEditMode;
@@ -19,8 +18,7 @@ class CreateOrEditCouncilMemberPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final CouncilPositionController controller =
-        Get.find<CouncilPositionController>();
+    final CouncilPositionController controller = Get.find<CouncilPositionController>();
 
     // Fetch positions when the page is opened if not already done
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -32,10 +30,13 @@ class CreateOrEditCouncilMemberPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(isEditMode ? 'Edit Member' : 'Add New Member'),
+        title: Text(
+          isEditMode ? 'Edit Member' : 'Add New Member',
+          style: Get.textTheme.titleMedium?.copyWith(color: Palette.PRIMARY),
+        ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 60.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
         child: FormBuilder(
           key: controller.councilPositionFormKey,
           child: Column(
@@ -71,8 +72,7 @@ class CreateOrEditCouncilMemberPage extends StatelessWidget {
                                     return const CircleAvatar(
                                       radius: 25,
                                       backgroundColor: Colors.grey,
-                                      child: Icon(Icons.person,
-                                          color: Colors.white),
+                                      child: Icon(Icons.person, color: Colors.white),
                                     );
                                   },
                                 ),
@@ -95,15 +95,17 @@ class CreateOrEditCouncilMemberPage extends StatelessWidget {
                                     )
                                   : Text(
                                       'Select User',
-                                      style: Get.textTheme.bodyMedium
-                                          ?.copyWith(color: Colors.grey),
+                                      style: Get.textTheme.bodyMedium?.copyWith(
+                                        color: Colors.grey,
+                                      ),
                                     ),
                               const SizedBox(height: 4),
                               controller.chosenUser.value != null
                                   ? Text(
                                       controller.chosenUser.value!.email ?? '',
-                                      style: Get.textTheme.bodySmall
-                                          ?.copyWith(color: Colors.grey),
+                                      style: Get.textTheme.bodySmall?.copyWith(
+                                        color: Colors.grey,
+                                      ),
                                       overflow: TextOverflow.ellipsis,
                                     )
                                   : const SizedBox.shrink(),
@@ -129,7 +131,7 @@ class CreateOrEditCouncilMemberPage extends StatelessWidget {
                 }
                 return FormBuilderDropdown<String>(
                   dropdownColor: Colors.white,
-                  style: Get.textTheme.bodyMedium!.copyWith(),
+                  style: Get.textTheme.bodyMedium?.copyWith(),
                   name: 'position',
                   initialValue: position?.position ?? '',
                   decoration: InputDecoration(
@@ -137,9 +139,9 @@ class CreateOrEditCouncilMemberPage extends StatelessWidget {
                     filled: true,
                     fillColor: Palette.LIGHT_BACKGROUND,
                     contentPadding:
-                        const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                        const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                     border: OutlineInputBorder(
-                      borderSide: BorderSide(width: 0.5, color: Palette.PRIMARY),
+                      borderSide: BorderSide(width: 0.1, color: Palette.PRIMARY),
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
@@ -153,6 +155,29 @@ class CreateOrEditCouncilMemberPage extends StatelessWidget {
                   onChanged: (value) {
                     print('Selected position: $value');
                   },
+                );
+              }),
+              const Gap(16),
+
+              // Switch for Grant Access
+              Obx(() {
+                return FormBuilderSwitch(
+                  name: 'grant_access',
+                  title: const Text('Grant Access'),
+                  initialValue: controller.grantAccess.value, // Bind initial value to controller
+                  onChanged: (val) {
+                    controller.grantAccess.value = val ?? false; // Update controller when switched
+                  },
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Palette.LIGHT_BACKGROUND,
+                    contentPadding:
+                        const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(width: 0.1, color: Palette.PRIMARY),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
                 );
               }),
             ],
@@ -169,7 +194,12 @@ class CreateOrEditCouncilMemberPage extends StatelessWidget {
               height: 55,
               width: Get.size.width,
               child: ElevatedButton(
-                style: ELEVATED_BUTTON_STYLE_DARK,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Palette.PRIMARY,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
                 onPressed: controller.isCreatingOrUpdating.value
                     ? null // Disable button while loading
                     : () {
@@ -195,3 +225,4 @@ class CreateOrEditCouncilMemberPage extends StatelessWidget {
     );
   }
 }
+
