@@ -88,7 +88,7 @@ class _DashboardPageState extends State<DashboardPage>
           controller: scrollController,
           slivers: [
             SliverGap(Get.size.height * 0.05),
-            ProfileSection(),
+          ProfileSection(),
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               sliver: ToSliver(
