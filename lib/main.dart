@@ -9,7 +9,9 @@ import 'package:geolocation/features/auth/middleware/guest_middleware.dart';
 import 'package:geolocation/features/council_positions/pages/create_or_edit_council_member_page.dart';
 import 'package:geolocation/features/councils/pages/council_list_page.dart';
 import 'package:geolocation/features/event/event_page.dart';
+import 'package:geolocation/features/globalpage/forbidden_page.dart';
 import 'package:geolocation/features/home/admin_home_main_page.dart';
+import 'package:geolocation/features/home/middleware/full_access_middleware.dart';
 import 'package:geolocation/features/map/sample_map.dart';
 import 'package:geolocation/features/council_positions/pages/council_member_position_list_page.dart';
 import 'package:geolocation/features/notification/notification_page.dart';
@@ -100,7 +102,7 @@ class _GeoLocationAppState extends State<GeoLocationApp>  with WidgetsBindingObs
         GetPage(name: '/login', page: () => LoginPage(), middlewares:[GuestMiddleware()]),
         GetPage(name: '/sign-up', page: () => SignupPage(),middlewares:[GuestMiddleware()]),
         GetPage(name: '/login-selection', page: () => LoginSelectionPage(), middlewares: []),
-        GetPage(name: '/home-main', page: () => AdminHomeMainPage(), middlewares: [AuthMiddleware()]),
+        GetPage(name: '/home-main', page: () => AdminHomeMainPage(), middlewares: [AuthMiddleware(), FullAccessMiddleware()]),
 
         GetPage(name: '/councils', page: () => CouncilListPage(), middlewares: []),
         GetPage(name: '/members', page: () => CouncilMemberPositionListPage(), middlewares: []),
@@ -111,8 +113,10 @@ class _GeoLocationAppState extends State<GeoLocationApp>  with WidgetsBindingObs
         GetPage(name: '/notifications', page: () => NotificationPage(), middlewares: []),
         
 
+
         GetPage(name: '/settings', page: () => SettingsPage(), middlewares: []),
         GetPage(name: '/councils', page: () => CouncilListPage(), middlewares: []),
+        GetPage(name: '/forbidden', page: () => ForbiddenPage(), middlewares: []),
       ],
     );
   }

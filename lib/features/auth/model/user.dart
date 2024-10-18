@@ -164,4 +164,15 @@ class User {
   bool isAdmin(){
     return this.role == Role.ADMIN;
   }
+
+  bool fullAccess() {
+  
+  if (this.role == Role.ADMIN) {
+    return true;
+  }
+
+  
+  return defaultPosition?.grantAccess == true;
+}
+
 }

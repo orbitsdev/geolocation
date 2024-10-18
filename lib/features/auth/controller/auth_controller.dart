@@ -283,7 +283,7 @@ class AuthController extends GetxController {
       (success) async {
         final updatedUser = User.fromJson(success.data['data']);
 
-        print('Fetched user: ${updatedUser.toJson()}');
+       
         print('Local stored user: ${user.value.toJson()}');
 
         if (updatedUser != user.value) {
