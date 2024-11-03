@@ -17,7 +17,9 @@ class ApiService {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
     },
-  ))..interceptors.add(_getInterceptor());  // Add the interceptor to Dio
+  )
+  );
+  // ..interceptors.add(_getInterceptor());  // Add the interceptor to Dio
 
   // Retrieve the token from SecureStorage for authenticated requests
   static Future<Map<String, dynamic>> _getAuthHeaders({Map<String, dynamic>? additionalHeaders}) async {
@@ -128,12 +130,22 @@ class ApiService {
   static Interceptor _getInterceptor() {
     return InterceptorsWrapper(
       onError: (DioException e, ErrorInterceptorHandler handler) async {
+
         if (e.response?.statusCode == 401) {
+
+           String? savedToken = await SecureStorage().readSecureData('token');
           // Token expired or session unauthorized
-          print('401 Unauthorized detected, performing auto logout...');
-          AuthController authController = Get.find<AuthController>();
+        
+         
           Failure failure = Failure(exception: e);
-          authController.localLogout(failure:failure ); // Call the logout function
+          if(savedToken != null){
+           print('! =  bnull');
+            // print(savedToken);
+          //  AuthController.controller.localLogout(failure:failure ); // Call the logout function
+
+          }else{
+            print('null');
+          }
         }
         return handler.next(e); // Continue with error handling
       },

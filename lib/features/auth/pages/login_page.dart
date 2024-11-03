@@ -150,14 +150,13 @@ class LoginPage extends GetView<AuthController> {
                                     onPressed: controller.isLoginLoading.value
                                         ? null
                                         : () async {
-                                            if (loginFormKey.currentState
-                                                    ?.saveAndValidate() ==
-                                                true) {
-                                              final formData =
-                                                  loginFormKey.currentState
-                                                      ?.value;
-                                              await controller.login(formData);
-                                            }
+
+                                          Modal.errorDialog();
+                                            // if (loginFormKey.currentState  ?.saveAndValidate() ==
+                                            //     true) {
+                                            //   final formData = loginFormKey.currentState  ?.value;
+                                            //   await controller.login(formData);
+                                            // }
                                           },
                                     style: GRADIENT_ELEVATED_BUTTON_STYLE,
                                     child: controller.isLoginLoading.value

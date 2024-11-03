@@ -3,10 +3,71 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gap/gap.dart';
 import 'package:geolocation/core/api/globalcontroller/modal_controller.dart';
+import 'package:geolocation/core/constant/path.dart';
 import 'package:geolocation/core/constant/style.dart';
+import 'package:geolocation/core/globalwidget/images/local_lottie_image.dart';
+import 'package:geolocation/core/globalwidget/loading_widget.dart';
 import 'package:get/get.dart';
 class Modal {
 
+
+
+static errorDialog(
+  {Widget? title,
+    Widget? content,
+    Widget? visualContent,  
+    String? buttonText = "OK",
+    VoidCallback? onDismiss,
+    bool barrierDismissible = false,}
+){
+
+    // Prevent showing multiple dialogs
+    // if (ModalController.controller.isDialogVisible.value) {
+    //     return;
+    // }
+
+    // // Mark the dialog as visible
+    // ModalController.controller.setDialog(true);
+   Get.dialog(
+      AlertDialog(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+             LocalLottieImage(
+            path: lottiesPath('error.json'),
+            repeat: false,
+          ),
+            Text(
+              "Error",
+              style: Get.textTheme.titleLarge?.copyWith(
+                color: Colors.red,
+              ),
+            ),
+            Text('Something went wrong.'),
+          ],
+        ),
+        actions: [
+          SizedBox(
+  width: double.infinity, // Full width
+  child: ElevatedButton(
+    style: ELEVATED_BUTTON_STYLE,
+    onPressed: onDismiss ?? () {
+      ModalController.controller.setDialog(false);
+      Get.back();
+    },
+    child: Text(buttonText ?? "Try Again", style: TextStyle(color: Colors.white) ,),
+  ),
+),
+
+        ],
+      ),
+      barrierDismissible: barrierDismissible,
+    ).then((_) {
+      // Ensure the dialog visibility is reset even if the dialog is dismissed in other ways
+      ModalController.controller.setDialog(false);
+    });
+
+}
 static success({
     Widget? title,
     Widget? content,
@@ -110,16 +171,12 @@ static success({
   }) {
     Get.dialog(
             transitionDuration: Duration(milliseconds: 150),  
-
       AlertDialog(
-        shape: shape,
+        shape: shape??  RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-             Container(width: Get.size.width,),
-            if (visualContent != null) visualContent,
-             
-            if (content != null) content,
+            LoadingWidget(message: 'Loading..',)
           ],
         ),
       ),

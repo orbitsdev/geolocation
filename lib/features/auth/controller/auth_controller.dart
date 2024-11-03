@@ -32,6 +32,7 @@ class AuthController extends GetxController {
   var isTokenLoaded = false.obs;
 
   Future<void> loadTokenAndUser({bool showModal = true}) async {
+    
     try {
       String? savedToken = await SecureStorage().readSecureData('token');
 
@@ -133,18 +134,7 @@ class AuthController extends GetxController {
       isSignupLoading(true);
       Modal.loading(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
-        content: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            SizedBox(width: 24),
-            CircularProgressIndicator(),
-            SizedBox(width: 36),
-            Text(
-              "Signing up...",
-              style: Get.textTheme.titleMedium,
-            ),
-          ],
-        ),
+        
       );
 
       final response = await ApiService.postPublicResource('register', {
@@ -260,6 +250,7 @@ class AuthController extends GetxController {
   }
 
   Future<bool> fetchAndUpdateUserDetails({bool showModal = true}) async {
+   
   if (token.value.isNotEmpty) {
     final response = await ApiService.getAuthenticatedResource('user');
 

@@ -12,6 +12,7 @@ class CouncilListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    _councilController.fetchCouncils();
     _scrollController.addListener(() {
       // Scroll threshold of 200 pixels before bottom to trigger loading more councils
       if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200 &&

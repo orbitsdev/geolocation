@@ -17,7 +17,7 @@ class CouncilController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchCouncils(); // Automatically fetch councils when the controller is initialized
+    // fetchCouncils(); // Automatically fetch councils when the controller is initialized
   }
 
   // Fetch councils
@@ -34,7 +34,7 @@ class CouncilController extends GetxController {
     response.fold(
       (failure) {
         isLoading(false);
-        Modal.error(content: Text(failure.message ?? 'Failed to fetch councils.'));
+        Modal.error(content: Text('Failed to fetch councils.'));
         update();
       },
       (success) {

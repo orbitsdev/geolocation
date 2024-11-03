@@ -24,7 +24,7 @@ class ErrorHandler {
           );
 
         case 401:
-          // Handle unauthorized access and check if token exists
+         
           return Failure(
             exception: exception,
             icon: FaIcon(
