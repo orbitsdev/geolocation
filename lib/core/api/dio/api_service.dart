@@ -18,8 +18,8 @@ class ApiService {
       'Accept': 'application/json',
     },
   )
-  );
-  // ..interceptors.add(_getInterceptor());  // Add the interceptor to Dio
+  )
+   ..interceptors.add(_getInterceptor());  // Add the interceptor to Dio
 
   // Retrieve the token from SecureStorage for authenticated requests
   static Future<Map<String, dynamic>> _getAuthHeaders({Map<String, dynamic>? additionalHeaders}) async {
@@ -140,7 +140,7 @@ class ApiService {
           Failure failure = Failure(exception: e);
           if(savedToken != null){
            print('! =  bnull');
-            // print(savedToken);
+           print(savedToken);
           //  AuthController.controller.localLogout(failure:failure ); // Call the logout function
 
           }else{
