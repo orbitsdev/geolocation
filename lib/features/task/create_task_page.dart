@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:geolocation/core/globalwidget/ripple_container.dart';
 import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/council_positions/data/sample_data.dart';
 import 'package:geolocation/features/task/controller/task_controller.dart';
+import 'package:geolocation/features/task/officer_selection_page.dart';
 import 'package:get/get.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:gap/gap.dart';
@@ -41,7 +43,7 @@ class CreateTaskPage extends StatelessWidget {
                   Text(
                     'Task Title',
                     style: Get.textTheme.bodyMedium
-                        ?.copyWith(color: Palette.LIGHT_TEXT),
+                        ?.copyWith(),
                   ),
                   Gap(2),
                   FormBuilderTextField(
@@ -82,9 +84,66 @@ class CreateTaskPage extends StatelessWidget {
                   Text(
                     'Assign to Officer',
                     style: Get.textTheme.bodyMedium
-                        ?.copyWith(color: Palette.LIGHT_TEXT),
+                        ?.copyWith(),
                   ),
                   Gap(2),
+
+                  RippleContainer(
+                    onTap: ()=> Get.to(()=> OfficerSelectionPage()),
+                    child: Container(
+                           decoration: BoxDecoration(
+                             color: controller.selectedOfficer.value.id != null  ? Colors.green.shade50 : Colors.grey.shade50, // Light background color
+                             borderRadius: BorderRadius.circular(8),
+                             border: Border.all(color: controller.selectedOfficer.value.id != null  ? Colors.green : Palette.LIGHT_TEXT), // Border for better visibility
+                           ),
+                           padding: EdgeInsets.all(8),
+                           child: Row(
+                             crossAxisAlignment: CrossAxisAlignment.center,
+                             children: [
+                               CircleAvatar(
+                                 radius: 20,
+                                 backgroundColor: Colors.grey,
+                                 child: Icon(
+                                   controller.selectedOfficer.value.id != null  ? Icons.check : Icons.account_circle_rounded,
+                                   color: Colors.white,
+                                 ),
+                               ),
+                               SizedBox(width: 16),
+                               Flexible(
+                                 child: Column(
+                                   crossAxisAlignment: CrossAxisAlignment.start,
+                                   children: [
+                                     Text(
+                     'Select Officer',
+                     style: TextStyle(
+                     ),
+                                     ),
+                                     SizedBox(height: 4),
+                                    if(controller.selectedOfficer.value.id != null) Column(
+                     children: [
+                       Text(
+                         '${controller.selectedOfficer.value.fullName} ' ,
+                         style: TextStyle(color: Colors.grey),
+                       ),
+                       Text(
+                         '${controller.selectedOfficer.value.email}',
+                         style: TextStyle(color: Colors.grey),
+                       ),
+                       Text(
+                         '${controller.selectedOfficer.value.position}',
+                         style: TextStyle(color: Colors.grey),
+                       ),
+                     ],
+                                     ),
+                                   ],
+                                 ),
+                               ),
+                               SizedBox(width: 8),
+                              //  Icon(Icons.arrow_forward_ios, color: Colors.grey, size: 16), // Arrow to indicate it's clickable
+                             ],
+                           ),
+                         ),
+                  ),
                   // FormBuilderDropdown<String>(
                   //   dropdownColor: Colors.white,
                   //   style: Get.textTheme.bodyMedium!.copyWith(),
@@ -134,7 +193,7 @@ class CreateTaskPage extends StatelessWidget {
                   Text(
                     'Task Description',
                     style: Get.textTheme.bodyMedium
-                        ?.copyWith(color: Palette.LIGHT_TEXT),
+                        ?.copyWith(),
                   ),
                   Gap(2),
                   FormBuilderTextField(
@@ -176,7 +235,7 @@ class CreateTaskPage extends StatelessWidget {
                   Text(
                     'Due Date',
                     style: Get.textTheme.bodyMedium
-                        ?.copyWith(color: Palette.LIGHT_TEXT),
+                        ?.copyWith(),
                   ),
                   Gap(2),
                   FormBuilderDateTimePicker(
