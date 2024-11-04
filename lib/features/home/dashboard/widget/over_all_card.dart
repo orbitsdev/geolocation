@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geolocation/core/globalwidget/circular_loading.dart';
 import 'package:geolocation/core/theme/game_pallete.dart';
 import 'package:get/get.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -6,12 +7,14 @@ class OverAllCard extends StatelessWidget {
   final String title;
   final Widget icon;
   final String count;
+  bool? isLoading;
 
   OverAllCard({
     Key? key,
     required this.title,
     required this.icon,
     required this.count,
+     this.isLoading,
   }) : super(key: key);
 
   @override
@@ -53,7 +56,7 @@ class OverAllCard extends StatelessWidget {
               ),
             ),
           ),
-          Text(
+          (isLoading ==  true)? CircularLoading() : Text(
             count,
             style: Get.textTheme.headlineSmall?.copyWith(
               color: GamePalette.textWhite,

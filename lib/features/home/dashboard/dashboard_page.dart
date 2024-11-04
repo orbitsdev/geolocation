@@ -13,7 +13,9 @@ import 'package:geolocation/core/localdata/sample_data.dart';
 import 'package:geolocation/core/theme/game_pallete.dart';
 import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
+import 'package:geolocation/features/auth/model/user.dart';
 import 'package:geolocation/features/collections/collection_page.dart';
+import 'package:geolocation/features/council_positions/controller/council_position_controller.dart';
 import 'package:geolocation/features/councils/controller/council_controller.dart';
 import 'package:geolocation/features/councils/pages/council_list_page.dart';
 import 'package:geolocation/features/event/event_page.dart';
@@ -52,16 +54,20 @@ class _DashboardPageState extends State<DashboardPage>
   final ScrollController scrollController = ScrollController();
   final councilController = Get.find<CouncilController>();
   final authcontroller = Get.find<AuthController>();
+  final positionController = Get.find<CouncilPositionController>();
   late TabController _tabController;
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 5, vsync: this);
-   
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-       loadData();
+      loadData();
+
       scrollController.addListener(() {
-        if (scrollController.position.pixels ==  scrollController.position.maxScrollExtent) {} });
+        if (scrollController.position.pixels ==
+            scrollController.position.maxScrollExtent) {}
+      });
     });
   }
 
@@ -72,7 +78,17 @@ class _DashboardPageState extends State<DashboardPage>
   }
 
   Future<void> loadData() async {
-    councilController.fetchCouncils();
+    final User currentUser = AuthController.controller.user.value;
+
+    if (currentUser.isAdmin()) {
+      await councilController.fetchCouncils();
+    } else if (!currentUser.isAdmin() && currentUser.hasAccess()) {
+      final councilId = currentUser.defaultPosition?.councilId;
+      if (councilId != null) {
+        CouncilPositionController.controller.setCouncilId(councilId);
+        await CouncilPositionController.controller.fetchCouncilMembers();
+      }
+    }
   }
 
   @override
@@ -87,7 +103,7 @@ class _DashboardPageState extends State<DashboardPage>
             physics: AlwaysScrollableScrollPhysics(),
             controller: scrollController,
             slivers: [
-            ProfileSection(),
+              ProfileSection(),
               SliverPadding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 sliver: ToSliver(
@@ -98,88 +114,110 @@ class _DashboardPageState extends State<DashboardPage>
                 )),
               ),
               SliverGap(16),
-             GetBuilder<AuthController>(
-          builder: (authController) {
-            return authController.user.value.isAdmin() ? ToSliver(
-        child: RippleContainer(
-          onTap: () => Get.to(() => CouncilListPage(), transition: Transition.cupertino),
-          child: GetBuilder<CouncilController>(
-            builder: (councilController) {
-              return OverAllCard(
-                icon: FaIcon(FontAwesomeIcons.users, size: 34, color: Colors.white), // Members
-                title: 'Councils',
-                // Dynamic count using the observable list length
-                count: '${councilController.councils.length}', // Dynamic council count
-              );
-            },
-          ),
-        ),
-            ) : ToSliver(child: Container());
-          },
-        ),
-        
-            
-               Obx((){
-                return  !authcontroller.user.value.isAdmin() ?  MultiSliver(children: [
-                  ToSliver(
-                      child: RippleContainer(
-                    onTap: () => Get.to(() => MemberTaskPage(),
-                        transition: Transition.cupertino),
-                    child: OverAllCard(
-                      icon: FaIcon(FontAwesomeIcons.tasks,
-                          size: 34, color: Colors.white), // Tasks
-                      title: 'Tasks',
-                      count: '39',
-                    ),
-                  )),
-                  ToSliver(
-                      child: RippleContainer(
-                    onTap: () =>
-                        Get.to(() => PostPage(), transition: Transition.cupertino),
-                    child: OverAllCard(
-                      icon: FaIcon(FontAwesomeIcons.bullhorn,
-                          size: 34, color: Colors.white), // Posts
-                      title: 'Posts',
-                      count: '58',
-                    ),
-                  )),
-                  ToSliver(
-                      child: RippleContainer(
-                    onTap: () => Get.to(() => CollectionPage(),
-                        transition: Transition.cupertino),
-                    child: OverAllCard(
-                      icon: FaIcon(FontAwesomeIcons.solidFolder,
-                          size: 34, color: Colors.white), // Collections
-                      title: 'Collections',
-                      count: '180',
-                    ),
-                  )),
-                  ToSliver(
-                      child: RippleContainer(
-                    onTap: () =>
-                        Get.to(() => EventPage(), transition: Transition.cupertino),
-                    child: OverAllCard(
-                      icon: FaIcon(FontAwesomeIcons.calendarCheck,
-                          size: 34, color: Colors.white), // Events
-                      title: 'Events',
-                      count: '16',
-                    ),
-                  )),
-                  ToSliver(
-                      child: RippleContainer(
-                    onTap: () =>
-                        Get.to(() => FilesPage(), transition: Transition.cupertino),
-                    child: OverAllCard(
-                      icon: FaIcon(FontAwesomeIcons.folderOpen,
-                          size: 34, color: Colors.white), // Files
-                      title: 'Files',
-                      count: '87',
-                    ),
-                  )),
-                ]) : ToSliver(child: Container());
-              }
-                
+              GetBuilder<AuthController>(
+                builder: (authController) {
+                  return authController.user.value.isAdmin()
+                      ? ToSliver(
+                          child: RippleContainer(
+                            onTap: () => Get.to(() => CouncilListPage(),
+                                transition: Transition.cupertino),
+                            child: GetBuilder<CouncilController>(
+                              builder: (councilController) {
+                                return OverAllCard(
+                                  icon: FaIcon(FontAwesomeIcons.users,
+                                      size: 34, color: Colors.white), // Members
+                                  title: 'Councils',
+                                  // Dynamic count using the observable list length
+                                  count:
+                                      '${councilController.councils.length}', // Dynamic council count
+                                );
+                              },
+                            ),
+                          ),
+                        )
+                      : ToSliver(child: Container());
+                },
               ),
+
+              Obx(() {
+                return authcontroller.user.value.hasAccess()
+                    ? MultiSliver(children: [
+                        Obx(
+                          () => ToSliver(
+                              child: RippleContainer(
+                            onTap: () {
+                              if (positionController.isPageLoading.value == false) {
+                                   positionController.selectAndNavigateToCouncilMemberPage(authcontroller.user.value.defaultPosition?.councilId as int);
+                              }
+                            },
+                            child: OverAllCard(
+                              isLoading: positionController.isPageLoading.value,
+                              icon: FaIcon(FontAwesomeIcons.tasks,
+                                  size: 34, color: Colors.white), // Tasks
+                              title: 'Members',
+                              count:
+                                  '${positionController.councilMembers.length}',
+                            ),
+                          )),
+                        ),
+                        ToSliver(
+                            child: RippleContainer(
+                          onTap: () => Get.to(() => MemberTaskPage(),
+                              transition: Transition.cupertino),
+                          child: OverAllCard(
+                            icon: FaIcon(FontAwesomeIcons.tasks,
+                                size: 34, color: Colors.white), // Tasks
+                            title: 'Tasks',
+                            count: '39',
+                          ),
+                        )),
+                        ToSliver(
+                            child: RippleContainer(
+                          onTap: () => Get.to(() => PostPage(),
+                              transition: Transition.cupertino),
+                          child: OverAllCard(
+                            icon: FaIcon(FontAwesomeIcons.bullhorn,
+                                size: 34, color: Colors.white), // Posts
+                            title: 'Posts',
+                            count: '58',
+                          ),
+                        )),
+                        ToSliver(
+                            child: RippleContainer(
+                          onTap: () => Get.to(() => CollectionPage(),
+                              transition: Transition.cupertino),
+                          child: OverAllCard(
+                            icon: FaIcon(FontAwesomeIcons.solidFolder,
+                                size: 34, color: Colors.white), // Collections
+                            title: 'Collections',
+                            count: '180',
+                          ),
+                        )),
+                        ToSliver(
+                            child: RippleContainer(
+                          onTap: () => Get.to(() => EventPage(),
+                              transition: Transition.cupertino),
+                          child: OverAllCard(
+                            icon: FaIcon(FontAwesomeIcons.calendarCheck,
+                                size: 34, color: Colors.white), // Events
+                            title: 'Events',
+                            count: '16',
+                          ),
+                        )),
+                        ToSliver(
+                            child: RippleContainer(
+                          onTap: () => Get.to(() => FilesPage(),
+                              transition: Transition.cupertino),
+                          child: OverAllCard(
+                            icon: FaIcon(FontAwesomeIcons.folderOpen,
+                                size: 34, color: Colors.white), // Files
+                            title: 'Files',
+                            count: '87',
+                          ),
+                        )),
+                      ])
+                    : ToSliver(child: Container());
+              }),
               //     ToSliver(child: RippleContainer(
               // onTap: ()=> Get.to(()=> CouncilPositionListPage(),transition: Transition.cupertino),
               // child: OverAllCard(
@@ -188,7 +226,7 @@ class _DashboardPageState extends State<DashboardPage>
               //   count: '242',
               // ),
               //     )),
-        
+
               // SliverPadding(
               //   padding: EdgeInsets.symmetric(
               //     horizontal: 16,
@@ -196,7 +234,7 @@ class _DashboardPageState extends State<DashboardPage>
               //   sliver: ToSliver(
               //     child: Container(
               //       height: 90, // Explicit height
-        
+
               //       child: ListView.builder(
               //         scrollDirection: Axis.horizontal,
               //         itemCount: 10,
@@ -215,13 +253,13 @@ class _DashboardPageState extends State<DashboardPage>
               //     Get.to(() => EventPage(), transition: Transition.cupertino);
               //   },
               // )),
-        
+
               // SliverPadding(
               //   padding: EdgeInsets.symmetric(
               //     horizontal: 16,
               //   ),
               //   sliver: SliverAlignedGrid.count(
-        
+
               //       //  SliverMasonryGrid.count(
               //       crossAxisSpacing: 0,
               //       mainAxisSpacing: 6,
@@ -236,7 +274,7 @@ class _DashboardPageState extends State<DashboardPage>
               //         }
               //       }),
               // ),
-        
+
               // SliverGap(24),
               // ToSliver(
               //     child: TittleWithIconAction(
@@ -245,13 +283,13 @@ class _DashboardPageState extends State<DashboardPage>
               //     Get.to(() => PostPage(), transition: Transition.cupertino);
               //   },
               // )),
-        
+
               // SliverPadding(
               //   padding: EdgeInsets.symmetric(
               //     horizontal: 16,
               //   ),
               //   sliver: SliverAlignedGrid.count(
-        
+
               //       //  SliverMasonryGrid.count(
               //       crossAxisSpacing: 0,
               //       mainAxisSpacing: 6,
@@ -262,7 +300,7 @@ class _DashboardPageState extends State<DashboardPage>
               //         return PostCard();
               //         })
               // ),
-        
+
               // SliverGap(24),
               // SliverPadding(
               //   padding: const EdgeInsets.only(left: 16),
@@ -320,7 +358,7 @@ class _DashboardPageState extends State<DashboardPage>
               //         ]),
               //   ),
               // ),
-        
+
               // SliverFillRemaining(
               //     child: Container(
               //   height: 300,
@@ -335,7 +373,7 @@ class _DashboardPageState extends State<DashboardPage>
               //     ],
               //   ),
               // ))
-        
+
               SliverGap(Get.size.height * 0.05)
             ],
           ),

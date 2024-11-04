@@ -46,7 +46,7 @@ class AuthController extends GetxController {
             print('${token.value}');
           print('--------------------------------------');
           print('------------DEFAULT_POSITION--------------------');
-          print(user.value.defaultPosition?.toJson());
+          print(user.value.defaultPosition?.grantAccess);
           print('--------------------------------------');
         }
       }

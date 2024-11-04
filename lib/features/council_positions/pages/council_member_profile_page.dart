@@ -4,136 +4,175 @@ import 'package:geolocation/core/globalwidget/images/online_image.dart';
 import 'package:geolocation/core/globalwidget/images/online_image_full_screen_display.dart';
 import 'package:geolocation/core/globalwidget/ripple_container.dart';
 import 'package:geolocation/core/theme/palette.dart';
+import 'package:geolocation/features/council_positions/controller/council_position_controller.dart';
 import 'package:geolocation/features/task/task_page.dart';
 import 'package:get/get.dart';
 
 class CouncilMemberProfilePage extends StatelessWidget {
+
+      var positionController = Get.find<CouncilPositionController>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: SingleChildScrollView(
-        
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Profile Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
+      body: Obx(
+        ()=>  RefreshIndicator(
+          triggerMode: RefreshIndicatorTriggerMode.anywhere,
+          onRefresh: () async {
+                positionController.refreshSelectedMemberDetails();
+          },
+          child: positionController.isMemberDetailsLoading.value ? Center(child: CircularProgressIndicator(),) : SingleChildScrollView(
+            
+              physics: AlwaysScrollableScrollPhysics(),
+              
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                 RippleContainer(
-                                      onTap: ()=> Get.to(()=>  OnlineImageFullScreenDisplay(imageUrl: 'https://i.pravatar.cc/300')),
+                  // Profile Header
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                     RippleContainer(onTap: ()=> Get.to(()=>  OnlineImageFullScreenDisplay(imageUrl:'${positionController.selectedMember.value.image}')),
+          
+                       child: Container(
+                        height: 80,
+                        width: 80,
+                        
+                        child: OnlineImage(imageUrl: '${positionController.selectedMember.value.image}', borderRadius: BorderRadius.circular(100),),),
+                     ),
+                      SizedBox(width: 16),
+                      Flexible(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${positionController.selectedMember.value.fullName}',
+                              maxLines: 3,
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                                                           '${positionController.selectedMember.value.email}',
+                              style:Get.textTheme.bodyLarge?.copyWith(
+                                color: Colors.grey[600],
+                              ),
+                            ),
 
-                   child: Container(
-                    height: 80,
-                    width: 80,
-                    
-                    child: OnlineImage(imageUrl: 'https://i.pravatar.cc/300', borderRadius: BorderRadius.circular(100),),),
-                 ),
-                  SizedBox(width: 16),
-                  Flexible(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'John Doe',
-                          maxLines: 3,
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
+                            RichText(
+                              
+                              text: TextSpan(text:'',children: [
+                              TextSpan(text: '${positionController.selectedMember.value.position}',style: Get.textTheme.titleMedium?.copyWith(
+                                color: Colors.green
+                              )),
+                              TextSpan(text: ' (${positionController.selectedMember.value.councilName})',style: Get.textTheme.titleMedium?.copyWith(
+                                color: Colors.green
+                              )),
+                            ])),
+                            // Text(
+                            //   '${positionController.selectedMember.value.position } ',
+                            //   style: TextStyle(
+                            //     fontSize: 18,
+                            //     color: Colors.green,
+                            //   ),
+                            // ),
+                          ],
                         ),
-                        Text(
-                          'john.doe@example.com',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                        Text(
-                          'Mayor (2021-2024)',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.green,
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              SizedBox(height: 24),
-              
-              // Task Overview
-              Text(
-                'Task Overview',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _buildTaskCard('Total Tasks', 120),
-                  _buildTaskCard('Submitted', 90),
-                ],
-              ),
-              SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _buildTaskCard('Remaining', 30),
-                  _buildTaskCard('Due Soon', 10),
-                ],
-              ),
-              
-              // Biography Section
-              SizedBox(height: 24),
-              Text(
-                'Biography',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 8),
-              Text(
-                'John Doe is a dedicated public servant with over 20 years of experience in municipal government. As the Mayor, he has led numerous initiatives aimed at improving the quality of life for residents...',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey[800],
-                ),
-              ),
-              
-              // Social Media Links Section
-              SizedBox(height: 24),
-              Text(
-                'Social Media',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 8),
-              Row(
-                children: [
-                  Icon(Icons.link, color: Palette.DARK_PRIMARY),
-                  SizedBox(width: 8),
+                  SizedBox(height: 24),
+                  
+                  // Task Overview
                   Text(
-                    'LinkedIn Profile',
+                    'Task Overview',
                     style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.deepPurple,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
+                  SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _buildTaskCard('Todo ',  positionController.selectedMember.value.totalDueTasks as int),
+                      _buildTaskCard('In Progress', positionController.selectedMember.value.totalInProgressTasks as int),
+                    ],
+                  ),
+                  SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // _buildTaskCard('On Hold', positionController.selectedMember.value.totalOnHoldTasks as int),
+                      _buildTaskCard('Due ', positionController.selectedMember.value.totalDueTasks as int ),
+                    ],
+                  ),
+                  SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _buildTaskCard('Cancelled', positionController.selectedMember.value.totalCancelledTasks as int),
+                      _buildTaskCard('Completed Late', positionController.selectedMember.value.totalCompletedLateTasks as int),
+                    ],
+                  ),
+                  
+                  SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                     
+                       _buildTaskCard('Completed', positionController.selectedMember.value.totalCompletedTasks as int ),
+                    ],
+                  ),
+                  
+                  // Biography Section
+                  SizedBox(height: 24),
+                  // Text(
+                  //   'Biography',
+                  //   style: TextStyle(
+                  //     fontSize: 20,
+                  //     fontWeight: FontWeight.bold,
+                  //   ),
+                  // ),
+                  // SizedBox(height: 8),
+                  // Text(
+                  //   'John Doe is a dedicated public servant with over 20 years of experience in municipal government. As the Mayor, he has led numerous initiatives aimed at improving the quality of life for residents...',
+                  //   style: TextStyle(
+                  //     fontSize: 16,
+                  //     color: Colors.grey[800],
+                  //   ),
+                  // ),
+                  
+                  // // Social Media Links Section
+                  // SizedBox(height: 24),
+                  // Text(
+                  //   'Social Media',
+                  //   style: TextStyle(
+                  //     fontSize: 20,
+                  //     fontWeight: FontWeight.bold,
+                  //   ),
+                  // ),
+                  // SizedBox(height: 8),
+                  // Row(
+                  //   children: [
+                  //     Icon(Icons.link, color: Palette.DARK_PRIMARY),
+                  //     SizedBox(width: 8),
+                  //     Text(
+                  //       'LinkedIn Profile',
+                  //       style: TextStyle(
+                  //         fontSize: 16,
+                  //         color: Colors.deepPurple,
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
                 ],
               ),
-            ],
+            ),
           ),
         ),
       ),
@@ -146,14 +185,14 @@ class CouncilMemberProfilePage extends StatelessWidget {
         onTap: (){
           Get.to(()=> TaskPage(), transition: Transition.cupertino);
         },
-        child: Card(
-          // color: Palette.LIGH_BACKGROUND_GREEN,
-          elevation: 4,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+        child: Container(
+         margin: EdgeInsets.symmetric(horizontal: 8),
+          decoration: BoxDecoration(
+           color: Palette.LIGH_BACKGROUND_GREEN,
+             borderRadius: BorderRadius.circular(12),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(8),
             child: Column(
               children: [
                 Text(

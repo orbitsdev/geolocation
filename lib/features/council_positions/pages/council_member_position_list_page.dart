@@ -10,11 +10,14 @@ import 'package:get/get.dart';
 
 class CouncilMemberPositionListPage extends StatefulWidget {
   @override
-  _CouncilMemberPositionListPageState createState() => _CouncilMemberPositionListPageState();
+  _CouncilMemberPositionListPageState createState() =>
+      _CouncilMemberPositionListPageState();
 }
 
-class _CouncilMemberPositionListPageState extends State<CouncilMemberPositionListPage> {
-  final CouncilPositionController _controller = Get.put(CouncilPositionController());
+class _CouncilMemberPositionListPageState
+    extends State<CouncilMemberPositionListPage> {
+  final CouncilPositionController _controller =
+      Get.put(CouncilPositionController());
   final ScrollController newScrollController = ScrollController();
 
   @override
@@ -22,20 +25,17 @@ class _CouncilMemberPositionListPageState extends State<CouncilMemberPositionLis
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (_controller.councilMembers.isEmpty) {
-         
-       _controller.fetchCouncilMembers();
+        _controller.fetchCouncilMembers();
       }
 
-      newScrollController.addListener(() async  {
-        if (newScrollController.position.pixels ==  newScrollController.position.maxScrollExtent) {
-
-          
+      newScrollController.addListener(() async {
+        if (newScrollController.position.pixels ==
+            newScrollController.position.maxScrollExtent) {
           double threshold = 200.0;
 
-         if (newScrollController.position.pixels >= newScrollController.position.maxScrollExtent - threshold) {
-           
-              _controller.fetchCouncilMembersOnScroll();
-            
+          if (newScrollController.position.pixels >=
+              newScrollController.position.maxScrollExtent - threshold) {
+            _controller.fetchCouncilMembersOnScroll();
           }
         }
       });
@@ -51,7 +51,8 @@ class _CouncilMemberPositionListPageState extends State<CouncilMemberPositionLis
         actions: [
           TextButton(
             onPressed: () {
-              Get.to(() => CreateOrEditCouncilMemberPage(), transition: Transition.cupertino);
+              Get.to(() => CreateOrEditCouncilMemberPage(),
+                  transition: Transition.cupertino);
             },
             child: Text(
               'New Member',
@@ -62,10 +63,12 @@ class _CouncilMemberPositionListPageState extends State<CouncilMemberPositionLis
       ),
       body: Obx(() {
         if (_controller.isPageLoading.value) {
-          return const Center(child: CircularProgressIndicator()); // Show loading indicator
+          return const Center(
+              child: CircularProgressIndicator()); // Show loading indicator
         }
         if (_controller.councilMembers.isEmpty) {
-          return const Center(child: Text('No members found')); // Show empty state
+          return const Center(
+              child: Text('No members found')); // Show empty state
         }
 
         return RefreshIndicator(
@@ -76,34 +79,39 @@ class _CouncilMemberPositionListPageState extends State<CouncilMemberPositionLis
           child: ListView.builder(
             controller: newScrollController,
 
-            physics: const AlwaysScrollableScrollPhysics(), // Ensure always scrollable
-            itemCount: _controller.councilMembers.length + 1, // +1 for the loading indicator at the end
+            physics:
+                const AlwaysScrollableScrollPhysics(), // Ensure always scrollable
+            itemCount: _controller.councilMembers.length +
+                1, // +1 for the loading indicator at the end
             itemBuilder: (context, index) {
               if (index == _controller.councilMembers.length) {
                 return _controller.isScrollLoading.value
                     ? const Padding(
                         padding: EdgeInsets.all(8.0),
-                        child: Center(child: CircularProgressIndicator()), // Show loading indicator at the end
+                        child: Center(
+                            child:
+                                CircularProgressIndicator()), // Show loading indicator at the end
                       )
                     : const SizedBox.shrink(); // No additional data to load
               }
 
               final position = _controller.councilMembers[index];
               return RippleContainer(
-                onTap: () => Get.to(
-                  () => CouncilMemberProfilePage(),
-                  transition: Transition.cupertino,
-                ),
+                onTap: () {
+                      _controller.selectMember(position);
+                },
                 child: CouncilPositionCard(
                   position: position,
                   onEdit: () {
-                    Get.to(() => CreateOrEditCouncilMemberPage(position: position));
+                    Get.to(() =>
+                        CreateOrEditCouncilMemberPage(position: position));
                   },
                   onDelete: () {
                     if (position.id != null) {
                       Modal.confirmation(
                         titleText: "Confirm Delete",
-                        contentText: "Are you sure you want to delete this member? All associated data, including files and records, will be permanently lost.",
+                        contentText:
+                            "Are you sure you want to delete this member? All associated data, including files and records, will be permanently lost.",
                         onConfirm: () {
                           _controller.deleteCouncilPosition(position.id!);
                         },

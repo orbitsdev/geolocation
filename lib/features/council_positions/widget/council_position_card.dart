@@ -21,7 +21,105 @@ class CouncilPositionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Slidable(
+
+    if(position.userId == AuthController.controller.user.value.id) {
+        return Stack(
+        children: [
+          Container(
+          
+            decoration: BoxDecoration(
+              color: Colors.white,
+           
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 8.0,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Row with image and name
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      RippleContainer(
+                        onTap: () => Get.to(() => OnlineImageFullScreenDisplay(imageUrl: position.image!)),
+                        child: CircleAvatar(
+                          radius: 25,
+                          backgroundColor: Colors.grey[200],
+                          child: OnlineImage(
+                            imageUrl: position.image ?? '',
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16.0),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Flexible(
+                                  child: RichText(text: TextSpan(text: '',children: [
+                                      TextSpan(text: '${position.fullName??''} ',style: Get.textTheme.bodyLarge?.copyWith(
+                                        fontWeight: FontWeight.bold
+                                      )),
+                                       if(position.userId == AuthController.controller.user.value.id)TextSpan(text: ' (You)',style: Get.textTheme.bodySmall?.copyWith(
+                                        color: Palette.ACTIVE
+                                      )),
+                                  ])),
+                                ),
+                                // if(position.userId == AuthController.controller.user.value.id)Text(
+                                //   'You',
+                                //   style: Get.textTheme.bodySmall,
+                                // ),
+                              ],
+                            ),
+                            Text(
+                              position.position ?? 'Position not available',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16.0),
+          
+                  // Task-related information
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _buildTaskInfo('To Do', position.totalToDoTasks),
+                      _buildTaskInfo('In Progress', position.totalInProgressTasks),
+                      _buildTaskInfo('Completed', position.totalCompletedTasks),
+                      _buildTaskInfo('Blocked', position.totalBlockedTasks),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+         if(position.grantAccess == true)Positioned(
+            top: 8,
+            right: 8,
+            child:Text('(Authorize)',style: Get.textTheme.bodySmall?.copyWith(
+              color: Colors.grey
+            ),))
+        ],
+      );
+    }else{
+       return Slidable(
       key: Key(position.id.toString()),
 
       // The end action pane, for the delete action
@@ -29,7 +127,7 @@ class CouncilPositionCard extends StatelessWidget {
         motion: const ScrollMotion(),
         children: [
           SlidableAction(
-            onPressed: (context) => onDelete(),
+            onPressed:( AuthController.controller.user.value.hasAccess() == true) ? null :  (context) => onDelete(),
             backgroundColor: Colors.red,
             foregroundColor: Colors.white,
             icon: Icons.delete,
@@ -82,24 +180,21 @@ class CouncilPositionCard extends StatelessWidget {
                             Row(
                               children: [
                                 Flexible(
-                                  child: Text(
-                                    position.fullName ?? 'N/A',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
+                                  child: RichText(text: TextSpan(text: '',children: [
+                                      TextSpan(text: '${position.fullName??''} ',style: Get.textTheme.bodyLarge?.copyWith(
+                                        fontWeight: FontWeight.bold
+                                      )),
+                                       if(position.userId == AuthController.controller.user.value.id)TextSpan(text: ' (You)',style: Get.textTheme.bodySmall?.copyWith(
+                                        color: Palette.ACTIVE
+                                      )),
+                                  ])),
                                 ),
-                                if(position.userId == AuthController.controller.user.value.id)Text(
-                                  'You',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                                // if(position.userId == AuthController.controller.user.value.id)Text(
+                                //   'You',
+                                //   style: Get.textTheme.bodySmall,
+                                // ),
                               ],
                             ),
-                            const SizedBox(height: 4),
                             Text(
                               position.position ?? 'Position not available',
                               style: TextStyle(
@@ -138,6 +233,8 @@ class CouncilPositionCard extends StatelessWidget {
         ],
       ),
     );
+    }
+   
   }
 
   // Helper widget to build task information display

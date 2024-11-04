@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:geolocation/core/api/dio/failure.dart';
 import 'package:geolocation/core/modal/modal.dart';
 import 'package:geolocation/features/auth/model/available_user.dart';
 import 'package:geolocation/features/auth/model/council_position.dart';
@@ -8,6 +9,7 @@ import 'package:geolocation/core/api/dio/api_service.dart';
 import 'package:geolocation/features/auth/model/position_option.dart';
 import 'package:geolocation/features/council_positions/model/member.dart';
 import 'package:geolocation/features/council_positions/pages/council_member_position_list_page.dart';
+import 'package:geolocation/features/council_positions/pages/council_member_profile_page.dart';
 import 'package:get/get.dart';
 
 class CouncilPositionController extends GetxController {
@@ -33,6 +35,41 @@ class CouncilPositionController extends GetxController {
   var councilPositionFormKey = GlobalKey<FormBuilderState>();
 
 
+  var selectedMember =  CouncilPosition().obs;
+
+  var isMemberDetailsLoading = false.obs;
+
+void selectMember(CouncilPosition member){
+  selectedMember(member);
+  Get.to(() => CouncilMemberProfilePage(),transition: Transition.cupertino,);
+}
+
+Future<void> refreshSelectedMemberDetails() async {
+ 
+  isMemberDetailsLoading(true);
+
+   var response = await ApiService.getAuthenticatedResource(
+      'councils/${selectedCouncilId.value}/positions/${selectedMember.value.id}',
+    );
+
+    response.fold((failure){
+      isMemberDetailsLoading(false);
+      Modal.errorDialog(failure: failure);
+    },  (success){
+      var data = success.data['data'];
+      print(data);
+      selectedMember(CouncilPosition.fromMap(data));
+      isMemberDetailsLoading(false);
+    });
+   
+}
+
+void setCouncilId(int id){    
+   if(selectedCouncilId.value != id){
+    councilMembers.clear();
+  } 
+   selectedCouncilId(id);
+}
 void selectAndNavigateToCouncilMemberPage(int id) {
   if(selectedCouncilId.value != id){
     councilMembers.clear();
@@ -41,6 +78,9 @@ void selectAndNavigateToCouncilMemberPage(int id) {
   print('Selected Council ID: ${selectedCouncilId.value}');
   Get.to(() => CouncilMemberPositionListPage(), transition: Transition.cupertino);
 }
+
+
+
 
   // Fetch council members
   Future<void> fetchCouncilMembers() async {

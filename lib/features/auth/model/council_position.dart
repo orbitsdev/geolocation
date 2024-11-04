@@ -5,6 +5,7 @@ class CouncilPosition {
   final int? userId;
   final String? fullName;
   final String? image;
+  final String? email;
   final String? position;
   final bool? isLogin;
   final bool? grantAccess;
@@ -25,6 +26,7 @@ class CouncilPosition {
     this.userId,
     this.fullName,
     this.image,
+    this.email,
     this.position,
     this.isLogin,
     this.grantAccess,
@@ -48,6 +50,7 @@ class CouncilPosition {
       userId: json['user_id'],
       fullName: json['fullname'],
       image: json['image'],
+      email: json['email'],
       position: json['position'],
       isLogin: json['is_login'],
       grantAccess: json['grant_access'],
@@ -72,6 +75,7 @@ class CouncilPosition {
       'user_id': userId,
       'fullname': fullName,
       'image': image,
+      'email': email,
       'position': position,
       'is_login': isLogin,
       'grant_access': grantAccess,
@@ -96,6 +100,7 @@ class CouncilPosition {
       'user_id': userId,
       'fullname': fullName,
       'image': image,
+      'email': email,
       'position': position,
       'is_login': isLogin,
       'grant_access': grantAccess,
@@ -120,6 +125,7 @@ class CouncilPosition {
       userId: map['user_id'] != null ? map['user_id'] as int : null,
       fullName: map['fullname'] != null ? map['fullname'] as String : null,
       image: map['image'] != null ? map['image'] as String : null,
+      email: map['email'] != null ? map['email'] as String : null,
       position: map['position'] != null ? map['position'] as String : null,
       isLogin: map['is_login'] != null ? map['is_login'] as bool : null,
       grantAccess: map['grant_access'] != null ? map['grant_access'] as bool : null,
@@ -143,6 +149,7 @@ class CouncilPosition {
     int? userId,
     String? fullName,
     String? image,
+    String? email,
     String? position,
     bool? isLogin,
     bool? grantAccess,
@@ -163,6 +170,7 @@ class CouncilPosition {
       userId: userId ?? this.userId,
       fullName: fullName ?? this.fullName,
       image: image ?? this.image,
+      email: email ?? this.email,
       position: position ?? this.position,
       isLogin: isLogin ?? this.isLogin,
       grantAccess: grantAccess ?? this.grantAccess,
@@ -180,52 +188,7 @@ class CouncilPosition {
 
   @override
   String toString() {
-    return 'CouncilPosition(id: $id, councilId: $councilId, councilName: $councilName, userId: $userId, fullName: $fullName, image: $image, position: $position, isLogin: $isLogin, grantAccess: $grantAccess, totalToDoTasks: $totalToDoTasks, totalInProgressTasks: $totalInProgressTasks, totalCompletedTasks: $totalCompletedTasks, totalCompletedLateTasks: $totalCompletedLateTasks, totalDueTasks: $totalDueTasks, totalOnHoldTasks: $totalOnHoldTasks, totalCancelledTasks: $totalCancelledTasks, totalReviewTasks: $totalReviewTasks, totalBlockedTasks: $totalBlockedTasks)';
+    return 'CouncilPosition(id: $id, councilId: $councilId, councilName: $councilName, userId: $userId, fullName: $fullName, image: $image,email: $email, position: $position, isLogin: $isLogin, grantAccess: $grantAccess, totalToDoTasks: $totalToDoTasks, totalInProgressTasks: $totalInProgressTasks, totalCompletedTasks: $totalCompletedTasks, totalCompletedLateTasks: $totalCompletedLateTasks, totalDueTasks: $totalDueTasks, totalOnHoldTasks: $totalOnHoldTasks, totalCancelledTasks: $totalCancelledTasks, totalReviewTasks: $totalReviewTasks, totalBlockedTasks: $totalBlockedTasks)';
   }
 
-  @override
-  bool operator ==(covariant CouncilPosition other) {
-    if (identical(this, other)) return true;
-
-    return other.id == id &&
-        other.councilId == councilId &&
-        other.councilName == councilName &&
-        other.userId == userId &&
-        other.fullName == fullName &&
-        other.image == image &&
-        other.position == position &&
-        other.isLogin == isLogin &&
-        other.grantAccess == grantAccess &&
-        other.totalToDoTasks == totalToDoTasks &&
-        other.totalInProgressTasks == totalInProgressTasks &&
-        other.totalCompletedTasks == totalCompletedTasks &&
-        other.totalCompletedLateTasks == totalCompletedLateTasks &&
-        other.totalDueTasks == totalDueTasks &&
-        other.totalOnHoldTasks == totalOnHoldTasks &&
-        other.totalCancelledTasks == totalCancelledTasks &&
-        other.totalReviewTasks == totalReviewTasks &&
-        other.totalBlockedTasks == totalBlockedTasks;
-  }
-
-  @override
-  int get hashCode {
-    return id.hashCode ^
-        councilId.hashCode ^
-        councilName.hashCode ^
-        userId.hashCode ^
-        fullName.hashCode ^
-        image.hashCode ^
-        position.hashCode ^
-        isLogin.hashCode ^
-        grantAccess.hashCode ^
-        totalToDoTasks.hashCode ^
-        totalInProgressTasks.hashCode ^
-        totalCompletedTasks.hashCode ^
-        totalCompletedLateTasks.hashCode ^
-        totalDueTasks.hashCode ^
-        totalOnHoldTasks.hashCode ^
-        totalCancelledTasks.hashCode ^
-        totalReviewTasks.hashCode ^
-        totalBlockedTasks.hashCode;
-  }
 }
