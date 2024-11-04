@@ -76,7 +76,7 @@ static errorDialog(
 }
 static success({
    
-    String? message,
+    String? message = 'Success!',
   
     Widget? visualContent,  // Lottie/SVG/Image widget
     String? buttonText = "OK",
@@ -99,9 +99,15 @@ static success({
             repeat: false,
           ),
             Gap(8),
-            Text("${message}", style: Get.textTheme.bodyLarge?.copyWith(
-             
-            )),
+            Text(
+      '${message}',
+     textAlign: TextAlign.center,
+        style: Get.textTheme.bodyMedium?.copyWith(
+          color: Colors.black54,
+        ), // Center the content text
+            )
+        
+      
             
           ],
         ),

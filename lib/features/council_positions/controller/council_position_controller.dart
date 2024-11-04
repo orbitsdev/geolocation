@@ -172,7 +172,8 @@ Future<void> createCouncilPosition() async {
         clearSelectedUser();
         await fetchCouncilMembers(); // Refresh council members
         // No need to reset selectedCouncilId
-        Get.offNamedUntil('/members', (route) => route.isFirst);
+        Modal.showToast(msg: 'New Member was created successfully');         Get.offNamedUntil('/members', (route) => route.isFirst);
+        
 
       },
     );

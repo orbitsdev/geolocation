@@ -12,14 +12,13 @@ class FullAccessMiddleware extends GetMiddleware {
   RouteSettings? redirect(String? route) {
   
     final AuthController authController = Get.find<AuthController>();
-
   
-    if (authController.user.value.fullAccess()) {
-     
+     if (authController.user.value.hasAccess() || authController.user.value.isAdmin()) {
+    
       return null;
-    } else {
-      // If the user does not have full access, redirect to the "/forbidden" page
-      return const RouteSettings(name: '/forbidden');
-    }
+    } 
+    
+    return const RouteSettings(name: '/forbidden');
+  
   }
 }

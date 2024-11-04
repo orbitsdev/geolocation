@@ -42,10 +42,10 @@ class CouncilPositionCard extends StatelessWidget {
       child: Stack(
         children: [
           Container(
-            margin: const EdgeInsets.only(bottom: 10),
+          
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(12.0),
+           
               boxShadow: [
                 BoxShadow(
                   color: Colors.black12,
