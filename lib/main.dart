@@ -34,7 +34,7 @@ import 'package:get/get.dart';
 void main() async  {
    WidgetsFlutterBinding.ensureInitialized();
    GlobalBinding().dependencies();   
-  //  await AuthController.controller.loadTokenAndUser(showModal: false);
+  await AuthController.controller.loadTokenAndUser(showModal: false);
    ModalController.controller.setDialog(false);
    runApp(const GeoLocationApp());
 }
@@ -57,11 +57,11 @@ class _GeoLocationAppState extends State<GeoLocationApp>  with WidgetsBindingObs
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     
-    // Future.delayed(Duration.zero, () async {
-    //   if(AuthController.controller.token.value.isNotEmpty){
-    //     // await AuthController.controller.fetchAndUpdateUserDetails(showModal: true);
-    //   }
-    // });  
+    Future.delayed(Duration.zero, () async {
+      if(AuthController.controller.token.value.isNotEmpty){
+        await AuthController.controller.fetchAndUpdateUserDetails(showModal: true);
+      }
+    });  
     
   }
 

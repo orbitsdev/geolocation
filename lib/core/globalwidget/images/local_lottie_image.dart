@@ -22,8 +22,8 @@ class LocalLottieImage extends StatelessWidget {
     return Lottie.asset(
       path,
       repeat: repeat, // This ensures repeat is true by default
-      width: width ?? 160, // Default width
-      height: height ?? 160, // Default height
+      width: width ?? 140, // Default width
+      height: height ?? 140, // Default height
       fit: fit,
     );
   }

@@ -171,6 +171,8 @@ class User {
     return true;
   }
 
+
+
   
   return defaultPosition?.grantAccess == true;
 }

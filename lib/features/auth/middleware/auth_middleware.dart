@@ -6,16 +6,12 @@ import 'package:geolocation/core/localdata/secure_storage.dart';
 class AuthMiddleware extends GetMiddleware {
   @override
   RouteSettings? redirect(String? route) {
-    
-    var  authController = Get.find<AuthController>();
-  print('AUTH MIDDLEWAURE-------------------');
-    print('${authController.token.value}');
-    // print('${!authController.token.value.isEmpty}');
+    var authController = Get.find<AuthController>();
 
-  
-  if(authController.token.value.isEmpty == true){
-   return RouteSettings(name: '/login');  }
-   print('AUTH MIDDLEWAURE---------------------');
+    if (authController.token.value.isEmpty == true) {
+      return RouteSettings(name: '/login');
+    }
+
     return null;
   }
 }

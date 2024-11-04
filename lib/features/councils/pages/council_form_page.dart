@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:geolocation/core/constant/style.dart';
+import 'package:geolocation/core/formatters/academic_year_fomatter.dart';
 import 'package:geolocation/features/councils/controller/council_controller.dart';
 import 'package:get/get.dart';
 
@@ -17,7 +20,8 @@ class CouncilFormPage extends StatelessWidget {
 
     if (isEdit && councilId != null) {
       // If editing, load the council data and pre-fill the form
-      final council = councilController.councils.firstWhere((c) => c.id == councilId);
+      final council =
+          councilController.councils.firstWhere((c) => c.id == councilId);
       nameController.text = council.name ?? '';
     }
 
@@ -35,6 +39,11 @@ class CouncilFormPage extends StatelessWidget {
               TextFormField(
                 controller: nameController,
                 decoration: InputDecoration(labelText: 'Council Name'),
+                inputFormatters: [
+                  // FilteringTextInputFormatter.allow(RegExp(r'[0-9]')), 
+                  FilteringTextInputFormatter.allow(RegExp(r'^[0-9-]*$')), 
+                      AcademicYearFomatter(sample: 'xxxx-xxxx', seperator: '-')
+                ],
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a council name';
@@ -44,11 +53,13 @@ class CouncilFormPage extends StatelessWidget {
               ),
               SizedBox(height: 20),
               ElevatedButton(
+                style: ELEVATED_BUTTON_STYLE,
                 onPressed: () {
                   if (_formKey.currentState?.validate() ?? false) {
                     if (isEdit) {
                       // Update council
-                      councilController.updateCouncil(councilId!, nameController.text);
+                      councilController.updateCouncil(
+                          councilId!, nameController.text);
                     } else {
                       // Create new council
                       councilController.createCouncil(nameController.text);

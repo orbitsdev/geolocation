@@ -10,12 +10,12 @@ class FullAccessMiddleware extends GetMiddleware {
 
   @override
   RouteSettings? redirect(String? route) {
-    // Get the AuthController instance
+  
     final AuthController authController = Get.find<AuthController>();
 
-    // Check if the user has full access
+  
     if (authController.user.value.fullAccess()) {
-      // Allow access to the route
+     
       return null;
     } else {
       // If the user does not have full access, redirect to the "/forbidden" page

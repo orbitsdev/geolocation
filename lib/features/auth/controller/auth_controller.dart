@@ -42,6 +42,12 @@ class AuthController extends GetxController {
         String? userJson = await SecureStorage().readSecureData('user');
         if (userJson != null && userJson.isNotEmpty) {
           user(User.fromJson(jsonDecode(userJson)));
+          print('------------TOKEN-------------');
+            print('${token.value}');
+          print('--------------------------------------');
+          print('------------DEFAULT_POSITION--------------------');
+          print(user.value.defaultPosition?.toJson());
+          print('--------------------------------------');
         }
       }
     } catch (e) {
@@ -77,21 +83,7 @@ class AuthController extends GetxController {
 
   Future<void> login(Map<String, dynamic>? formData) async {
     isLoginLoading(true);
-    Modal.loading(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
-      content: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          SizedBox(width: 24),
-          CircularProgressIndicator(),
-          SizedBox(width: 36),
-          Text(
-            "Logging in...",
-            style: Get.textTheme.titleMedium,
-          ),
-        ],
-      ),
-    );
+    Modal.loading();
 
     final response = await ApiService.postPublicResource('login', {
       'email': formData!['email'],
@@ -102,14 +94,8 @@ class AuthController extends GetxController {
 
     response.fold(
       (failure) {
-        failure.printError();
-        Modal.error(
-          content: Text(failure.message ?? 'Something went wrong.'),
-          visualContent: LocalLottieImage(
-            path: lottiesPath('error.json'),
-            repeat: false,
-          ),
-        );
+         isLoginLoading(false);
+        Modal.errorDialog(failure: failure);
       },
       (success) async {
         final data = success.data['data'];
@@ -149,11 +135,8 @@ class AuthController extends GetxController {
 
       response.fold(
         (failure) {
-          failure.printError();
-          Modal.error(
-            content: Text(failure.message ?? 'Something went wrong.'),
-            visualContent: failure.icon,
-          );
+          isSignupLoading(false);
+         Modal.errorDialog(failure: failure);
         },
         (success) async {
           final data = success.data['data'];
@@ -258,7 +241,7 @@ class AuthController extends GetxController {
       (failure) {
         
 
-        // Only call localLogout if the failure is due to unauthorized access (401)
+        
         if (failure.statusCode != 401) {
            Modal.error(
           content: Text(failure.message ?? 'Something went wrong.'),
@@ -299,6 +282,7 @@ class AuthController extends GetxController {
   }
   return false; // Return false if token is empty
 }
+
   Future<void> localLogout({Failure? failure}) async {
   // Show a loading modal immediately
   Modal.loading(
@@ -312,8 +296,6 @@ class AuthController extends GetxController {
 
   // Delay for 5 seconds (optional, based on your use case)
   await Future.delayed(Duration(seconds: 2));
-
-  // Clear token and user details from SecureStorage
   await SecureStorage().deleteSecureData('token');
   await SecureStorage().deleteSecureData('user');
 

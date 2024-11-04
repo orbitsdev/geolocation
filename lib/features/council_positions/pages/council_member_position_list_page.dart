@@ -103,7 +103,7 @@ class _CouncilMemberPositionListPageState extends State<CouncilMemberPositionLis
                     if (position.id != null) {
                       Modal.confirmation(
                         titleText: "Confirm Delete",
-                        contentText: "Are you sure you want to delete this council position?",
+                        contentText: "Are you sure you want to delete this member? All associated data, including files and records, will be permanently lost.",
                         onConfirm: () {
                           _controller.deleteCouncilPosition(position.id!);
                         },

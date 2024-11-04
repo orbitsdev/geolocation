@@ -163,7 +163,7 @@ class CreateOrEditCouncilMemberPage extends StatelessWidget {
               Obx(() {
                 return FormBuilderSwitch(
                   name: 'grant_access',
-                  title: const Text('Grant Access'),
+                  title:  Text('Grant Access'),
                   initialValue: controller.grantAccess.value, // Bind initial value to controller
                   onChanged: (val) {
                     controller.grantAccess.value = val ?? false; // Update controller when switched

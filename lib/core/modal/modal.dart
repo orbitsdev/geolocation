@@ -2,48 +2,54 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gap/gap.dart';
+import 'package:geolocation/core/api/dio/failure.dart';
 import 'package:geolocation/core/api/globalcontroller/modal_controller.dart';
 import 'package:geolocation/core/constant/path.dart';
 import 'package:geolocation/core/constant/style.dart';
 import 'package:geolocation/core/globalwidget/images/local_lottie_image.dart';
 import 'package:geolocation/core/globalwidget/loading_widget.dart';
+import 'package:geolocation/core/theme/palette.dart';
 import 'package:get/get.dart';
 class Modal {
 
 
 
 static errorDialog(
-  {Widget? title,
-    Widget? content,
+  {String? message,
+    Failure? failure,
     Widget? visualContent,  
     String? buttonText = "OK",
     VoidCallback? onDismiss,
-    bool barrierDismissible = false,}
+    bool barrierDismissible = false,
+    bool? repeat = true,
+    
+    }
 ){
 
     // Prevent showing multiple dialogs
-    // if (ModalController.controller.isDialogVisible.value) {
-    //     return;
-    // }
+    if (ModalController.controller.isDialogVisible.value) {
+        return;
+    }
 
-    // // Mark the dialog as visible
-    // ModalController.controller.setDialog(true);
+    // Mark the dialog as visible
+    ModalController.controller.setDialog(true);
    Get.dialog(
       AlertDialog(
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-             LocalLottieImage(
+          (visualContent != null) ? visualContent : LocalLottieImage(
             path: lottiesPath('error.json'),
-            repeat: false,
+            repeat: repeat ?? true,
           ),
-            Text(
-              "Error",
+          Gap(12),
+           if(message != null)  Text(
+              "${message}",
               style: Get.textTheme.titleLarge?.copyWith(
                 color: Colors.red,
               ),
             ),
-            Text('Something went wrong.'),
+            Text('${failure?.message}',style:  Get.textTheme.bodyLarge,),
           ],
         ),
         actions: [
@@ -52,8 +58,8 @@ static errorDialog(
   child: ElevatedButton(
     style: ELEVATED_BUTTON_STYLE,
     onPressed: onDismiss ?? () {
-      ModalController.controller.setDialog(false);
       Get.back();
+      ModalController.controller.setDialog(false);
     },
     child: Text(buttonText ?? "Try Again", style: TextStyle(color: Colors.white) ,),
   ),
@@ -69,8 +75,9 @@ static errorDialog(
 
 }
 static success({
-    Widget? title,
-    Widget? content,
+   
+    String? message,
+  
     Widget? visualContent,  // Lottie/SVG/Image widget
     String? buttonText = "OK",
     VoidCallback? onDismiss,
@@ -87,18 +94,34 @@ static success({
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(width: Get.size.width,),
-            if (visualContent != null) visualContent,
+          (visualContent != null) ? visualContent : LocalLottieImage(
+            path: lottiesPath('success.json'),
+            repeat: false,
+          ),
+            Gap(8),
+            Text("${message}", style: Get.textTheme.bodyLarge?.copyWith(
              
-            Text("Success", style: Get.textTheme.titleLarge?.copyWith(
-              color: Colors.green
             )),
-            if (content != null) content,
+            
           ],
         ),
         actions: [
-          TextButton(
-            onPressed: onDismiss ?? () => Get.back(),
-            child: Text(buttonText ?? "OK"),
+          SizedBox(
+             width: double.infinity,
+            child: ElevatedButton(
+               style: ElevatedButton.styleFrom(
+                backgroundColor: Palette.PRIMARY,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+              onPressed: onDismiss ?? () => Get.back(),
+              child: Text(buttonText ?? "OK",style: Get.textTheme.bodyMedium?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                )),
+            ),
           ),
         ],
       ),
@@ -194,48 +217,98 @@ static success({
     String confirmText = "Yes",
     String cancelText = "No",
     bool barrierDismissible = true,
+    bool? repeat = true,
   }) {
     Get.dialog(
             transitionDuration: Duration(milliseconds: 150),  
 
       AlertDialog(
-        
+
+
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (visualContent != null) visualContent,
+
+       
+          (visualContent != null) ? visualContent : LocalLottieImage(
+            path: lottiesPath('question.json'),
+            repeat: repeat == false,
+          ),
+              Gap(8), // Spacing between title and content
+                Text(
+        titleText,
+        textAlign: TextAlign.center,
+        style: Get.textTheme.titleLarge?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: Colors.black87,
+        ),),
               Gap(8), // Spacing between title and content
 
-                   Text(
-      titleText,
-      style: Get.textTheme.titleLarge?.copyWith(
-        fontWeight: FontWeight.bold, // Bold title
-      ),
-      textAlign: TextAlign.center, // Center the title
-    ),
+           
     Text(
       contentText,
-      style: Get.textTheme.bodyMedium?.copyWith(
-        fontSize: 14, // Smaller font for content
-        color: Colors.grey, // Lighter color for the content
-      ),
-      textAlign: TextAlign.center, // Center the content text
+     textAlign: TextAlign.center,
+        style: Get.textTheme.bodyMedium?.copyWith(
+          color: Colors.black54,
+        ), // Center the content text
     ),
           ],
         ),
-        actions: [
- 
-          TextButton(
-            onPressed: onCancel ?? () => Get.back(),
-            child: Text(cancelText),
-          ),
-          TextButton(
-            onPressed: () {
+        actions: [    
+
+           Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                elevation: 0,
+                backgroundColor: Colors.grey.shade200,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                cancelText,
+                style: Get.textTheme.bodyMedium?.copyWith(
+                  color: Colors.grey,
+                ),
+              ),
+              onPressed: onCancel ?? () => Get.back(),
+            ),
+            const SizedBox(width: 8),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Palette.PRIMARY,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                confirmText,
+                style: Get.textTheme.bodyMedium?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              onPressed: () {
               Get.back();
               onConfirm();
             },
-            child: Text(confirmText),
-          ),
+            ),
+          ],
+        ),
+ 
+          // TextButton(
+          //   onPressed: onCancel ?? () => Get.back(),
+          //   child: Text(cancelText),
+          // ),
+          // TextButton(
+          //   onPressed: () {
+          //     Get.back();
+          //     onConfirm();
+          //   },
+          //   child: Text(confirmText),
+          // ),
         ],
       ),
       barrierDismissible: barrierDismissible,

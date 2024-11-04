@@ -141,7 +141,7 @@ class ApiService {
           if(savedToken != null){
            print('! =  bnull');
            print(savedToken);
-          //  AuthController.controller.localLogout(failure:failure ); // Call the logout function
+          AuthController.controller.localLogout(failure:failure ); // Call the logout function
 
           }else{
             print('null');

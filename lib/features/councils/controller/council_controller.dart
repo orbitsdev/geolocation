@@ -104,12 +104,12 @@ class CouncilController extends GetxController {
 
         response.fold(
           (failure) {
-            Modal.error(content: Text(failure.message ?? 'Failed to delete council.'));
+            Modal.errorDialog(failure: failure);
           },
           (success) {
             councils.removeWhere((council) => council.id == id); // Remove the deleted council
             update();
-            Modal.success(content: Text('Council deleted successfully.'));
+            Modal.success(message: 'Council deleted successfully.');
           },
         );
       },
@@ -128,11 +128,11 @@ class CouncilController extends GetxController {
 
     response.fold(
       (failure) {
-        Modal.error(content: Text(failure.message ?? 'Failed to create council.'));
+        Modal.errorDialog(failure: failure);
       },
       (success) {
         fetchCouncils(); // Reload the council list after successful creation
-        Modal.success(content: Text('Council created successfully.'));
+        Modal.success(message: 'Council created successfully.');
       },
     );
   }
@@ -154,7 +154,7 @@ class CouncilController extends GetxController {
       },
       (success) {
         fetchCouncils(); // Reload the council list after successful update
-        Modal.success(content: Text('Council updated successfully.'));
+        Modal.success(message: 'Council updated successfully.');
       },
     );
   }

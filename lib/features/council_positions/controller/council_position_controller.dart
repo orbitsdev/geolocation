@@ -12,7 +12,7 @@ import 'package:get/get.dart';
 
 class CouncilPositionController extends GetxController {
   static CouncilPositionController controller = Get.find();
-    var grantAccess = false.obs;
+  var grantAccess = false.obs;
  var isFetchingCouncilPositions = false.obs;
   var isFetchingUsers = false.obs;
   var isFetchingAvailablePositions = false.obs;
@@ -35,9 +35,7 @@ class CouncilPositionController extends GetxController {
 
 void selectAndNavigateToCouncilMemberPage(int id) {
   if(selectedCouncilId.value != id){
-    print(true);
     councilMembers.clear();
-
   }
   selectedCouncilId(id);
   print('Selected Council ID: ${selectedCouncilId.value}');
@@ -130,8 +128,7 @@ void selectAndNavigateToCouncilMemberPage(int id) {
         Get.back(); // Close the modal
         councilMembers.removeWhere((p) => p.id == positionId);
         update();
-        Modal.success(
-        content: const Text('Council position deleted successfully!'));
+        Modal.success(message: 'Council position deleted successfully!');
       },
     );
   }
@@ -150,6 +147,9 @@ Future<void> createCouncilPosition() async {
       'grant_access': councilPositionFormKey.currentState?.fields['grant_access']?.value ?? false, 
     };
 
+    print('position data');
+    // print(positionData);
+
     isCreatingOrUpdating(true);
 
     var response = await ApiService.postAuthenticatedResource(
@@ -163,11 +163,16 @@ Future<void> createCouncilPosition() async {
         Modal.error(content: Text(failure.message!));
       },
       (success) async {
+
+        // print('_________ data of created');
+        // print(success.data);
+        // print('_________');
+        grantAccess.value = false;
         isCreatingOrUpdating(false);
         clearSelectedUser();
         await fetchCouncilMembers(); // Refresh council members
         // No need to reset selectedCouncilId
-      Get.offNamedUntil('/councils', (route) => route.isFirst);
+        Get.offNamedUntil('/members', (route) => route.isFirst);
 
       },
     );
@@ -210,7 +215,9 @@ Future<void> createCouncilPosition() async {
           fetchCouncilMembers();
           Get.offNamedUntil( '/councils', (route) => Get.currentRoute == '/create-or-edit');
           Get.to(()=>CouncilMemberPositionListPage(),  transition: Transition.cupertino);
-          Modal.success(content: const Text('Position updated successfully!'));
+         
+            
+      Modal.success(message: 'Position updated successfully!');
         },
       );
     }
@@ -321,7 +328,7 @@ Future<void> createCouncilPosition() async {
 
       var data = success.data['data'];
       
-      Modal.success(content: const Text('Position switched successfully!'));
+      Modal.success(message: 'Position switched successfully!');
       
 
     },

@@ -18,8 +18,8 @@ class ModalTestPage extends StatelessWidget {
             ElevatedButton(
               onPressed: () {
                 Modal.success(
-                  title: Text("Success"),
-                  content: Text("This is a success message."),
+                  message: 'Success',
+                  
                  
                   buttonText: "Close",
                 );
