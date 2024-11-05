@@ -26,7 +26,7 @@ class TaskController extends GetxController {
   var selectedOfficer = CouncilPosition().obs;
 
 
-  Future<void> loadFavorites(BuildContext context) async {
+  Future<void> loadTask() async {
     isLoading(true);
     page(1);
     perPage(20);

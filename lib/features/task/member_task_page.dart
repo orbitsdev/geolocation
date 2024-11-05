@@ -25,7 +25,7 @@ class _MemberTaskPageState extends State<MemberTaskPage> {
    
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      taskController.loadTasks();
+      taskController.loadTask();
      
 
       scrollController.addListener(() {
