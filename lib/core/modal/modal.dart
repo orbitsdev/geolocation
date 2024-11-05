@@ -10,6 +10,8 @@ import 'package:geolocation/core/globalwidget/images/local_lottie_image.dart';
 import 'package:geolocation/core/globalwidget/loading_widget.dart';
 import 'package:geolocation/core/theme/palette.dart';
 import 'package:get/get.dart';
+
+
 class Modal {
 
 
@@ -50,6 +52,63 @@ static errorDialog(
               ),
             ),
             Text('${failure?.message}',style:  Get.textTheme.bodyLarge,),
+          ],
+        ),
+        actions: [
+          SizedBox(
+  width: double.infinity, // Full width
+  child: ElevatedButton(
+    style: ELEVATED_BUTTON_STYLE,
+    onPressed: onDismiss ?? () {
+      Get.back();
+      ModalController.controller.setDialog(false);
+    },
+    child: Text(buttonText ?? "Try Again", style: TextStyle(color: Colors.white) ,),
+  ),
+),
+
+        ],
+      ),
+      barrierDismissible: barrierDismissible,
+    ).then((_) {
+      // Ensure the dialog visibility is reset even if the dialog is dismissed in other ways
+      ModalController.controller.setDialog(false);
+    });
+
+}
+
+
+static errorDialogMessage(
+  {String? message,
+    Failure? failure,
+    Widget? visualContent,  
+    String? buttonText = "OK",
+    VoidCallback? onDismiss,
+    bool barrierDismissible = false,
+    bool? repeat = true,
+    
+    }
+){
+
+    // Prevent showing multiple dialogs
+    if (ModalController.controller.isDialogVisible.value) {
+        return;
+    }
+
+    // Mark the dialog as visible
+    ModalController.controller.setDialog(true);
+   Get.dialog(
+      AlertDialog(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+          (visualContent != null) ? visualContent : LocalLottieImage(
+            path: lottiesPath('error.json'),
+            repeat: repeat ?? true,
+          ),
+          Gap(12),
+           
+            Text('${message}',style:  Get.textTheme.bodyLarge,),
           ],
         ),
         actions: [
@@ -362,6 +421,53 @@ static success({
         textColor: textColor ?? Colors.white,
         fontSize: 16.0);
   }
+
+   static void androidDialogNoContext({
+    String title = 'Loading',
+    bool barrierDismissible = false,
+  }) {
+    Get.dialog(
+      Dialog(
+        backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Align(
+            alignment: Alignment.center,
+            child: Container(
+              width: 80,
+              constraints: BoxConstraints(maxHeight: 80),
+              decoration: BoxDecoration(
+                color: Colors.black,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Center(
+                    child: SizedBox(
+                      height: 26,
+                      width: 26,
+                      child: CircularProgressIndicator(
+                        color: Palette.PRIMARY,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    title,
+                    style: Get.textTheme.bodySmall?.copyWith(color: Colors.white),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+      barrierDismissible: barrierDismissible,
+    );
+  }
+
 }
 
 

@@ -200,7 +200,7 @@ Future<void> createCouncilPosition() async {
     response.fold(
       (failure) {
         isCreatingOrUpdating(false);
-        Modal.error(content: Text(failure.message!));
+               Modal.errorDialog(failure: failure);
       },
       (success) async {
 
@@ -225,7 +225,9 @@ Future<void> createCouncilPosition() async {
   Future<void> updateCouncilPosition(int positionId) async {
     if (councilPositionFormKey.currentState!.saveAndValidate()) {
       if (chosenUser.value == null) {
-        Modal.error(content: const Text('Please select a user.'));
+
+
+        Modal.errorDialogMessage(message: 'Please select a user.');
         return;
       }
 
@@ -247,7 +249,7 @@ Future<void> createCouncilPosition() async {
         (failure) {
           isCreatingOrUpdating(false);
           update();
-          Modal.error(content: Text(failure.message!));
+          Modal.errorDialog(failure: failure);
         },
         (success) {
           isCreatingOrUpdating(false);
@@ -275,15 +277,14 @@ Future<void> createCouncilPosition() async {
       (failure) {
         isFetchingUsers(false);
         update();
-        Modal.error(content: Text(failure.message!));
+      Modal.errorDialog(failure: failure);
       },
       (success) {
         isFetchingUsers(false);
         update();
         var userData = (success.data['data'] as List<dynamic>);
-        usersAvailableForSelection.value = userData
-            .map((json) => AvailableUser.fromMap(json as Map<String, dynamic>))
-            .toList();
+
+        usersAvailableForSelection.value = userData.map((json) => AvailableUser.fromMap(json as Map<String, dynamic>)) .toList();
         filteredUsers.value = usersAvailableForSelection;
 
         isFetchingUsers(false);
@@ -318,7 +319,7 @@ Future<void> createCouncilPosition() async {
     response.fold(
       (failure) {
         isSearchingUsers(false);
-        Modal.error(content: Text(failure.message!));
+      Modal.errorDialog(failure: failure);
       },
       (success) {
         print(success.data);
@@ -363,7 +364,9 @@ Future<void> createCouncilPosition() async {
   response.fold(
     (failure) {
       // Show an error message if the API request failed
-      Modal.error(content: Text(failure.message ?? 'Failed to switch position.'));
+
+      Modal.errorDialog(failure: failure);
+     
     },
     (success) {
 

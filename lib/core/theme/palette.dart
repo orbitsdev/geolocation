@@ -42,4 +42,11 @@ static Color LIGHT_RED = Color(0xFFFB714A);
 
 static Color BG_DARK = Color(0xFF1C404B);
 static Color  BG_LIGH_3 = Color(0xFFF2F5F7);
+
+
+//shimmer
+static Color  SHIMMER1 = Color(0xFFefefef);
+static Color  SHIMMER2 = Color(0xFFefefef);
+static Color  SHIMMER3 = Color(0xffF7F7F7);
+
 }

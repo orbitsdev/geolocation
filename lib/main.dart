@@ -28,6 +28,7 @@ import 'package:geolocation/features/auth/controller/login_controller.dart';
 import 'package:geolocation/features/auth/pages/login_page.dart';
 import 'package:geolocation/features/auth/pages/signup_page.dart';
 import 'package:geolocation/features/settings/settings_page.dart';
+import 'package:geolocation/features/task/member_task_page.dart';
 import 'package:geolocation/features/task/task_page.dart';
 import 'package:get/get.dart';
 
@@ -107,6 +108,7 @@ class _GeoLocationAppState extends State<GeoLocationApp>  with WidgetsBindingObs
         GetPage(name: '/members', page: () => CouncilMemberPositionListPage(), middlewares: []),
         GetPage(name: '/create-or-edit', page: () => CreateOrEditCouncilMemberPage(), middlewares: []),
 
+        GetPage(name: '/tasks', page: () => MemberTaskPage(), middlewares: []),
         GetPage(name: '/event', page: () => EventPage(), middlewares: []),
 
         GetPage(name: '/notifications', page: () => NotificationPage(), middlewares: []),
