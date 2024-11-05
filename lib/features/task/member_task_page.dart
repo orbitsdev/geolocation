@@ -65,55 +65,59 @@ class _MemberTaskPageState extends State<MemberTaskPage> {
           ),]
       ),
     
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ListView(
-          children: [
-            RippleContainer(
-              child: AdminTaskCard(
-                title: 'Design Website Banner',
-                description: 'Create a promotional banner for the homepage.',
-                status: 'In Progress',
-                dueDate: 'Sep 15, 2024',
-                officerName: 'Jane Smith',
-                officerImageUrl: 'https://i.pravatar.cc/150?img=5',
-                officerPosition: 'Marketing Officer',
-                attachedFiles: exampleFiles ,
+      body: RefreshIndicator(
+        triggerMode: RefreshIndicatorTriggerMode.anywhere,
+        onRefresh: ()=> taskController.loadTask(),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: ListView(
+            children: [
+              RippleContainer(
+                child: AdminTaskCard(
+                  title: 'Design Website Banner',
+                  description: 'Create a promotional banner for the homepage.',
+                  status: 'In Progress',
+                  dueDate: 'Sep 15, 2024',
+                  officerName: 'Jane Smith',
+                  officerImageUrl: 'https://i.pravatar.cc/150?img=5',
+                  officerPosition: 'Marketing Officer',
+                  attachedFiles: exampleFiles ,
+                ),
               ),
-            ),
-            AdminTaskCard(
-  title: 'Design Website Banner',
-  description: 'Create a promotional banner for the homepage.',
-  status: 'In Progress',
-  dueDate: 'Sep 15, 2024',
-  officerName: 'Jane Smith',
-  officerImageUrl: 'https://i.pravatar.cc/150?img=5',
-  officerPosition: 'Marketing Officer',
-   attachedFiles: exampleFiles ,
-),
-            AdminTaskCard(
-  title: 'Design Website Banner',
-  description: 'Create a promotional banner for the homepage.',
-  status: 'In Progress',
-  dueDate: 'Sep 15, 2024',
-  officerName: 'Jane Smith',
-  officerImageUrl: 'https://i.pravatar.cc/150?img=5',
-  officerPosition: 'Marketing Officer',
-   attachedFiles: exampleFiles ,
-  
-),
-            AdminTaskCard(
-  title: 'Design Website Banner',
-  description: 'Create a promotional banner for the homepage.',
-  status: 'In Progress',
-  dueDate: 'Sep 15, 2024',
-  officerName: 'Jane Smith',
-  officerImageUrl: 'https://i.pravatar.cc/150?img=5',
-  officerPosition: 'Marketing Officer',
-   attachedFiles: exampleFiles ,
-),
-
-          ],
+              AdminTaskCard(
+          title: 'Design Website Banner',
+          description: 'Create a promotional banner for the homepage.',
+          status: 'In Progress',
+          dueDate: 'Sep 15, 2024',
+          officerName: 'Jane Smith',
+          officerImageUrl: 'https://i.pravatar.cc/150?img=5',
+          officerPosition: 'Marketing Officer',
+           attachedFiles: exampleFiles ,
+        ),
+              AdminTaskCard(
+          title: 'Design Website Banner',
+          description: 'Create a promotional banner for the homepage.',
+          status: 'In Progress',
+          dueDate: 'Sep 15, 2024',
+          officerName: 'Jane Smith',
+          officerImageUrl: 'https://i.pravatar.cc/150?img=5',
+          officerPosition: 'Marketing Officer',
+           attachedFiles: exampleFiles ,
+          
+        ),
+              AdminTaskCard(
+          title: 'Design Website Banner',
+          description: 'Create a promotional banner for the homepage.',
+          status: 'In Progress',
+          dueDate: 'Sep 15, 2024',
+          officerName: 'Jane Smith',
+          officerImageUrl: 'https://i.pravatar.cc/150?img=5',
+          officerPosition: 'Marketing Officer',
+           attachedFiles: exampleFiles ,
+        ),
+        
+            ],
+          ),
         ),
       ),
     );

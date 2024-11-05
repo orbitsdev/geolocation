@@ -87,6 +87,7 @@ class Task {
   }
 
   factory Task.fromMap(Map<String, dynamic> map) {
+    
     return Task(
       id: map['id'] != null ? map['id'] as int : null,
       title: map['title'] != null ? map['title'] as String : null,
@@ -98,8 +99,11 @@ class Task {
       isDone: map['isDone'] != null ? map['isDone'] as bool : null,
       createdAt: map['created_at'] != null ? map['created_at'] as String : null,
       updatedAt: map['updated_at'] != null ? map['updated_at'] as String : null,
-      assignedCouncilPosition: map['assigned_council_position'] ?CouncilPosition.fromMap(map['assigned_council_position'] as Map<String, dynamic>) : null,
-      approvedByCouncilPosition: map['approved_by_council_position']  ?CouncilPosition.fromMap(map['approved_by_council_position'] as Map<String, dynamic>) : null,
+       assignedCouncilPosition:  map['assigned_council_position'] != null ? CouncilPosition.fromMap((map['assigned_council_position']) ): null,
+       approvedByCouncilPosition:  map['approved_by_council_position'] != null ? CouncilPosition.fromMap((map['approved_by_council_position']) ): null,
+      // approvedByCouncilPosition:  null,
+      //assignedCouncilPosition: map['assigned_council_position'] ?CouncilPosition.fromMap(map['assigned_council_position'] ) : null,
+      // approvedByCouncilPosition: map['approved_by_council_position']  ?CouncilPosition.fromMap(map['approved_by_council_position'] ) : null,
       media: map['media'] != null
           ? List<MediaFile>.from(
               (map['media'] as List<dynamic>).map<MediaFile?>(

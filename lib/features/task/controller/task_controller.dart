@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:fpdart/fpdart.dart';
+
 import 'package:geolocation/core/api/dio/api_service.dart';
 import 'package:geolocation/core/modal/modal.dart';
+import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:geolocation/features/auth/model/council_position.dart';
+import 'package:geolocation/features/task/model/task.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
@@ -37,30 +39,37 @@ class TaskController extends GetxController {
     Map<String, dynamic> data = {
       'page': page,
       'per_page': perPage,
+      'councilId':  AuthController.controller.user.value.defaultPosition?.councilId,
     };
 
 
-    
+    print(data);
 
-    // var response = await ApiService.getAuthenticatedResource('favorite',
-    //     queryParameters: data);
-    // response.fold((failed) {
-    //   isLoading(false);
-    //   update();
-    //   Modal.errorDialog( failure: failed);
-    // }, (success) {
-    //   var data = success.data;
+    var response = await ApiService.getAuthenticatedResource('tasks',
+        queryParameters: data);
+    response.fold((failed) {
+      isLoading(false);
+      update();
+      Modal.errorDialog( failure: failed);
+    }, (success) {
+      var data = success.data;
 
-    //   List<Task> newData = (data['data'] as List<dynamic>)
-    //       .map((product) => Task.fromMap(product))
-    //       .toList();
-    //   products(newData);
-    //   page.value++;
-    //   lastTotalValue.value = data['total'];
-    //   hasData.value = products.length < lastTotalValue.value;
-    //   isLoading(false);
-    //   update();
-    // });
+        // CouncilPosition newCounCilPosition =  CouncilPosition.fromMap(success.data['data'][0]['assigned_council_position']);
+        // print(newCounCilPosition);
+      
+      List<Task> newData = (data['data'] as List<dynamic>).map((task) => Task.fromMap(task)) .toList();
+      tasks(newData);
+      page.value++;
+      lastTotalValue.value = data['pagination']['total'];
+      hasData.value = tasks.length < lastTotalValue.value;
+      isLoading(false);
+      update();
+      tasks.forEach((e){
+        print('___________');
+        print(e.toJson());
+        print('__________________');
+      });
+    });
 
    
   }
