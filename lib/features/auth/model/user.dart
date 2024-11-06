@@ -2,8 +2,9 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:geolocation/features/auth/model/council_position.dart';
 
-import 'package:geolocation/features/council_positions/model/concil_position.dart';
+
 
 class Role  {
     static String ADMIN = 'admin';

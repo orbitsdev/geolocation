@@ -19,124 +19,122 @@ class AdminTaskCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RippleContainer(
-      onTap: ()=> Get.to(()=> AdminTaskCardPage(), transition: Transition.cupertino),
-      child: Container(
-        margin: EdgeInsets.only(bottom: 16.0),
-        padding: EdgeInsets.all(16.0),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black12,
-              blurRadius: 10,
-              offset: Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Officer Information
-            Row(
-              children: [
-
-                Container(
-                  width: 24,
-                  height: 24,
-                  child: OnlineImage(imageUrl: '${task.assignedCouncilPosition?.image??''}', borderRadius: BorderRadius.circular(24),)),
-                
-                SizedBox(width: 16),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '${task.assignedCouncilPosition?.fullname}',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      '${task.assignedCouncilPosition?.position}',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            SizedBox(height: 16),
-      
-            // Task Information
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '${task.title}',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: _getStatusColor('${task.status}'),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    '${task.status}',
+    return Container(
+      padding: EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Officer Information
+          Row(
+            children: [
+    
+              Container(
+                width: 24,
+                height: 24,
+                child: OnlineImage(imageUrl: '${task.assignedCouncilPosition?.image??''}', borderRadius: BorderRadius.circular(24),)),
+              
+              SizedBox(width: 16),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${task.assignedCouncilPosition?.fullName}',
                     style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
-              ],
-            ),
-            SizedBox(height: 8),
-            Text(
-              '${task.taskDetails}',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[600],
-              ),
-            ),
-            SizedBox(height: 12),
-            Divider(color: Palette.LIGHT_BACKGROUND,),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Due Date',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
+                  Text(
+                    '${task.assignedCouncilPosition?.position}',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                    ),
                   ),
+                ],
+              ),
+            ],
+          ),
+          SizedBox(height: 16),
+    
+          // Task Information
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '${task.title}',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
                 ),
-                Text(
-                  '${task.dueDate}',
+              ),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                decoration: BoxDecoration(
+                  color: _getStatusColor('${task.status}'),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  '${task.status}',
                   style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[800],
+                    color: Colors.white,
+                    fontSize: 12,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-              ],
+              ),
+            ],
+          ),
+          SizedBox(height: 8),
+          Text(
+            '${task.taskDetails}',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[600],
             ),
-          ],
-        ),
+          ),
+          SizedBox(height: 12),
+          Divider(color: Palette.LIGHT_BACKGROUND,),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Due Date',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                ),
+              ),
+              Text(
+                '${task.dueDate}',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[800],
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 
   Color _getStatusColor(String status) {
     switch (status) {
+      case 'To Do':
+        return Colors.blueAccent;
       case 'Completed':
         return Colors.green;
       case 'In Progress':

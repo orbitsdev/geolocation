@@ -40,7 +40,7 @@ class ApiService {
       D.Response response = await _dio.get(endpoint);
       return right(response); // On success, return the response
     } on DioException catch (e) {
-      return left(ErrorHandler.handleError(e)); // On error, return Failure
+      return left(ErrorHandler.handleDio(e)); // On error, return Failure
     }
   }
 
@@ -50,7 +50,7 @@ class ApiService {
       D.Response response = await _dio.post(endpoint, data: data);
       return right(response);
     } on DioException catch (e) {
-      return left(ErrorHandler.handleError(e));
+      return left(ErrorHandler.handleDio(e));
     }
   }
 
@@ -66,7 +66,7 @@ class ApiService {
       D.Response response = await _dio.get(endpoint, options: options, queryParameters: queryParameters, data: data);
       return right(response);
     } on DioException catch (e) {
-      return left(ErrorHandler.handleError(e));
+      return left(ErrorHandler.handleDio(e));
     }
   }
 
@@ -80,7 +80,7 @@ class ApiService {
       D.Response response = await _dio.post(endpoint, data: data, options: options);
       return right(response);
     } on DioException catch (e) {
-      return left(ErrorHandler.handleError(e));
+      return left(ErrorHandler.handleDio(e));
     }
   }
 
@@ -94,7 +94,7 @@ class ApiService {
       D.Response response = await _dio.put(endpoint, data: data, options: options);
       return right(response);
     } on DioException catch (e) {
-      return left(ErrorHandler.handleError(e));
+      return left(ErrorHandler.handleDio(e));
     }
   }
 
@@ -108,7 +108,7 @@ class ApiService {
       D.Response response = await _dio.patch(endpoint, data: data, options: options);
       return right(response);
     } on DioException catch (e) {
-      return left(ErrorHandler.handleError(e));
+      return left(ErrorHandler.handleDio(e));
     }
   }
 
@@ -122,7 +122,7 @@ class ApiService {
       D.Response response = await _dio.delete(endpoint, options: options);
       return right(response);
     } on DioException catch (e) {
-      return left(ErrorHandler.handleError(e));
+      return left(ErrorHandler.handleDio(e));
     }
   }
 

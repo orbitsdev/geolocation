@@ -1,22 +1,42 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:gap/gap.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+
 import 'package:geolocation/core/globalwidget/ripple_container.dart';
 import 'package:geolocation/core/theme/palette.dart';
+import 'package:geolocation/features/auth/model/council_position.dart';
 import 'package:geolocation/features/council_positions/data/sample_data.dart';
 import 'package:geolocation/features/officers/officer_card.dart';
 import 'package:geolocation/features/task/controller/task_controller.dart';
+import 'package:geolocation/features/task/model/task.dart';
 import 'package:geolocation/features/task/officer_selection_page.dart';
-import 'package:get/get.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:gap/gap.dart';
-import 'package:intl/intl.dart';
 
-class CreateTaskPage extends StatelessWidget {
-  const CreateTaskPage({Key? key}) : super(key: key);
+class CreatedOrEditPage extends StatelessWidget {
+     final bool? isEditMode;
+  final Task? task;
+
+  const CreatedOrEditPage({
+    Key? key,
+    this.isEditMode,
+    this.task,
+  }) : super(key: key);
+
+
+
 
   @override
   Widget build(BuildContext context) {
+    
     var taskController = Get.find<TaskController>();
+
+    // Initialize form values only once if in edit mode
+    if (isEditMode == true && task != null) {
+      taskController.initializeFormForEdit(task!);
+    }
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -239,43 +259,41 @@ class CreateTaskPage extends StatelessWidget {
                   ),
                   Gap(2),
                   FormBuilderDateTimePicker(
-                    firstDate: DateTime.now(),
-                    name: 'due_date',
-                  inputType: InputType.both, // Allow date and time selection
+  name: 'due_date',
+  initialValue: taskController.taskFormKey.currentState?.fields['due_date']?.value ??
+      (taskController.selectedTask.value.dueDate != null
+          ? DateTime.tryParse(taskController.selectedTask.value.dueDate!)
+          : null),
+  firstDate: DateTime.now(),
+  inputType: InputType.both, // Allow date and time selection
   format: DateFormat('yyyy-MM-dd HH:mm:ss'), // Adjust format
-  
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Palette.LIGHT_BACKGROUND,
-                      contentPadding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 10),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(width: 0.5, color: Palette.PRIMARY),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      border: OutlineInputBorder(
-                        borderSide: const BorderSide(
-                            width: 1.0, color: Colors.transparent),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(
-                            width: 1.0, color: Colors.transparent),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      errorBorder: OutlineInputBorder(
-                        borderSide:
-                            const BorderSide(width: 1.0, color: Colors.red),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    validator: FormBuilderValidators.compose([
-                      FormBuilderValidators.required(),
-                      
-                     
-                    ]),
-                  ),
+  decoration: InputDecoration(
+    filled: true,
+    fillColor: Palette.LIGHT_BACKGROUND,
+    contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+    focusedBorder: OutlineInputBorder(
+      borderSide: BorderSide(width: 0.5, color: Palette.PRIMARY),
+      borderRadius: BorderRadius.circular(12),
+    ),
+    border: OutlineInputBorder(
+      borderSide: const BorderSide(width: 1.0, color: Colors.transparent),
+      borderRadius: BorderRadius.circular(12),
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderSide: const BorderSide(width: 1.0, color: Colors.transparent),
+      borderRadius: BorderRadius.circular(12),
+    ),
+    errorBorder: OutlineInputBorder(
+      borderSide: const BorderSide(width: 1.0, color: Colors.red),
+      borderRadius: BorderRadius.circular(12),
+    ),
+  ),
+  validator: FormBuilderValidators.compose([
+    FormBuilderValidators.required(),
+  ]),
+)
+,
+                  Gap(Get.size.height * 0.20),
                 ],
               ),
             ),
@@ -308,10 +326,14 @@ class CreateTaskPage extends StatelessWidget {
                   ),
                 ),
                 onPressed: () {
-                  controller.createTask();
+                  if (isEditMode == true) {
+                  taskController.updateTask(task?.id as int);
+                } else {
+                  taskController.createTask();
+                }
                 },
                 child: Text(
-                  'Save Task',
+                  isEditMode == true ? 'Update Task': 'Save Task',
                   style: Get.textTheme.bodyLarge!.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.normal,

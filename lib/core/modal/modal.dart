@@ -51,7 +51,7 @@ static errorDialog(
                 color: Colors.red,
               ),
             ),
-            Text('${failure?.message}',style:  Get.textTheme.bodyLarge,),
+            Text('${failure?.message}',style:  Get.textTheme.bodyLarge, textAlign: TextAlign.center,),
           ],
         ),
         actions: [

@@ -2,15 +2,94 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocation/core/api/dio/failure.dart';
+import 'package:geolocation/core/api/dio/response_message.dart';
 import 'package:geolocation/core/localdata/secure_storage.dart';
+import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/auth/model/user.dart';
 import 'package:get/get.dart';
 import 'package:geolocation/core/modal/modal.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
 
 class ErrorHandler {
-  static Failure handleError(DioException exception) {
-    if (exception.response != null) {
+  static Failure handleDio(DioException exception) {
+    switch (exception.type) {
+      case DioExceptionType.connectionTimeout:
+        return Failure(
+            exception: exception,
+            message: exception.message,
+            icon: FaIcon(
+              FontAwesomeIcons.clock,
+              size: 40,
+              color: Palette.TEXT_LIGHT,
+            ));
+      case DioExceptionType.sendTimeout:
+        return Failure(
+            exception: exception,
+            message: ResponseMessage.sendTimeout,
+            icon: FaIcon(
+              FontAwesomeIcons.clock,
+              size: 40,
+              color: Palette.TEXT_LIGHT,
+            ));
+      case DioExceptionType.receiveTimeout:
+        return Failure(
+            exception: exception,
+            message: ResponseMessage.receiveTimeout,
+            icon: FaIcon(
+              FontAwesomeIcons.clock,
+              size: 40,
+              color: Palette.TEXT_LIGHT,
+            ));
+      case DioExceptionType.badCertificate:
+        return Failure(
+            exception: exception,
+            message: 'Bad Certificate',
+            icon: FaIcon(
+              FontAwesomeIcons.ban,
+              size: 40,
+              color: Palette.TEXT_LIGHT,
+            ));
+      case DioExceptionType.badResponse:
+        return handleStatusCodeError(exception);
+      case DioExceptionType.cancel:
+        return Failure(
+            exception: exception,
+            message: ResponseMessage.cancel,
+            icon: FaIcon(
+              FontAwesomeIcons.xmark,
+              size: 40,
+              color: Palette.TEXT_LIGHT,
+            ));
+      case DioExceptionType.connectionError:
+        return Failure(
+            exception: exception,
+            message: ResponseMessage.noInternetConnection,
+            icon: FaIcon(
+              FontAwesomeIcons.towerCell,
+              size: 40,
+              color: Palette.TEXT_LIGHT,
+            ));
+      case DioExceptionType.unknown:
+        return Failure(
+            exception: exception,
+            message: exception.message,
+            icon: FaIcon(
+              FontAwesomeIcons.question,
+              size: 40,
+              color: Palette.TEXT_LIGHT,
+            ));
+      default:
+        return Failure(
+            exception: exception,
+            message: exception.message,
+            icon: FaIcon(
+              FontAwesomeIcons.triangleExclamation,
+              size: 40,
+              color: Palette.TEXT_LIGHT,
+            ));
+    }}
+  static Failure handleStatusCodeError(DioException exception){
+      if (exception.response != null) {
       switch (exception.response?.statusCode) {
         case 400:
           return Failure(
@@ -101,5 +180,6 @@ class ErrorHandler {
       );
     }
   }
+  }
 
-}
+

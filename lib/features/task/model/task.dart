@@ -1,7 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
-import 'package:geolocation/features/council_positions/model/concil_position.dart';
+import 'package:geolocation/features/auth/model/council_position.dart';
 import 'package:geolocation/features/file/model/media_file.dart';
 
 class Task {
