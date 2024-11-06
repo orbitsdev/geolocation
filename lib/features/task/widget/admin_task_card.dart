@@ -1,28 +1,21 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
+import 'package:geolocation/core/globalwidget/images/online_image.dart';
+import 'package:get/get.dart';
+
 import 'package:geolocation/core/globalwidget/ripple_container.dart';
 import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/task/admin_members_task_page.dart';
-import 'package:get/get.dart';
+import 'package:geolocation/features/task/model/task.dart';
 
 class AdminTaskCard extends StatelessWidget {
-  final String title;
-  final String description;
-  final String status;
-  final String dueDate;
-  final String officerName;
-  final String officerImageUrl;
-  final String officerPosition;
-
+  final Task task;
   const AdminTaskCard({
     Key? key,
-    required this.title,
-    required this.description,
-    required this.status,
-    required this.dueDate,
-    required this.officerName,
-    required this.officerImageUrl,
-    required this.officerPosition, required attachedFiles,
+    required this.task,
   }) : super(key: key);
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -48,23 +41,25 @@ class AdminTaskCard extends StatelessWidget {
             // Officer Information
             Row(
               children: [
-                CircleAvatar(
-                  radius: 24,
-                  backgroundImage: NetworkImage(officerImageUrl),
-                ),
+
+                Container(
+                  width: 24,
+                  height: 24,
+                  child: OnlineImage(imageUrl: '${task.assignedCouncilPosition?.image??''}', borderRadius: BorderRadius.circular(24),)),
+                
                 SizedBox(width: 16),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      officerName,
+                      '${task.assignedCouncilPosition?.fullname}',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text(
-                      officerPosition,
+                      '${task.assignedCouncilPosition?.position}',
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey[600],
@@ -81,7 +76,7 @@ class AdminTaskCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  title,
+                  '${task.title}',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -90,11 +85,11 @@ class AdminTaskCard extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
-                    color: _getStatusColor(status),
+                    color: _getStatusColor('${task.status}'),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    status,
+                    '${task.status}',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 12,
@@ -106,7 +101,7 @@ class AdminTaskCard extends StatelessWidget {
             ),
             SizedBox(height: 8),
             Text(
-              description,
+              '${task.taskDetails}',
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.grey[600],
@@ -125,7 +120,7 @@ class AdminTaskCard extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  dueDate,
+                  '${task.dueDate}',
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey[800],

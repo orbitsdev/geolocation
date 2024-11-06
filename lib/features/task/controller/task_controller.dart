@@ -52,12 +52,9 @@ class TaskController extends GetxController {
       update();
       Modal.errorDialog( failure: failed);
     }, (success) {
-      var data = success.data;
-
-        // CouncilPosition newCounCilPosition =  CouncilPosition.fromMap(success.data['data'][0]['assigned_council_position']);
-        // print(newCounCilPosition);
+      var data = success.data;  
       
-      List<Task> newData = (data['data'] as List<dynamic>).map((task) => Task.fromMap(task)) .toList();
+      List<Task> newData = (data['data'] as List<dynamic>).map((task) => Task.fromMap(task)).toList();
       tasks(newData);
       page.value++;
       lastTotalValue.value = data['pagination']['total'];

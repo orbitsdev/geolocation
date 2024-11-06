@@ -8,6 +8,7 @@ class Task {
   int? id;
   String? title;
   String? taskDetails;
+  String? dueDate;
   String? completedAt;
   String? status;
   String? remarks;
@@ -24,6 +25,7 @@ class Task {
     this.id,
     this.title,
     this.taskDetails,
+    this.dueDate,
     this.completedAt,
     this.status,
     this.remarks,
@@ -40,6 +42,7 @@ class Task {
     int? id,
     String? title,
     String? taskDetails,
+    String? dueDate,
     String? completedAt,
     String? status,
     String? remarks,
@@ -55,6 +58,7 @@ class Task {
       id: id ?? this.id,
       title: title ?? this.title,
       taskDetails: taskDetails ?? this.taskDetails,
+      dueDate: dueDate ?? this.dueDate,
       completedAt: completedAt ?? this.completedAt,
       status: status ?? this.status,
       remarks: remarks ?? this.remarks,
@@ -73,6 +77,7 @@ class Task {
       'id': id,
       'title': title,
       'task_details': taskDetails,
+      'due_date': dueDate,
       'completed_at': completedAt,
       'status': status,
       'remarks': remarks,
@@ -87,11 +92,11 @@ class Task {
   }
 
   factory Task.fromMap(Map<String, dynamic> map) {
-    
     return Task(
       id: map['id'] != null ? map['id'] as int : null,
       title: map['title'] != null ? map['title'] as String : null,
       taskDetails: map['task_details'] != null ? map['task_details'] as String : null,
+      dueDate: map['due_date'] != null ? map['due_date'] as String : null,
       completedAt: map['completed_at'] != null ? map['completed_at'] as String : null,
       status: map['status'] != null ? map['status'] as String : null,
       remarks: map['remarks'] != null ? map['remarks'] as String : null,
@@ -99,11 +104,8 @@ class Task {
       isDone: map['isDone'] != null ? map['isDone'] as bool : null,
       createdAt: map['created_at'] != null ? map['created_at'] as String : null,
       updatedAt: map['updated_at'] != null ? map['updated_at'] as String : null,
-       assignedCouncilPosition:  map['assigned_council_position'] != null ? CouncilPosition.fromMap((map['assigned_council_position']) ): null,
-       approvedByCouncilPosition:  map['approved_by_council_position'] != null ? CouncilPosition.fromMap((map['approved_by_council_position']) ): null,
-      // approvedByCouncilPosition:  null,
-      //assignedCouncilPosition: map['assigned_council_position'] ?CouncilPosition.fromMap(map['assigned_council_position'] ) : null,
-      // approvedByCouncilPosition: map['approved_by_council_position']  ?CouncilPosition.fromMap(map['approved_by_council_position'] ) : null,
+      assignedCouncilPosition: map['assigned_council_position']!= null ?  CouncilPosition.fromMap(map['assigned_council_position']) : null,
+      approvedByCouncilPosition: map['approved_by_council_position']!= null ?  CouncilPosition.fromMap(map['approved_by_council_position']) : null,
       media: map['media'] != null
           ? List<MediaFile>.from(
               (map['media'] as List<dynamic>).map<MediaFile?>(
@@ -120,7 +122,7 @@ class Task {
 
   @override
   String toString() {
-    return 'Task(id: $id, title: $title, taskDetails: $taskDetails, completedAt: $completedAt, status: $status, remarks: $remarks, isLock: $isLock, isDone: $isDone, createdAt: $createdAt, updatedAt: $updatedAt,  assignedCouncilPosition: $assignedCouncilPosition,  approvedByCouncilPosition: $approvedByCouncilPosition,  media: $media)';
+    return 'Task(id: $id, title: $title, taskDetails: $taskDetails, dueDate: $dueDate, completedAt: $completedAt, status: $status, remarks: $remarks, isLock: $isLock, isDone: $isDone, createdAt: $createdAt, updatedAt: $updatedAt,  assignedCouncilPosition: $assignedCouncilPosition,  approvedByCouncilPosition: $approvedByCouncilPosition,  media: $media)';
   }
 
  
