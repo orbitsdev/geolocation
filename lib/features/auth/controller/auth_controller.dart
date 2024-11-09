@@ -3,11 +3,13 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:geolocation/core/api/dio/api_service.dart';
+import 'package:geolocation/core/api/globalcontroller/device_controller.dart';
 import 'package:geolocation/core/constant/path.dart';
 import 'package:geolocation/core/globalwidget/images/local_image_widget.dart';
 import 'package:geolocation/core/globalwidget/images/local_lottie_image.dart';
 import 'package:geolocation/core/globalwidget/logout_loading.dart';
 import 'package:geolocation/core/modal/modal.dart';
+import 'package:geolocation/core/services/firebase_service.dart';
 import 'package:geolocation/features/auth/model/user.dart';
 import 'package:get/get.dart';
 import 'package:geolocation/core/localdata/secure_storage.dart';
@@ -32,7 +34,6 @@ class AuthController extends GetxController {
   var isTokenLoaded = false.obs;
 
   Future<void> loadTokenAndUser({bool showModal = true}) async {
-    
     try {
       String? savedToken = await SecureStorage().readSecureData('token');
 
@@ -43,7 +44,7 @@ class AuthController extends GetxController {
         if (userJson != null && userJson.isNotEmpty) {
           user(User.fromJson(jsonDecode(userJson)));
           print('------------TOKEN-------------');
-            print('${token.value}');
+          print('${token.value}');
           print('--------------------------------------');
           print('------------DEFAULT_POSITION--------------------');
           print(user.value.defaultPosition?.grantAccess);
@@ -54,12 +55,8 @@ class AuthController extends GetxController {
       print("Error loading token and user: $e");
     } finally {
       isTokenLoaded.value = true;
-  
-    
     }
   }
-
-
 
   bool isLoggedIn() {
     return token.isNotEmpty;
@@ -94,7 +91,7 @@ class AuthController extends GetxController {
 
     response.fold(
       (failure) {
-         isLoginLoading(false);
+        isLoginLoading(false);
         Modal.errorDialog(failure: failure);
       },
       (success) async {
@@ -106,6 +103,7 @@ class AuthController extends GetxController {
         await SecureStorage().writeSecureData('user', jsonEncode(data['user']));
         //  await fetchUserFromStorage();
         await loadTokenAndUser();
+        // await AuthController.controller.updateDeviceToken();
         Get.offAllNamed('/home-main');
       },
     );
@@ -120,7 +118,6 @@ class AuthController extends GetxController {
       isSignupLoading(true);
       Modal.loading(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
-        
       );
 
       final response = await ApiService.postPublicResource('register', {
@@ -136,14 +133,14 @@ class AuthController extends GetxController {
       response.fold(
         (failure) {
           isSignupLoading(false);
-         Modal.errorDialog(failure: failure);
+          Modal.errorDialog(failure: failure);
         },
         (success) async {
           final data = success.data['data'];
           await SecureStorage().writeSecureData('token', data['access_token']);
-          await SecureStorage()
-              .writeSecureData('user', jsonEncode(data['user']));
+          await SecureStorage().writeSecureData('user', jsonEncode(data['user']));
           await loadTokenAndUser();
+          //  await AuthController.controller.updateDeviceToken();
           Get.offAllNamed('/home-main');
         },
       );
@@ -185,6 +182,8 @@ class AuthController extends GetxController {
     // Handle success or failure response
     return response.fold(
       (failure) async {
+
+       
         await clearLocalData();
         Modal.error(
           content: Text(failure.message ?? 'Logout failed.'),
@@ -233,79 +232,94 @@ class AuthController extends GetxController {
   }
 
   Future<bool> fetchAndUpdateUserDetails({bool showModal = true}) async {
-   
-  if (token.value.isNotEmpty) {
-    final response = await ApiService.getAuthenticatedResource('user');
+    if (token.value.isNotEmpty) {
+      final response = await ApiService.getAuthenticatedResource('user');
 
-    return response.fold(
-      (failure) {
-        
+      return response.fold(
+        (failure) {
+          if (failure.statusCode != 401) {
+            Modal.error(
+              content: Text(failure.message ?? 'Something went wrong.'),
+              visualContent: LocalLottieImage(
+                path: lottiesPath('error.json'),
+                repeat: false,
+              ),
+            );
+          }
 
-        
-        if (failure.statusCode != 401) {
-           Modal.error(
-          content: Text(failure.message ?? 'Something went wrong.'),
-          visualContent: LocalLottieImage(
-            path: lottiesPath('error.json'),
-            repeat: false,
-          ),
-        );
-        }
+          return false; // Return false indicating failure
+        },
+        (success) async {
+          final updatedUser = User.fromJson(success.data['data']);
 
-        return false; // Return false indicating failure
-      },
-      (success) async {
-        final updatedUser = User.fromJson(success.data['data']);
+          print('Local stored user: ${user.value.toJson()}');
 
-       
-        print('Local stored user: ${user.value.toJson()}');
+          if (updatedUser != user.value) {
+            print('User details are different. Updating local user...');
 
-        if (updatedUser != user.value) {
-          print('User details are different. Updating local user...');
+            // Update the user and save it to SecureStorage
+            user(updatedUser);
 
-          // Update the user and save it to SecureStorage
-          user(updatedUser);
+            await SecureStorage().writeSecureData(
+              'user',
+              jsonEncode(updatedUser.toJson()),
+            );
 
-          await SecureStorage().writeSecureData(
-            'user',
-            jsonEncode(updatedUser.toJson()),
-          );
+            print('User details updated locally.');
+          } else {
+            print('No updates in user details.');
+          }
 
-          print('User details updated locally.');
-        } else {
-          print('No updates in user details.');
-        }
-
-        return true; // Return true indicating success
-      },
-    );
+          return true; // Return true indicating success
+        },
+      );
+    }
+    return false; // Return false if token is empty
   }
-  return false; // Return false if token is empty
-}
+
+  Future<void> updateDeviceToken() async {
+    if (AuthController.controller.user.value.id != null) {
+      String? deviceToken = await FirebaseService.getDeviceToken();
+      Map<String, dynamic> deviceData = await DeviceController().getDeviceInfo();
+
+      Map<String, dynamic> data = {
+        "device_token": deviceToken,
+        "device_id": deviceData['id'],
+        "device_name": deviceData['model'],
+        "device_type": deviceData['brand'],
+      };
+      var response = await ApiService.postAuthenticatedResource('devices/register', data);
+      response.fold((failure) {
+        Modal.showToast(msg: failure.message);
+      }, (success) {
+        print('device registered');
+      });
+    }
+
+    //  print(updateDeviceToken);
+  }
 
   Future<void> localLogout({Failure? failure}) async {
-  // Show a loading modal immediately
-  Modal.loading(
-    content: Column(
-      children: [
-        if (failure != null) Text('Session Expired'),
-        LogoutLoading(),
-      ],
-    ),
-  );
+    Modal.loading(
+      content: Column(
+        children: [
+          if (failure != null) Text('Session Expired'),
+          LogoutLoading(),
+        ],
+      ),
+    );
 
-  // Delay for 5 seconds (optional, based on your use case)
-  await Future.delayed(Duration(seconds: 2));
-  await SecureStorage().deleteSecureData('token');
-  await SecureStorage().deleteSecureData('user');
+    // Delay for 5 seconds (optional, based on your use case)
+    await Future.delayed(Duration(seconds: 2));
+    await SecureStorage().deleteSecureData('token');
+    await SecureStorage().deleteSecureData('user');
 
-  // Clear AuthController's token and user observable
-  AuthController authController = Get.find<AuthController>();
-  authController.token.value = '';
-  authController.user.value = User(); // Reset user to an empty User model
+    // Clear AuthController's token and user observable
+    AuthController authController = Get.find<AuthController>();
+    authController.token.value = '';
+    authController.user.value = User(); // Reset user to an empty User model
 
-  // Redirect to the login page
-  Get.offAllNamed('/login');
-}
-
+    // Redirect to the login page
+    Get.offAllNamed('/login');
+  }
 }

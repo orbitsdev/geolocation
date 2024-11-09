@@ -3,6 +3,8 @@ import 'package:geolocation/core/api/globalcontroller/modal_controller.dart';
 import 'package:geolocation/core/bindings/app_binding.dart';
 import 'package:geolocation/core/bindings/global_binding.dart';
 import 'package:geolocation/core/localdata/secure_storage.dart';
+import 'package:geolocation/core/modal/modal.dart';
+import 'package:geolocation/core/services/firebase_service.dart';
 import 'package:geolocation/core/theme/app_theme.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:geolocation/features/auth/middleware/auth_middleware.dart';
@@ -32,10 +34,16 @@ import 'package:geolocation/features/task/member_task_page.dart';
 import 'package:geolocation/features/task/task_page.dart';
 import 'package:get/get.dart';
 
-void main() async  {
+Future<void> main() async  {
    WidgetsFlutterBinding.ensureInitialized();
    GlobalBinding().dependencies();   
-  await AuthController.controller.loadTokenAndUser(showModal: false);
+   await FirebaseService.initializeApp().then((value){
+    print(value);
+   }).catchError((e){
+    print(e.toString());
+    Modal.showToast(msg: e.toString());
+   });
+   await AuthController.controller.loadTokenAndUser(showModal: false);
    ModalController.controller.setDialog(false);
    runApp(const GeoLocationApp());
 }
@@ -57,11 +65,12 @@ class _GeoLocationAppState extends State<GeoLocationApp>  with WidgetsBindingObs
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    
     Future.delayed(Duration.zero, () async {
+      
       if(AuthController.controller.token.value.isNotEmpty){
         await AuthController.controller.fetchAndUpdateUserDetails(showModal: true);
       }
+      AuthController.controller.updateDeviceToken();
     });  
     
   }

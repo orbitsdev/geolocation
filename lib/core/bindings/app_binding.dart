@@ -1,6 +1,8 @@
 
 
+import 'package:geolocation/core/api/globalcontroller/device_controller.dart';
 import 'package:geolocation/features/attendance/controller/attendance_controller.dart';
+import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:geolocation/features/collections/controller/collection_controller.dart';
 import 'package:geolocation/features/event/controller/event_controller.dart';
 import 'package:geolocation/features/file/controller/files_controller.dart';
@@ -21,6 +23,8 @@ class AppBinding  extends Bindings{
 
     // Get.put(LoginController(), permanent: true);
     // Get.put(SignupController(), permanent: true);
+    Get.put(AuthController(), permanent: true);
+    Get.put(DeviceController(), permanent: true);
     Get.put(ProfileController(), permanent: true);
     Get.put(NotificationController(), permanent: true);
     Get.put(EventController(), permanent: true);

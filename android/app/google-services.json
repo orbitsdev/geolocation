@@ -1,0 +1,38 @@
+{
+  "project_info": {
+    "project_number": "302420639094",
+    "project_id": "geolocation-b3fab",
+    "storage_bucket": "geolocation-b3fab.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:302420639094:android:c5ac24ddbb9d92cb5b4e57",
+        "android_client_info": {
+          "package_name": "com.geolocation.orbitsdev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "302420639094-ocs1gfnm7f2qqoaqv7plros0nm5q1np4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.geolocation.orbitsdev",
+            "certificate_hash": "4251c5750882cd7d9648ea9a20dc3b489bc2b915"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDrfjVCPlQKM-NNx0fhFrNsPY7UOJiw7nk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
