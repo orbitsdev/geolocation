@@ -119,22 +119,26 @@ class OfficerSelectionPage extends StatelessWidget {
              
                 return SliverPadding(
                     padding: EdgeInsets.only(left: 8.0, right: 8, bottom: 8 ),
-                  sliver: SliverMasonryGrid.count(
-                          crossAxisCount: 2,
-                          mainAxisSpacing: 16,
-                          crossAxisSpacing: 16,
-                          childCount: controller.officers.length,
-                          itemBuilder: (context, index) {
-                            CouncilPosition officer = controller.officers[index];
-                            // return Container();
-                            return RippleContainer(
-                              onTap: (){
-                             TaskController.controller.selectOfficer(officer);                                 
-                              },child: OfficerCard(officer: officer)
+                  sliver: GetBuilder<TaskController>(
+                    builder: (taskcontroller) {
+                      return SliverMasonryGrid.count(
+                              crossAxisCount: 2,
+                              mainAxisSpacing: 16,
+                              crossAxisSpacing: 16,
+                              childCount: controller.officers.length,
+                              itemBuilder: (context, index) {
+                                CouncilPosition officer = controller.officers[index];
+                                // return Container();
+                                return RippleContainer(
+                                  onTap: (){
+                                 taskcontroller.selectOfficer(officer);                                 
+                                  },child: OfficerCard(officer: officer)
+                                );
+                              
+                              },
                             );
-                          
-                          },
-                        ),
+                    }
+                  ),
                 );
               }
             ),

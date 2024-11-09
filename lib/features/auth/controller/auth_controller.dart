@@ -103,7 +103,7 @@ class AuthController extends GetxController {
         await SecureStorage().writeSecureData('user', jsonEncode(data['user']));
         //  await fetchUserFromStorage();
         await loadTokenAndUser();
-        // await AuthController.controller.updateDeviceToken();
+        await AuthController.controller.updateDeviceToken();
         Get.offAllNamed('/home-main');
       },
     );
@@ -140,7 +140,7 @@ class AuthController extends GetxController {
           await SecureStorage().writeSecureData('token', data['access_token']);
           await SecureStorage().writeSecureData('user', jsonEncode(data['user']));
           await loadTokenAndUser();
-          //  await AuthController.controller.updateDeviceToken();
+           await AuthController.controller.updateDeviceToken();
           Get.offAllNamed('/home-main');
         },
       );

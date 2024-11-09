@@ -1,3 +1,5 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocation/core/api/globalcontroller/modal_controller.dart';
 import 'package:geolocation/core/bindings/app_binding.dart';
@@ -5,6 +7,7 @@ import 'package:geolocation/core/bindings/global_binding.dart';
 import 'package:geolocation/core/localdata/secure_storage.dart';
 import 'package:geolocation/core/modal/modal.dart';
 import 'package:geolocation/core/services/firebase_service.dart';
+import 'package:geolocation/core/services/notificaiton_service.dart';
 import 'package:geolocation/core/theme/app_theme.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:geolocation/features/auth/middleware/auth_middleware.dart';
@@ -34,8 +37,15 @@ import 'package:geolocation/features/task/member_task_page.dart';
 import 'package:geolocation/features/task/task_page.dart';
 import 'package:get/get.dart';
 
+@pragma('vm:entry-point') 
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+
+  await Firebase.initializeApp();
+  NotificationsService.handleBackground(message);
+}
 Future<void> main() async  {
    WidgetsFlutterBinding.ensureInitialized();
+    NotificationsService.init();
    GlobalBinding().dependencies();   
    await FirebaseService.initializeApp().then((value){
     print(value);
@@ -45,6 +55,19 @@ Future<void> main() async  {
    });
    await AuthController.controller.loadTokenAndUser(showModal: false);
    ModalController.controller.setDialog(false);
+   await NotificationsService().requestNotification();
+   
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    NotificationsService.handleForground(message);
+  });
+  
+
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    NotificationsService.handleWhenOfficialNotificationClick(message);
+  });
+
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
    runApp(const GeoLocationApp());
 }
 

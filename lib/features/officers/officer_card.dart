@@ -63,6 +63,11 @@ class OfficerCard extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
+             Text(
+              '(${officer.email})',
+              style: Get.textTheme.bodySmall,
+              textAlign: TextAlign.center,
+            ),
       
             // Experience
             

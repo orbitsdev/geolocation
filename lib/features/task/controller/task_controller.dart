@@ -152,6 +152,9 @@ void initializeFormForEdit(Task task) {
 
   void selectOfficer(CouncilPosition officer) {
     selectedOfficer(officer);
+    print('---------------------------');
+    print(selectedOfficer.toJson());
+    print('---------------------------');
     update();
     Get.back();
   }
@@ -242,6 +245,7 @@ void initializeFormForEdit(Task task) {
       (failure) {
         Get.back(); // Close loading modal
         Modal.errorDialog(failure: failure);
+        print(failure.exception?.message);
       },
       (success) {
         print(success.data);
