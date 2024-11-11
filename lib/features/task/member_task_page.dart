@@ -12,6 +12,8 @@ import 'package:geolocation/features/task/controller/task_controller.dart';
 import 'package:geolocation/features/task/created_or_edit_page.dart';
 import 'package:geolocation/features/task/model/sample_data.dart';
 import 'package:geolocation/features/task/model/task.dart';
+import 'package:geolocation/features/task/task_details_page.dart';
+import 'package:geolocation/features/task/task_page.dart';
 import 'package:geolocation/features/task/widget/admin_task_card.dart';
 import 'package:geolocation/features/task/widget/task_card.dart';
 import 'package:get/get.dart';
@@ -87,47 +89,65 @@ class _MemberTaskPageState extends State<MemberTaskPage> {
                             itemBuilder: (context, index) {
                               Task task = controller.tasks[index];
                               return Slidable(
-                                key: Key(task.id.toString()),
-                                endActionPane: ActionPane(
-                                  motion: const ScrollMotion(),
-                                  children: [
-                                    SlidableAction(
-                                        borderRadius: BorderRadius.circular(4),
-                                      onPressed: (context) {
-                                        if (task.id != null) {
-                                          Modal.confirmation(
-                                            titleText: "Confirm Delete",
-                                            contentText:
-                                                "Are you sure you want to delete this task? All associated data, including files and records, will be permanently lost.",
-                                            onConfirm: () {
-                                              controller.deleteCouncilPosition(
-                                                  task.id!);
-                                            },
-                                            onCancel: () {
-                                              Get.back();
-                                            },
-                                          );
-                                        }
-                                      },
-                                       backgroundColor: Colors.transparent,
-                                       foregroundColor: Colors.red,
-                                      icon: Icons.delete,
-                                      
-                                      label: 'Delete',
-                                    ),
-                                  ],
-                                ),
-                                child: RippleContainer(
-                                    onTap: () {
-                                      Get.to(
-                                          () => CreatedOrEditPage(
-                                                isEditMode: true,
-                                                task: task,
-                                              ),
-                                          transition: Transition.cupertino);
-                                    },
-                                    child: AdminTaskCard(task: task)),
-                              );
+  key: Key(task.id.toString()),
+  endActionPane: ActionPane(
+    motion: const DrawerMotion(),
+    extentRatio: 0.5, // Adjust the ratio for more space
+    children: [
+      // Update Action
+      SlidableAction(
+      
+        onPressed: (context) {
+          if (task.id != null) {
+            Get.to(
+              () => CreatedOrEditPage(
+                isEditMode: true,
+                task: task,
+              ),
+              transition: Transition.cupertino,
+            );
+          }
+        },
+        backgroundColor: Colors.green,
+        foregroundColor: Colors.white,
+        icon: Icons.edit,
+        label: 'Update',
+        autoClose: true,
+      ),
+
+      // Delete Action
+      SlidableAction(
+      
+        onPressed: (context) {
+          if (task.id != null) {
+            Modal.confirmation(
+              titleText: "Confirm Delete",
+              contentText: "Are you sure you want to delete this task? This action cannot be undone.",
+              onConfirm: () {
+                controller.deleteTask(task.id!);
+              },
+              onCancel: () {
+                Get.back();
+              },
+            );
+          }
+        },
+        backgroundColor: Colors.red,
+        foregroundColor: Colors.white,
+        icon: Icons.delete,
+        label: 'Delete',
+        autoClose: true,
+      ),
+    ],
+  ),
+  child: RippleContainer(
+    onTap: () {
+      Get.to(() => TaskDetailsPage(task: task,));
+    },
+    child: AdminTaskCard(task: task),
+  ),
+);
+
                             })
                         : ToSliver(child: Container()),
                 if (controller.isScrollLoading.value)

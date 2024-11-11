@@ -258,7 +258,7 @@ void initializeFormForEdit(Task task) {
   }
 
   
-  Future<void> deleteCouncilPosition(int taskId) async {
+  Future<void> deleteTask(int taskId) async {
     Modal.loading(content: const Text('Deleting position...'));
     var response = await ApiService.deleteAuthenticatedResource(
       'tasks/${taskId}',

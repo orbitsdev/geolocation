@@ -1,21 +1,14 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
-import 'package:geolocation/core/globalwidget/images/online_image.dart';
-import 'package:get/get.dart';
-
-import 'package:geolocation/core/globalwidget/ripple_container.dart';
-import 'package:geolocation/core/theme/palette.dart';
-import 'package:geolocation/features/task/admin_members_task_page.dart';
 import 'package:geolocation/features/task/model/task.dart';
+import 'package:get/get.dart';
 
 class AdminTaskCard extends StatelessWidget {
   final Task task;
-  const AdminTaskCard({
+
+  AdminTaskCard({
     Key? key,
     required this.task,
   }) : super(key: key);
-
-  
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +16,7 @@ class AdminTaskCard extends StatelessWidget {
       padding: EdgeInsets.all(16.0),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        // borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
             color: Colors.black12,
@@ -33,79 +26,50 @@ class AdminTaskCard extends StatelessWidget {
         ],
       ),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Officer Information
-          Row(
-            children: [
-    
-              Container(
-                width: 24,
-                height: 24,
-                child: OnlineImage(imageUrl: '${task.assignedCouncilPosition?.image??''}', borderRadius: BorderRadius.circular(24),)),
-              
-              SizedBox(width: 16),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '${task.assignedCouncilPosition?.fullName}',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    '${task.assignedCouncilPosition?.position}',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          SizedBox(height: 16),
-    
-          // Task Information
+          // Title and Status Row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                '${task.title}',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+              Expanded(
+                child: Text(
+                  '${task.title??''}',
+                  style: Get.textTheme.bodyLarge,
                 ),
               ),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                 decoration: BoxDecoration(
-                  color: _getStatusColor('${task.status}'),
+                  color: _getStatusColor(task.status ?? 'Unknown'),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  '${task.status}',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
+                  task.status ?? 'Unknown',
+                  style: Get.textTheme.bodyMedium?.copyWith(
+                     color: Colors.white,
                   ),
                 ),
               ),
             ],
           ),
           SizedBox(height: 8),
+
+          // Task Details (Body)
           Text(
-            '${task.taskDetails}',
+            task.taskDetails ?? 'No details available.',
             style: TextStyle(
               fontSize: 14,
               color: Colors.grey[600],
             ),
           ),
+
           SizedBox(height: 12),
-          Divider(color: Palette.LIGHT_BACKGROUND,),
+          Divider(color: Color(0xFFF1F1F1)),
+
+          // Due Date Row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -117,7 +81,7 @@ class AdminTaskCard extends StatelessWidget {
                 ),
               ),
               Text(
-                '${task.dueDate}',
+                task.dueDate ?? 'No Due Date',
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.grey[800],
@@ -131,14 +95,15 @@ class AdminTaskCard extends StatelessWidget {
     );
   }
 
+  // Dynamic color based on task status
   Color _getStatusColor(String status) {
     switch (status) {
       case 'To Do':
         return Colors.blueAccent;
-      case 'Completed':
-        return Colors.green;
       case 'In Progress':
         return Colors.orange;
+      case 'Completed':
+        return Colors.green;
       case 'Pending':
         return Colors.red;
       default:
