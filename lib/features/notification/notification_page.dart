@@ -1,6 +1,8 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:geolocation/core/constant/path.dart';
+import 'package:geolocation/core/globalwidget/images/local_lottie_image.dart';
 import 'package:geolocation/core/globalwidget/shimmer_widget.dart';
 import 'package:geolocation/core/localdata/sample_data.dart';
 import 'package:geolocation/core/theme/palette.dart';
@@ -18,14 +20,14 @@ class NotificationPage extends StatefulWidget {
 
 class _NotificationPageState extends State<NotificationPage> {
 
-      var notificationController = Get.find<NotificationController>();
+     var notificationController = Get.find<NotificationController>();
 
    @override
   void initState() {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {  
-      // notificationController.markNotificationsAsRead(context);
+       notificationController.markNotificationsAsRead(context);
 
     });
   }
@@ -58,25 +60,25 @@ class _NotificationPageState extends State<NotificationPage> {
                 child: GetBuilder<NotificationController>(
                   builder: (controller) {
 
-                  return ListView.builder(
-                        itemCount: notifications.length,
-                        itemBuilder: (context,index){
-                    return NotificationItem(notificaiton: NotificationModel());
-
-                        });
-
-                  // if(controller.isLoading.value){
-                  // return Center( child: CircularProgressIndicator(color: Palette.PRIMARY ,));
-        
-                  // }else{
-                  //     return controller.notifications.isNotEmpty ? ListView.builder(
-                  //       itemCount: controller.notifications.length,
+                  // return ListView.builder(
+                  //       itemCount: notifications.length,
                   //       itemBuilder: (context,index){
-                  //         M.Notification notificaiton =  controller.notifications[index];
+                  //   return NotificationItem(notificaiton: NotificationModel());
+
+                  //       });
+
+                  if(controller.isLoading.value){
+                  return Center( child: CircularProgressIndicator(color: Palette.PRIMARY ,));
         
-                  //       return NotificationItem(notificaiton:notificaiton ,);
-                  //     }): Center(child: LocalLottieImage(imagePath: lottiesPath('empty.json')) ,);
-                  // }
+                  }else{
+                      return controller.notifications.isNotEmpty ? ListView.builder(
+                        itemCount: controller.notifications.length,
+                        itemBuilder: (context,index){
+                          NotificationModel notificaiton =  controller.notifications[index];
+        
+                        return NotificationItem(notification:notificaiton ,);
+                      }): Center(child: LocalLottieImage(path: lottiesPath('empty.json')) ,);
+                  }
                    
                   }
                 ),

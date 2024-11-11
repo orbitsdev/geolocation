@@ -43,12 +43,12 @@ class AuthController extends GetxController {
         String? userJson = await SecureStorage().readSecureData('user');
         if (userJson != null && userJson.isNotEmpty) {
           user(User.fromJson(jsonDecode(userJson)));
-          print('------------TOKEN-------------');
-          print('${token.value}');
-          print('--------------------------------------');
-          print('------------DEFAULT_POSITION--------------------');
-          print(user.value.defaultPosition?.grantAccess);
-          print('--------------------------------------');
+          // print('------------TOKEN-------------');
+          // print('${token.value}');
+          // print('--------------------------------------');
+          // print('------------DEFAULT_POSITION--------------------');
+          // print(user.value.defaultPosition?.grantAccess);
+          // print('--------------------------------------');
         }
       }
     } catch (e) {
@@ -96,9 +96,9 @@ class AuthController extends GetxController {
       },
       (success) async {
         final data = success.data['data'];
-        print('DATA----------------');
-        print(data);
-        print('DATA--------------');
+        // print('DATA----------------');
+        // print(data);
+        // print('DATA--------------');
         await SecureStorage().writeSecureData('token', data['access_token']);
         await SecureStorage().writeSecureData('user', jsonEncode(data['user']));
         //  await fetchUserFromStorage();
@@ -209,7 +209,7 @@ class AuthController extends GetxController {
       Map<String, dynamic> userMap = jsonDecode(userJson);
       user(User.fromJson(userMap));
 
-      print(user.toJson());
+      // print(user.toJson());
     } else {
       print('No user found in storage');
     }
@@ -252,7 +252,7 @@ class AuthController extends GetxController {
         (success) async {
           final updatedUser = User.fromJson(success.data['data']);
 
-          print('Local stored user: ${user.value.toJson()}');
+          // print('Local stored user: ${user.value.toJson()}');
 
           if (updatedUser != user.value) {
             print('User details are different. Updating local user...');

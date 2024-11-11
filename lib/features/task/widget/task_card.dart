@@ -98,11 +98,15 @@ class TaskCard extends StatelessWidget {
 
  Color _getStatusColor(String status) {
     switch (status) {
-      case 'Completed':
-        return Colors.green;
+      case 'To Do':
+        return Colors.blue;
       case 'In Progress':
         return Colors.orange;
-      case 'Pending':
+      case 'Completed':
+        return Colors.green;
+      case 'Needs Revision':
+        return Colors.red;
+      case 'Rejected':
         return Colors.red;
       default:
         return Colors.grey;

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocation/core/modal/modal.dart';
+import 'package:geolocation/features/notification/controller/notification_controller.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
@@ -75,13 +76,11 @@ class NotificationsService {
   }
 
   static void handleForground(RemoteMessage message) {
-     print('--------------');
-    print('FORGORUND');
-    print('--------------');
-    // if (message.data['notificaiton'] == 'task') {
-    //   print('task forground');
-    //   // NotificationController.controller.loadNotificationsWithoutContext();
-    // }
+    
+    if (message.data['notification'] == 'task') {
+      print('task forground');
+       NotificationController.controller.loadNotifications();
+    }
 
     NotificationsService.showNotificationWithLongContent(
         title: message.notification?.title,

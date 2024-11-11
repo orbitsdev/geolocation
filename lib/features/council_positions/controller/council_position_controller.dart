@@ -103,8 +103,8 @@ void selectAndNavigateToCouncilMemberPage(int id) {
           
 
         var data = success.data;
-        print(selectedCouncilId.value);
-        print(data['data']);
+        // print(selectedCouncilId.value);
+        // print(data['data']);
         var newData = (data['data'] as List<dynamic>)
             .map((json) => CouncilPosition.fromJson(json))
             .toList();

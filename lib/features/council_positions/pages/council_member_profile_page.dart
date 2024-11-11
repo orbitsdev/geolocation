@@ -99,24 +99,17 @@ class CouncilMemberProfilePage extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildTaskCard('Todo ',  positionController.selectedMember.value.totalDueTasks as int),
+                      _buildTaskCard('Todo ',  positionController.selectedMember.value.totalToDoTasks as int),
                       _buildTaskCard('In Progress', positionController.selectedMember.value.totalInProgressTasks as int),
                     ],
                   ),
+                
                   SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // _buildTaskCard('On Hold', positionController.selectedMember.value.totalOnHoldTasks as int),
-                      _buildTaskCard('Due ', positionController.selectedMember.value.totalDueTasks as int ),
-                    ],
-                  ),
-                  SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _buildTaskCard('Cancelled', positionController.selectedMember.value.totalCancelledTasks as int),
-                      _buildTaskCard('Completed Late', positionController.selectedMember.value.totalCompletedLateTasks as int),
+                      _buildTaskCard('Need Revision', positionController.selectedMember.value.totalNeedsRevision as int),
+                      _buildTaskCard('Rejected', positionController.selectedMember.value.totalRejected as int),
                     ],
                   ),
                   

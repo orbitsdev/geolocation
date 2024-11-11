@@ -12,12 +12,8 @@ class CouncilPosition {
   final int? totalToDoTasks;
   final int? totalInProgressTasks;
   final int? totalCompletedTasks;
-  final int? totalCompletedLateTasks;
-  final int? totalDueTasks;
-  final int? totalOnHoldTasks;
-  final int? totalCancelledTasks;
-  final int? totalReviewTasks;
-  final int? totalBlockedTasks;
+  final int? totalNeedsRevision;
+  final int? totalRejected;
 
   CouncilPosition({
     this.id,
@@ -33,12 +29,9 @@ class CouncilPosition {
     this.totalToDoTasks,
     this.totalInProgressTasks,
     this.totalCompletedTasks,
-    this.totalCompletedLateTasks,
-    this.totalDueTasks,
-    this.totalOnHoldTasks,
-    this.totalCancelledTasks,
-    this.totalReviewTasks,
-    this.totalBlockedTasks,
+    this.totalNeedsRevision,
+    this.totalRejected,
+   
   });
 
   // Factory constructor to create a CouncilPosition from a JSON object
@@ -57,14 +50,15 @@ class CouncilPosition {
       totalToDoTasks: json['total_to_do_tasks'],
       totalInProgressTasks: json['total_in_progress_tasks'],
       totalCompletedTasks: json['total_completed_tasks'],
-      totalCompletedLateTasks: json['total_completed_late_tasks'],
-      totalDueTasks: json['total_due_tasks'],
-      totalOnHoldTasks: json['total_on_hold_tasks'],
-      totalCancelledTasks: json['total_cancelled_tasks'],
-      totalReviewTasks: json['total_review_tasks'],
-      totalBlockedTasks: json['total_blocked_tasks'],
+      totalNeedsRevision: json['total_needs_revision'],
+      totalRejected: json['total_rejected'],
+    
     );
   }
+
+  
+
+
 
   // Convert CouncilPosition object to JSON
   Map<String, dynamic> toJson() {
@@ -82,12 +76,9 @@ class CouncilPosition {
       'total_to_do_tasks': totalToDoTasks,
       'total_in_progress_tasks': totalInProgressTasks,
       'total_completed_tasks': totalCompletedTasks,
-      'total_completed_late_tasks': totalCompletedLateTasks,
-      'total_due_tasks': totalDueTasks,
-      'total_on_hold_tasks': totalOnHoldTasks,
-      'total_cancelled_tasks': totalCancelledTasks,
-      'total_review_tasks': totalReviewTasks,
-      'total_blocked_tasks': totalBlockedTasks,
+      'total_needs_revision': totalNeedsRevision,
+      'total_rejected': totalRejected,
+    
     };
   }
 
@@ -107,12 +98,9 @@ class CouncilPosition {
       'total_to_do_tasks': totalToDoTasks,
       'total_in_progress_tasks': totalInProgressTasks,
       'total_completed_tasks': totalCompletedTasks,
-      'total_completed_late_tasks': totalCompletedLateTasks,
-      'total_due_tasks': totalDueTasks,
-      'total_on_hold_tasks': totalOnHoldTasks,
-      'total_cancelled_tasks': totalCancelledTasks,
-      'total_review_tasks': totalReviewTasks,
-      'total_blocked_tasks': totalBlockedTasks,
+      'total_needs_revision': totalNeedsRevision,
+      'total_rejected': totalRejected,
+     
     };
   }
 
@@ -132,12 +120,9 @@ class CouncilPosition {
       totalToDoTasks: map['total_to_do_tasks'] != null ? map['total_to_do_tasks'] as int : null,
       totalInProgressTasks: map['total_in_progress_tasks'] != null ? map['total_in_progress_tasks'] as int : null,
       totalCompletedTasks: map['total_completed_tasks'] != null ? map['total_completed_tasks'] as int : null,
-      totalCompletedLateTasks: map['total_completed_late_tasks'] != null ? map['total_completed_late_tasks'] as int : null,
-      totalDueTasks: map['total_due_tasks'] != null ? map['total_due_tasks'] as int : null,
-      totalOnHoldTasks: map['total_on_hold_tasks'] != null ? map['total_on_hold_tasks'] as int : null,
-      totalCancelledTasks: map['total_cancelled_tasks'] != null ? map['total_cancelled_tasks'] as int : null,
-      totalReviewTasks: map['total_review_tasks'] != null ? map['total_review_tasks'] as int : null,
-      totalBlockedTasks: map['total_blocked_tasks'] != null ? map['total_blocked_tasks'] as int : null,
+      totalNeedsRevision: map['total_needs_revision'] != null ? map['total_needs_revision'] as int : null,
+      totalRejected: map['total_rejected'] != null ? map['total_rejected'] as int : null,
+     
     );
   }
 
@@ -177,18 +162,15 @@ class CouncilPosition {
       totalToDoTasks: totalToDoTasks ?? this.totalToDoTasks,
       totalInProgressTasks: totalInProgressTasks ?? this.totalInProgressTasks,
       totalCompletedTasks: totalCompletedTasks ?? this.totalCompletedTasks,
-      totalCompletedLateTasks: totalCompletedLateTasks ?? this.totalCompletedLateTasks,
-      totalDueTasks: totalDueTasks ?? this.totalDueTasks,
-      totalOnHoldTasks: totalOnHoldTasks ?? this.totalOnHoldTasks,
-      totalCancelledTasks: totalCancelledTasks ?? this.totalCancelledTasks,
-      totalReviewTasks: totalReviewTasks ?? this.totalReviewTasks,
-      totalBlockedTasks: totalBlockedTasks ?? this.totalBlockedTasks,
+      totalNeedsRevision: totalNeedsRevision ?? this.totalNeedsRevision,
+      totalRejected: totalRejected ?? this.totalRejected,
+     
     );
   }
 
   @override
   String toString() {
-    return 'CouncilPosition(id: $id, councilId: $councilId, councilName: $councilName, userId: $userId, fullName: $fullName, image: $image,email: $email, position: $position, isLogin: $isLogin, grantAccess: $grantAccess, totalToDoTasks: $totalToDoTasks, totalInProgressTasks: $totalInProgressTasks, totalCompletedTasks: $totalCompletedTasks, totalCompletedLateTasks: $totalCompletedLateTasks, totalDueTasks: $totalDueTasks, totalOnHoldTasks: $totalOnHoldTasks, totalCancelledTasks: $totalCancelledTasks, totalReviewTasks: $totalReviewTasks, totalBlockedTasks: $totalBlockedTasks)';
+    return 'CouncilPosition(id: $id, councilId: $councilId, councilName: $councilName, userId: $userId, fullName: $fullName, image: $image,email: $email, position: $position, isLogin: $isLogin, grantAccess: $grantAccess, totalToDoTasks: $totalToDoTasks, totalInProgressTasks: $totalInProgressTasks, totalCompletedTasks: $totalCompletedTasks, totalNeedsRevision: $totalNeedsRevision, totalRejected: $totalRejected)';
   }
 
 }

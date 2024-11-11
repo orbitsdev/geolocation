@@ -1,16 +1,13 @@
-
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
-
-
-
-class NotificationModel {
+class Notification {
   String? id;
   int? notifiable_id;
   String? read_at;
   String? created_at;
   NotificationMessage? data;
-  NotificationModel({
+  Notification({
     this.id,
     this.notifiable_id,
     this.read_at,
@@ -20,14 +17,14 @@ class NotificationModel {
 
 
 
-  NotificationModel copyWith({
+  Notification copyWith({
     String? id,
     int? notifiable_id,
     String? read_at,
     String? created_at,
      NotificationMessage? data,
   }) {
-    return NotificationModel(
+    return Notification(
       id: id ?? this.id,
       notifiable_id: notifiable_id ?? this.notifiable_id,
       read_at: read_at ?? this.read_at,
@@ -46,8 +43,8 @@ class NotificationModel {
     };
   }
 
-  factory NotificationModel.fromMap(Map<String, dynamic> map) {
-    return NotificationModel(
+  factory Notification.fromMap(Map<String, dynamic> map) {
+    return Notification(
       id: map['id'] != null ? map['id'] as String : null,
       notifiable_id: map['notifiable_id'] != null ? map['notifiable_id'] as int : null,
       read_at: map['read_at'] != null ? map['read_at'] as String : null,
@@ -58,7 +55,7 @@ class NotificationModel {
 
   String toJson() => json.encode(toMap());
 
-  factory NotificationModel.fromJson(String source) => NotificationModel.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory Notification.fromJson(String source) => Notification.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() => 'Notification(id: $id, notifiable_id: $notifiable_id, read_at: $read_at, created_at: $created_at data: $data)';
@@ -67,43 +64,43 @@ class NotificationModel {
 }
 
 class NotificationMessage {
-  int? modelId;
-  String? body;
+
+  int? model_id;
   String? title;
+  String? message;
   NotificationMessage({
-    this.body,
-    this.modelId,
+    this.model_id,
     this.title,
+    this.message,
   });
   
- 
 
 
   NotificationMessage copyWith({
-    String? message,
-    int? modelId,
+    int? model_id,
     String? title,
+    String? message,
   }) {
     return NotificationMessage(
-      body: message ?? this.body,
-      modelId: modelId ?? this.modelId,
+      model_id: model_id ?? this.model_id,
       title: title ?? this.title,
+      message: message ?? this.message,
     );
   }
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      'body': body,
-      'model_id': modelId,
+      'model_id': model_id,
       'title': title,
+      'message': message,
     };
   }
 
   factory NotificationMessage.fromMap(Map<String, dynamic> map) {
     return NotificationMessage(
-      body: map['body'] != null ? map['body'] as String : null,
-      modelId: map['model_id'] != null ? map['model_id'] as int : null,
+      model_id: map['model_id'] != null ? map['model_id'] as int : null,
       title: map['title'] != null ? map['title'] as String : null,
+      message: map['message'] != null ? map['message'] as String : null,
     );
   }
 
@@ -112,6 +109,18 @@ class NotificationMessage {
   factory NotificationMessage.fromJson(String source) => NotificationMessage.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
-  String toString() => 'NotificationMessage(body: $body, modelId: $modelId, title: $title)';
+  String toString() => 'NotificationMessage(model_id: $model_id, title: $title, message: $message)';
 
+  @override
+  bool operator ==(covariant NotificationMessage other) {
+    if (identical(this, other)) return true;
+  
+    return 
+      other.model_id == model_id &&
+      other.title == title &&
+      other.message == message;
+  }
+
+  @override
+  int get hashCode => model_id.hashCode ^ title.hashCode ^ message.hashCode;
 }
