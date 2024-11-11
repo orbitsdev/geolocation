@@ -1,10 +1,10 @@
 import 'dart:convert';
 
 class MediaFile {
-  int? id;       // Added to track specific media file IDs
-  String? url;   // URL of the media file
-  String? type;  // MIME type of the media file
-  String? extension; // File extension (e.g., jpg, pdf)
+  int? id;      
+  String? url;   
+  String? type;  
+  String? extension; 
 
   MediaFile({
     this.id,

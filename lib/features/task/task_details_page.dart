@@ -28,14 +28,14 @@ class TaskDetailsPage extends StatelessWidget {
       ),
       body: Stack(
         children: [
-          // Background Animation
+       
           Positioned.fill(
             child: Align(
               alignment: Alignment.topCenter,
               child: LocalLottieImage(path: lottiesPath('thumbsup.json')),
             ),
           ),
-          // Content
+         
           Positioned.fill(
             top: 100,
             child: Padding(
@@ -43,7 +43,7 @@ class TaskDetailsPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Task Title and Greetings
+                
                   _buildHeader(task),
                   SizedBox(height: 20),
                   // Card: Task Details
