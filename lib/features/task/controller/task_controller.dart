@@ -47,6 +47,51 @@ class TaskController extends GetxController {
   var uploadProgress = 0.0.obs;
 
 
+  Future<void> deleteMediaFromServer(int mediaId) async {
+    try {
+      Modal.loading();
+      final response = await ApiService.deleteAuthenticatedResource(
+        'tasks/${selectedTask.value.id}/media/$mediaId',
+      );
+      response.fold(
+        (failure) {
+          Get.back();
+          Modal.errorDialog(
+           failure: failure
+          );
+        },
+        (success) {
+           Get.back();
+          selectedTask.value.media?.removeWhere((media) => media.id == mediaId);
+          update();
+          Modal.success(message: 'File deleted successfully');
+        },
+      );
+    } catch (e) {
+      Modal.errorDialog(message: 'An unexpected error occurred');
+    }
+  }
+
+  // Confirmation modal before deleting
+  void confirmDeleteMedia(int index) {
+    final mediaFile = selectedTask.value.media?[index];
+    if (mediaFile == null) return;
+
+    Modal.confirmation(
+      titleText: 'Delete File',
+      contentText: 'Are you sure you want to delete this file?',
+      onConfirm: () {
+        deleteMediaFromServer(mediaFile.id ?? 0);
+      },
+      onCancel: () {
+        // Optional cancel logic if needed
+      },
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      barrierDismissible: false,
+    );
+  }
+
   void fullScreenDisplay( List<MediaFile> media, MediaFile file) {
     int initialIndex = media.indexOf(file); 
      if (file.type!.startsWith('video')) {

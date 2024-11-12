@@ -20,26 +20,26 @@ class PreviewVideo extends StatelessWidget {
       future: OnlineThumbnailHelper.getThumbnail(file.url ?? ''),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-           return Stack(
-             children: [
-               ShimmerWidget(
+          return Stack(
+            children: [
+              ShimmerWidget(
                 borderRadius: BorderRadius.circular(8),
                 width: double.infinity,
                 height: 85,
-                         ),
-                         Positioned(
-                  child: Icon(
-                    Icons.play_circle_filled,
-                    color: Palette.PRIMARY_DARK,
-                    size: 34,
-                  ),
-                  top: 0,
-                  bottom: 0,
-                  left: 0,
-                  right: 0,)
-
-             ],
-           );
+              ),
+              Positioned(
+                child: Icon(
+                  Icons.play_circle_filled,
+                  color: Palette.LIGHT_PRIMARY,
+                  size: 34,
+                ),
+                top: 0,
+                bottom: 0,
+                left: 0,
+                right: 0,
+              ),
+            ],
+          );
         } else if (snapshot.hasData) {
           return Container(
             decoration: BoxDecoration(
@@ -48,7 +48,7 @@ class PreviewVideo extends StatelessWidget {
             height: 85,
             child: Stack(
               children: [
-                // Display the thumbnail image
+                // Display the cached thumbnail image
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: Image.memory(
@@ -76,7 +76,7 @@ class PreviewVideo extends StatelessWidget {
                 Positioned(
                   child: Icon(
                     Icons.play_circle_filled,
-                   color: Palette.PRIMARY_DARK,
+                    color: Palette.LIGHT_PRIMARY,
                     size: 34,
                   ),
                   top: 0,

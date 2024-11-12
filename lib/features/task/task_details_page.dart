@@ -259,23 +259,59 @@ class TaskDetailsPage extends StatelessWidget {
                                  ),
 
                                   ToSliver(child: Text('Files')), 
-                                  SliverGap(8),   
-                      SliverAlignedGrid.count(
-                        
-  itemCount: taskController.selectedTask.value.media?.length ??0,
+                                  SliverAlignedGrid.count(
+  itemCount: taskController.selectedTask.value.media?.length ?? 0,
   crossAxisCount: 3,
   mainAxisSpacing: 8,
   crossAxisSpacing: 8,
   itemBuilder: (context, index) {
     final file = taskController.selectedTask.value.media![index];
-    return GestureDetector(
-      onTap: () {
-          taskController.fullScreenDisplay(taskController.selectedTask.value.media ?? [], file);
-      },
-      child: MediaFileCard(file: file), // Use the new universal widget
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        GestureDetector(
+          onTap: () {
+            taskController.fullScreenDisplay(
+              taskController.selectedTask.value.media ?? [],
+              file,
+            );
+          },
+          child: MediaFileCard(file: file),
+        ),
+       Positioned(
+  top: -12, // Adjust the position as needed
+  right: -12, // Adjust to make it more visible and larger
+  child: GestureDetector(
+    behavior: HitTestBehavior.opaque,
+    onTap: () => taskController.confirmDeleteMedia(index),
+    child: Container(
+      height: 28, // Increased size for better visibility
+      width: 28,  // Increased size for better visibility
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: LinearGradient(
+          colors: [
+            Colors.black.withOpacity(0.7),
+            Colors.black.withOpacity(0.5), // Adjust transparency for better contrast
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Icon(
+        Icons.close,
+        color: Colors.white,
+        size: 20, // Increased icon size for better visibility
+      ),
+    ),
+  ),
+),
+
+      ],
     );
   },
 ),
+
                                 
                                 
                                 ToSliver(

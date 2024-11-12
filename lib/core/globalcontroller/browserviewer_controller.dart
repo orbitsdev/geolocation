@@ -30,7 +30,7 @@ class BrowserviewerController extends GetxController {
 
   if (shouldExit) {
     // If "Yes" is confirmed, close and reset the URL or exit
-    closeThenResetUrl(); // Exit the page
+    // Exit the page
     return true;
   } else {
     // If "No" is selected, simply close the dialog
