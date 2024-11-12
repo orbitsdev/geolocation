@@ -1,7 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocation/core/api/globalcontroller/modal_controller.dart';
+import 'package:geolocation/core/globalcontroller/modal_controller.dart';
 import 'package:geolocation/core/bindings/app_binding.dart';
 import 'package:geolocation/core/bindings/global_binding.dart';
 import 'package:geolocation/core/localdata/secure_storage.dart';

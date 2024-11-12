@@ -21,10 +21,8 @@ class LoginPage extends GetView<AuthController> {
       body: SafeArea(
         child: GestureDetector(
           onTap: () {
-            // Only unfocus if the current focus is not on any form field
-            if (FocusScope.of(context).hasPrimaryFocus) {
-              FocusScope.of(context).unfocus();
-            }
+               FocusScope.of(context).unfocus();
+           
           },
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 60),

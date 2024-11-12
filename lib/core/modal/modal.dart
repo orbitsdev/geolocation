@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gap/gap.dart';
 import 'package:geolocation/core/api/dio/failure.dart';
-import 'package:geolocation/core/api/globalcontroller/modal_controller.dart';
+import 'package:geolocation/core/globalcontroller/modal_controller.dart';
 import 'package:geolocation/core/constant/path.dart';
 import 'package:geolocation/core/constant/style.dart';
 import 'package:geolocation/core/globalwidget/images/local_lottie_image.dart';
@@ -467,6 +467,96 @@ static success({
       barrierDismissible: barrierDismissible,
     );
   }
+static Future<bool> confirmation2({
+  required String titleText,
+  required String contentText,
+  Widget? visualContent, // Optional visual content (Lottie/SVG/Image)
+  String confirmText = "Yes",
+  String cancelText = "No",
+  bool barrierDismissible = true,
+  bool? repeat = true,
+}) async {
+  final result = await Get.dialog<bool>(
+    AlertDialog(
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          visualContent ??
+              LocalLottieImage(
+                path: lottiesPath('question.json'),
+                repeat: repeat == false,
+              ),
+          const Gap(8),
+          Text(
+            titleText,
+            textAlign: TextAlign.center,
+            style: Get.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+          const Gap(8),
+          Text(
+            contentText,
+            textAlign: TextAlign.center,
+            style: Get.textTheme.bodyMedium?.copyWith(
+              color: Colors.black54,
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                elevation: 0,
+                backgroundColor: Colors.grey.shade200,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                cancelText,
+                style: Get.textTheme.bodyMedium?.copyWith(
+                  color: Colors.grey,
+                ),
+              ),
+              onPressed: () {
+                Get.back(result: false); // Return false when "No" is clicked
+              },
+            ),
+            const SizedBox(width: 8),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Palette.PRIMARY,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                confirmText,
+                style: Get.textTheme.bodyMedium?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              onPressed: () {
+                Get.back(result: true); // Return true when "Yes" is clicked
+              },
+            ),
+          ],
+        ),
+      ],
+    ),
+    barrierDismissible: barrierDismissible,
+  );
+
+  return result ?? false; // Default to false if dialog is dismissed without action
+}
+
+
 
 }
 

@@ -1,6 +1,6 @@
 
 
-import 'package:geolocation/core/api/globalcontroller/device_controller.dart';
+import 'package:geolocation/core/globalcontroller/device_controller.dart';
 import 'package:geolocation/features/attendance/controller/attendance_controller.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:geolocation/features/collections/controller/collection_controller.dart';

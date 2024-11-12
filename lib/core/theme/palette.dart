@@ -4,7 +4,12 @@
 import 'package:flutter/material.dart';
 
 class Palette {
+   static Color PRIMARY_DARK = Color(0xffEB9B00);
+   static Color TEXT_DARK = Color(0xff253D4E);
 
+   static Color grayTextLight = Color(0xff999EA1);
+   static Color PRIMARY_BG = Color(0xffF4F4F4);
+     static Color RED = Color(0xffFF0000);
     static Color BACKGROUND = Color(0xffFFFFFF);
     static Color LIGH_BACKGROUND = Color(0xffF5F4F4);
     static Color LIGH_BACKGROUND_GREEN = Color(0xffCDE7C1);

@@ -7,6 +7,7 @@ import 'package:geolocation/core/localdata/secure_storage.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:get/get.dart';
 import 'package:dio/dio.dart' as D;
+import 'package:get/get.dart' as getX;
 // EitherModel typedef for response type
 typedef EitherModel<T> = Either<Failure, T>;
 
@@ -151,4 +152,30 @@ class ApiService {
       },
     );
   }
+
+static Future<EitherModel<D.Response>> filePostAuthenticatedResource(
+    String endpoint,
+    dynamic data, {
+    Map<String, dynamic>? headers,
+    ProgressCallback? onSendProgress,
+  }) async {
+    try {
+      final options = Options(
+        headers: await _getAuthHeaders(additionalHeaders: headers),
+        contentType: 'multipart/form-data',
+      );
+
+      D.Response response = await _dio.post(
+        endpoint,
+        data: data,
+        options: options,
+        onSendProgress: onSendProgress,
+      );
+
+      return right(response);
+    } on DioException catch (e) {
+      return left(ErrorHandler.handleDio(e)); // Use ErrorHandler for consistent error handling
+    }
+  }
+
 }

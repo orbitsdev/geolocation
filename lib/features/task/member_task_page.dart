@@ -142,7 +142,7 @@ class _MemberTaskPageState extends State<MemberTaskPage> {
   ),
   child: RippleContainer(
     onTap: () {
-      Get.to(() => TaskDetailsPage(task: task,));
+      taskController.selectTaskAndNavigateToFullDetails(task);
     },
     child: AdminTaskCard(task: task),
   ),
