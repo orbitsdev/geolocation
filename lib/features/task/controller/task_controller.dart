@@ -47,6 +47,118 @@ class TaskController extends GetxController {
   var uploadProgress = 0.0.obs;
 
 
+
+  void showApprovalModal() {
+    Get.bottomSheet(
+      Container(
+        padding: EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Manage Task Status',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 12),
+            ListTile(
+              leading: Icon(Icons.check, color: Colors.green),
+              title: Text('Approve Task'),
+              onTap: () => updateTaskStatus(Task.STATUS_COMPLETED),
+            ),
+            ListTile(
+              leading: Icon(Icons.edit, color: Colors.orange),
+              title: Text('Needs Revision'),
+              onTap: () {
+                Get.back(); // Close the modal
+                showRemarksModal(Task.STATUS_NEED_REVISION); // Open remarks input modal
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.close, color: Colors.red),
+              title: Text('Reject Task'),
+              onTap: () {
+                Get.back(); // Close the modal
+                showRemarksModal(Task.STATUS_REJECTED); // Open remarks input modal
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  
+
+
+  // Modal to input remarks
+  void showRemarksModal(String status) {
+    TextEditingController remarksController = TextEditingController();
+    Get.defaultDialog(
+      title: "Add Remarks",
+      content: Column(
+        children: [
+          TextField(
+            controller: remarksController,
+            maxLines: 4,
+            decoration: InputDecoration(
+              hintText: "Enter remarks here...",
+              border: OutlineInputBorder(),
+            ),
+          ),
+        ],
+      ),
+      textConfirm: "Submit",
+      confirmTextColor: Colors.white,
+      onConfirm: () {
+        updateTaskStatus(status, remarks: remarksController.text);
+        Get.back(); // Close the remarks modal
+      },
+      textCancel: "Cancel",
+    );
+  }
+
+  // Method to update the task status
+  void updateTaskStatus(String status, {String? remarks}) async {
+    try {
+      
+      
+     var data = {
+      'status': '',
+      'remarks': '', 
+     };
+      
+
+    
+      Modal.loading();
+      var response = await ApiService.putAuthenticatedResource('/tasks/${selectedTask.value.id}/status',data);
+      response.fold(
+        (failure) {
+          Get.back();
+          Modal.errorDialog(
+           failure: failure
+          );
+        },
+        (success) {
+         isLoading(false);
+            
+             var data = success.data['data'];
+            Task taskDetails = Task.fromMap(data);
+            selectedTask(taskDetails);
+            update();
+            (success.data['data']['media'] as List<dynamic>).forEach((e){
+              print(e);
+            });
+            Modal.success( message: 'Task Updated 🎉');
+        },
+      );
+    } catch (e) {
+      Get.snackbar("Error", "Something went wrong: $e");
+    }
+  }
   Future<void> deleteMediaFromServer(int mediaId) async {
     try {
       Modal.loading();

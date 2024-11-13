@@ -17,7 +17,7 @@ class ProgressBarSubmit extends StatelessWidget {
           value: progress,
           minHeight: 12, // Increased height for better visibility
           backgroundColor: Colors.grey[300],
-          color: Palette.PRIMARY_DARK,
+          color: Palette.LIGHT_PRIMARY,
         ),
         Text(
           '${(progress * 100).toStringAsFixed(0)}%', // Dynamic percentage display

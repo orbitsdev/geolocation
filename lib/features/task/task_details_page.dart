@@ -11,6 +11,9 @@ import 'package:geolocation/core/globalwidget/progress_bar_submit.dart';
 import 'package:geolocation/core/globalwidget/thumbnail_helper.dart';
 import 'package:geolocation/core/globalwidget/to_sliver.dart';
 import 'package:geolocation/core/theme/palette.dart';
+import 'package:geolocation/features/auth/controller/auth_controller.dart';
+import 'package:geolocation/features/task/model/task.dart';
+import 'package:geolocation/features/task/widget/remarks_widget.dart';
 import 'package:get/get.dart';
 import 'package:geolocation/features/task/controller/task_controller.dart';
 import 'package:gradient_elevated_button/gradient_elevated_button.dart';
@@ -19,9 +22,9 @@ class TaskDetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xfff6f8fa),
+      backgroundColor:Colors.white,
       appBar: AppBar(
-        backgroundColor: Color(0xfffafafa),
+        backgroundColor: Colors.white,
         elevation: 1,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Color(0xff333333)),
@@ -31,6 +34,21 @@ class TaskDetailsPage extends StatelessWidget {
           'Task Details',
           style: TextStyle(color: Color(0xff333333)),
         ),
+         actions: [
+      // Conditionally show "Manage Task" icon for authorized users
+      if (AuthController.controller.user.value.hasAccess()) // Replace with correct logic
+        GetBuilder<TaskController>(
+          builder: (controllert) {
+            return  TextButton(
+              
+              onPressed: () {
+                controllert.showApprovalModal(); // Trigger the approval modal
+              },
+              child: Text('MANAGE'), // Tooltip for better accessibility
+            );
+          }
+        ),
+    ],
       ),
       body: GetBuilder<TaskController>(
         builder: (taskController) {
@@ -46,98 +64,139 @@ class TaskDetailsPage extends StatelessWidget {
                               physics: const AlwaysScrollableScrollPhysics(),
                               
                               slivers: [
-                                ToSliver(
-                                  child: SizedBox(height: 16), // Add spacing at the top
-                                ),
-                                ToSliver(
-                                  child: Row(
-                                    children: [
-                                      Icon(Icons.priority_high, color: Color(0xffff3b30)),
-                                      SizedBox(width: 8),
-                                      Text(
-                                        'High priority',
-                                        style: TextStyle(
-                                          color: Color(0xffff3b30),
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                ToSliver(
-                                  child: SizedBox(height: 12),
-                                ),
-                                ToSliver(
-                                  child: Text(
-                                    '${taskController.selectedTask.value.title ?? ''}',
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xff333333),
-                                    ),
-                                  ),
-                                ),
-                                ToSliver(
-                                  child: SizedBox(height: 12),
-                                ),
-                                ToSliver(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        'Status',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0xff333333),
-                                        ),
-                                      ),
-                                      Text('${taskController.selectedTask.value.status ?? ''}'),
-                                    ],
-                                  ),
-                                ),
-                                ToSliver(
-                                  child: SizedBox(height: 12),
-                                ),
-                                ToSliver(
-                                  child: Row(
-                                    children: [
-                                      Icon(Icons.calendar_today, color: Color(0xff888888)),
-                                      SizedBox(width: 8),
-                                      Text(
-                                        '${taskController.selectedTask.value.dueDate ?? ''}',
-                                        style: TextStyle(
-                                          color: Color(0xff555555),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                ToSliver(
-                                  child: SizedBox(height: 16),
-                                ),
-                                ToSliver(
-                                  child: Text(
-                                    'Task Details',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xff333333),
-                                    ),
-                                  ),
-                                ),
-                                ToSliver(
-                                  child: SizedBox(height: 8),
-                                ),
-                                ToSliver(
-                                  child: Text(
-                                    '${taskController.selectedTask.value.taskDetails ?? ''}',
-                                    style: TextStyle(color: Color(0xff555555)),
-                                  ),
-                                ),
-                                ToSliver(
-                                  child: SizedBox(height: 16),
-                                ),
+                              
+                         
+    
+    // Title
+    ToSliver(
+      child: SizedBox(height: 12),
+    ),
+    ToSliver(
+      child: Text(
+        '${taskController.selectedTask.value.title ?? ''}',
+        style: TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          color: Color(0xff333333),
+        ),
+      ),
+    ),
+    ToSliver(
+      child: SizedBox(height: 12),
+    ),
+    
+    // Status
+    ToSliver(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            'Status',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Color(0xff333333),
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.greenAccent.withOpacity(0.1), // Light green background
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              '${taskController.selectedTask.value.status ?? ''}',
+              style: TextStyle(
+                color: Colors.green,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+    ToSliver(
+      child: SizedBox(height: 12),
+    ),
+    
+    // Due Date
+    ToSliver(
+      child: Row(
+        children: [
+          Icon(Icons.calendar_today, color: Color(0xff888888), size: 18),
+          SizedBox(width: 8),
+          Text(
+            'Due: ${taskController.selectedTask.value.dueDate ?? ''}',
+            style: TextStyle(
+              color: Color(0xff555555),
+              fontSize: 14,
+            ),
+          ),
+        ],
+      ),
+    ),
+    
+    ToSliver(
+      child: SizedBox(height: 16),
+    ),
+    
+    // Task Details Header
+    ToSliver(
+      child: Text(
+        'Task Details',
+        style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: Color(0xff333333),
+        ),
+      ),
+    ),
+    ToSliver(
+      child: SizedBox(height: 8),
+    ),
+    
+    // Task Details Description
+    ToSliver(
+      child: Text(
+        '${taskController.selectedTask.value.taskDetails ?? ''}',
+        style: TextStyle(
+          color: Color(0xff555555),
+          fontSize: 14,
+        ),
+      ),
+    ),
+    
+    ToSliver(
+      child: SizedBox(height: 16),
+    ),
+
+    // Remarks if Need Revision
+    if (taskController.selectedTask.value.ifNeedRevision())
+      ToSliver(
+        child: RemarkWidget(
+          title: 'Remarks',
+          message: '${taskController.selectedTask.value.remarks}',
+          icon: Icons.warning_amber_rounded,
+
+        ),
+      ),
+        ToSliver(
+      child: SizedBox(height: 12),
+    ),
+    // Last Updated
+    if (taskController.selectedTask.value.statusChangedAt != null)
+      ToSliver(
+        child: Text(
+          'Last Updated: ${taskController.selectedTask.value.statusChangedAt}',
+          style: TextStyle(
+            color: Colors.grey,
+            fontSize: 12.0,
+          ),
+        ),
+      ),
+
+    SliverGap(8), // Extra spacing
             
                                 Obx(() {
                                       if (taskController.isLoading.value) {
@@ -160,11 +219,10 @@ class TaskDetailsPage extends StatelessWidget {
                                         ); // Placeholder when not loading
                                       }
                                     }),
-                             
+
                               
 
-                                      
-                                 ToSliver(
+ if(taskController.selectedTask.value.isTaskNotCompleteAndAssignedToCurrentOfficer())ToSliver(
                                    child: SizedBox(
                                                     child: GridView.builder(
                                                       shrinkWrap:true, 
@@ -219,7 +277,7 @@ class TaskDetailsPage extends StatelessWidget {
                                                                     onTap: () =>
                                                                         taskController
                                                                             .removeFile(
-                                                                                index - 1),
+                                                                                index - 1), 
                                                                     child: Container(
                                                                       decoration: BoxDecoration(
                                                                         shape: BoxShape.circle,
@@ -258,7 +316,13 @@ class TaskDetailsPage extends StatelessWidget {
                                                   ),
                                  ),
 
+                       ToSliver(
+      child: SizedBox(height: 16),
+    ),
                                   ToSliver(child: Text('Files')), 
+                                   ToSliver(
+      child: SizedBox(height: 16),
+    ),
                                   SliverAlignedGrid.count(
   itemCount: taskController.selectedTask.value.media?.length ?? 0,
   crossAxisCount: 3,
@@ -278,7 +342,7 @@ class TaskDetailsPage extends StatelessWidget {
           },
           child: MediaFileCard(file: file),
         ),
-       Positioned(
+      if(taskController.selectedTask.value.isTaskNotCompleteAndAssignedToCurrentOfficer()) Positioned(
   top: -12, // Adjust the position as needed
   right: -12, // Adjust to make it more visible and larger
   child: GestureDetector(
@@ -311,10 +375,10 @@ class TaskDetailsPage extends StatelessWidget {
     );
   },
 ),
-
+ 
                                 
                                 
-                                ToSliver(
+                                if(taskController.selectedTask.value.isTaskNotCompleteAndAssignedToCurrentOfficer())ToSliver(
                                   child: SizedBox(height: 16),
                                 ),
                                       

@@ -1,10 +1,21 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
+import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:geolocation/features/auth/model/council_position.dart';
 import 'package:geolocation/features/file/model/media_file.dart';
 
 class Task {
+
+    static String STATUS_TODO = 'To Do';
+    static String STATUS_IN_PROGRESS = 'In Progress';
+    static String STATUS_COMPLETED = 'Completed';
+    static String STATUS_NEED_REVISION = 'Needs Revision';
+    static String STATUS_REJECTED = 'Rejected';
+
+
+  
+
   int? id;
   String? title;
   String? taskDetails;
@@ -14,6 +25,7 @@ class Task {
   String? remarks;
   bool? isLock;
   bool? isDone;
+  String? statusChangedAt;
   String? createdAt;
   String? updatedAt;
   CouncilPosition? assignedCouncilPosition;
@@ -31,6 +43,7 @@ class Task {
     this.remarks,
     this.isLock,
     this.isDone,
+    this.statusChangedAt,
     this.createdAt,
     this.updatedAt,
     this.assignedCouncilPosition,
@@ -48,6 +61,7 @@ class Task {
     String? remarks,
     bool? isLock,
     bool? isDone,
+    String? statusChangedAt,
     String? createdAt,
     String? updatedAt,
   CouncilPosition? assignedCouncilPosition,
@@ -64,6 +78,7 @@ class Task {
       remarks: remarks ?? this.remarks,
       isLock: isLock ?? this.isLock,
       isDone: isDone ?? this.isDone,
+      statusChangedAt: statusChangedAt ?? this.statusChangedAt,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       assignedCouncilPosition: assignedCouncilPosition ?? this.assignedCouncilPosition,
@@ -83,6 +98,7 @@ class Task {
       'remarks': remarks,
       'isLock': isLock,
       'isDone': isDone,
+      'statusChangedAt': statusChangedAt,
       'created_at': createdAt,
       'updated_at': updatedAt,
       'assigned_council_position': assignedCouncilPosition?.toMap(),
@@ -102,6 +118,7 @@ class Task {
       remarks: map['remarks'] != null ? map['remarks'] as String : null,
       isLock: map['isLock'] != null ? map['isLock'] as bool : null,
       isDone: map['isDone'] != null ? map['isDone'] as bool : null,
+      statusChangedAt: map['status_changed_at'] != null ? map['status_changed_at'] as String : null,
       createdAt: map['created_at'] != null ? map['created_at'] as String : null,
       updatedAt: map['updated_at'] != null ? map['updated_at'] as String : null,
       assignedCouncilPosition: map['assigned_council_position']!= null ?  CouncilPosition.fromMap(map['assigned_council_position']) : null,
@@ -122,8 +139,30 @@ class Task {
 
   @override
   String toString() {
-    return 'Task(id: $id, title: $title, taskDetails: $taskDetails, dueDate: $dueDate, completedAt: $completedAt, status: $status, remarks: $remarks, isLock: $isLock, isDone: $isDone, createdAt: $createdAt, updatedAt: $updatedAt,  assignedCouncilPosition: $assignedCouncilPosition,  approvedByCouncilPosition: $approvedByCouncilPosition,  media: $media)';
+    return 'Task(id: $id, title: $title, taskDetails: $taskDetails, dueDate: $dueDate, completedAt: $completedAt, status: $status, remarks: $remarks, isLock: $isLock, isDone: $isDone,  statusChangedAt: $statusChangedAt,createdAt: $createdAt, updatedAt: $updatedAt,  assignedCouncilPosition: $assignedCouncilPosition,  approvedByCouncilPosition: $approvedByCouncilPosition,  media: $media)';
   }
+
+
+  isCompleted(int officerId){
+    return status == Task.STATUS_COMPLETED;
+  }
+  
+  bool isTaskNotCompleteAndAssignedToCurrentOfficer() {
+  int? officerId = AuthController.controller.user.value.defaultPosition?.id;
+  return (status != Task.STATUS_COMPLETED && assignedCouncilPosition?.id == officerId);
+}
+  
+  bool ifNeedRevision() {
+  return (status == Task.STATUS_NEED_REVISION && remarks != null);
+}
+
+
+  String taskAndOfficer() {
+      int? officerId = AuthController.controller.user.value.defaultPosition?.id;
+
+  return 'STATUS: ${status} - OFFICER: ${assignedCouncilPosition?.id} - LOGIN OFFICER: ${officerId}';
+}
+
 
  
 }
