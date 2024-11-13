@@ -14,6 +14,7 @@ import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:geolocation/features/task/model/task.dart';
 import 'package:geolocation/features/task/widget/remarks_widget.dart';
+import 'package:geolocation/features/task/widget/staus_widget.dart';
 import 'package:get/get.dart';
 import 'package:geolocation/features/task/controller/task_controller.dart';
 import 'package:gradient_elevated_button/gradient_elevated_button.dart';
@@ -39,13 +40,14 @@ class TaskDetailsPage extends StatelessWidget {
       if (AuthController.controller.user.value.hasAccess()) // Replace with correct logic
         GetBuilder<TaskController>(
           builder: (controllert) {
-            return  TextButton(
+             return  TextButton(
               
               onPressed: () {
                 controllert.showApprovalModal(); // Trigger the approval modal
               },
-              child: Text('MANAGE'), // Tooltip for better accessibility
+              child: Text( AuthController.controller.user.value.hasAccess()?  'MANAGE': 'COMPLY'), // Tooltip for better accessibility
             );
+            
           }
         ),
     ],
@@ -87,34 +89,11 @@ class TaskDetailsPage extends StatelessWidget {
     
     // Status
     ToSliver(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            'Status',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Color(0xff333333),
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: Colors.greenAccent.withOpacity(0.1), // Light green background
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              '${taskController.selectedTask.value.status ?? ''}',
-              style: TextStyle(
-                color: Colors.green,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ],
+      child: StatusRowWidget(
+        label: 'Status',
+        status: taskController.selectedTask.value.status ?? 'Unknown',
       ),
+
     ),
     ToSliver(
       child: SizedBox(height: 12),
@@ -172,7 +151,7 @@ class TaskDetailsPage extends StatelessWidget {
     ),
 
     // Remarks if Need Revision
-    if (taskController.selectedTask.value.ifNeedRevision())
+    if (taskController.selectedTask.value.ifNeedRevisionOrRejected())
       ToSliver(
         child: RemarkWidget(
           title: 'Remarks',

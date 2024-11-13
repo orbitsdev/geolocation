@@ -152,8 +152,8 @@ class Task {
   return (status != Task.STATUS_COMPLETED && assignedCouncilPosition?.id == officerId);
 }
   
-  bool ifNeedRevision() {
-  return (status == Task.STATUS_NEED_REVISION && remarks != null);
+  bool ifNeedRevisionOrRejected() {
+  return ((status == Task.STATUS_NEED_REVISION || status == Task.STATUS_REJECTED) && remarks != null);
 }
 
 

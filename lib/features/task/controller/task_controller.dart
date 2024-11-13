@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 
 import 'package:geolocation/core/api/dio/api_service.dart';
 import 'package:geolocation/core/globalwidget/browser_view_page.dart';
@@ -46,119 +47,307 @@ class TaskController extends GetxController {
   var mediaFiles = <File>[].obs;
   var uploadProgress = 0.0.obs;
 
-
-
   void showApprovalModal() {
     Get.bottomSheet(
-      Container(
-        padding: EdgeInsets.all(16.0),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
-        ),
+      GetBuilder<AuthController>(
+        builder: (authcontroller) {
+          return Container(
+            padding: EdgeInsets.all(16.0),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
+            ),
+            child: authcontroller.user.value.hasAccess() ?  Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Manage Task Status',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 12),
+                    if (selectedTask.value.status != Task.STATUS_COMPLETED)
+                      ListTile(
+                        leading: Icon(Icons.check, color: Colors.green),
+                        title: Text('Approve Task'),
+                        onTap: () => updateTaskStatus(Task.STATUS_COMPLETED),
+                      ),
+                    if (selectedTask.value.status != Task.STATUS_NEED_REVISION)
+                      ListTile(
+                        leading: Icon(Icons.edit, color: Colors.orange),
+                        title: Text('Needs Revision'),
+                        onTap: () {
+                          Get.back(); // Close the modal
+                          showRemarksModal(Task.STATUS_NEED_REVISION);
+                        },
+                      ),
+                    if (selectedTask.value.status != Task.STATUS_REJECTED)
+                      ListTile(
+                        leading: Icon(Icons.close, color: Colors.red),
+                        title: Text('Reject Task'),
+                        onTap: () {
+                          Get.back(); // Close the modal
+                          showRemarksModal(Task.STATUS_REJECTED);
+                        },
+                      ),
+                      if (selectedTask.value.status != Task.STATUS_COMPLETED && selectedTask.value.isTaskNotCompleteAndAssignedToCurrentOfficer())
+                      ListTile(
+                        leading: Icon(Icons.done, color: Colors.blue),
+                        title: Text('Mark as Done'),
+                        onTap: () => updateTaskStatus(Task.STATUS_COMPLETED),
+                      ),
+                                            if (selectedTask.value.status != Task.STATUS_IN_PROGRESS && selectedTask.value.isTaskNotCompleteAndAssignedToCurrentOfficer())
+                   
+                      ListTile(
+                        leading: Icon(Icons.refresh, color: Colors.orange),
+                        title: Text('Resubmit Task'),
+                        onTap: () {
+                          Get.back(); // Close the modal
+                          showRemarksModal('Resubmission');
+                        },
+                      ),
+                  ],
+                )
+              : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Task Actions',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 12),
+                    if (selectedTask.value.status != Task.STATUS_COMPLETED)
+                      ListTile(
+                        leading: Icon(Icons.done, color: Colors.blue),
+                        title: Text('Mark as Done'),
+                        onTap: () => updateTaskStatus(Task.STATUS_COMPLETED),
+                      ),
+                    if (selectedTask.value.status != Task.STATUS_IN_PROGRESS)
+                      ListTile(
+                        leading: Icon(Icons.refresh, color: Colors.orange),
+                        title: Text('Resubmit Task'),
+                        onTap: () {
+                          Get.back(); // Close the modal
+                          showRemarksModal('Resubmission');
+                        },
+                      ),
+                  ],
+                ),
+          );
+        }
+      ),
+    );
+  }
+
+  // Modal to input remarks
+  void showRemarksModal(String status) {
+    final _formKey = GlobalKey<FormBuilderState>(); // FormBuilder key
+
+    Get.defaultDialog(
+      barrierDismissible: false,
+      title: "Add Remarks",
+      content: FormBuilder(
+        key: _formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Manage Task Status',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 12),
-            ListTile(
-              leading: Icon(Icons.check, color: Colors.green),
-              title: Text('Approve Task'),
-              onTap: () => updateTaskStatus(Task.STATUS_COMPLETED),
-            ),
-            ListTile(
-              leading: Icon(Icons.edit, color: Colors.orange),
-              title: Text('Needs Revision'),
-              onTap: () {
-                Get.back(); // Close the modal
-                showRemarksModal(Task.STATUS_NEED_REVISION); // Open remarks input modal
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.close, color: Colors.red),
-              title: Text('Reject Task'),
-              onTap: () {
-                Get.back(); // Close the modal
-                showRemarksModal(Task.STATUS_REJECTED); // Open remarks input modal
-              },
+            FormBuilderTextField(
+              name: 'remarks',
+              maxLines: 4,
+              decoration: InputDecoration(
+                hintText: "Enter remarks here...",
+                border: OutlineInputBorder(),
+              ),
+              validator: FormBuilderValidators.compose([
+                FormBuilderValidators.required(
+                    errorText: "Remarks are required."),
+                FormBuilderValidators.minLength(5,
+                    errorText: "Remarks must be at least 5 characters long."),
+                FormBuilderValidators.maxLength(500,
+                    errorText: "Remarks must not exceed 500 characters."),
+              ]),
             ),
           ],
         ),
       ),
-    );
-  }
-  
-
-
-  // Modal to input remarks
-  void showRemarksModal(String status) {
-    TextEditingController remarksController = TextEditingController();
-    Get.defaultDialog(
-      title: "Add Remarks",
-      content: Column(
-        children: [
-          TextField(
-            controller: remarksController,
-            maxLines: 4,
-            decoration: InputDecoration(
-              hintText: "Enter remarks here...",
-              border: OutlineInputBorder(),
-            ),
-          ),
-        ],
-      ),
       textConfirm: "Submit",
       confirmTextColor: Colors.white,
-      onConfirm: () {
-        updateTaskStatus(status, remarks: remarksController.text);
-        Get.back(); // Close the remarks modal
-      },
-      textCancel: "Cancel",
+      confirm: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Palette.PRIMARY,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+        child: Text(
+          'Confirm',
+          style: Get.textTheme.bodyMedium?.copyWith(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        onPressed: () {
+          if (_formKey.currentState!.saveAndValidate()) {
+            final remarks = _formKey.currentState?.value['remarks'];
+
+            updateTaskStatusNoConfirmation(status, remarks: remarks);
+           
+          } 
+        },
+      ),
+      cancel: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          elevation: 0,
+          backgroundColor: Colors.grey.shade200,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+        child: Text(
+          'Cancel',
+          style: Get.textTheme.bodyMedium?.copyWith(
+            color: Colors.grey,
+          ),
+        ),
+        onPressed: () => Get.back(),
+      ),
     );
   }
 
-  // Method to update the task status
-  void updateTaskStatus(String status, {String? remarks}) async {
-    try {
-      
-      
-     var data = {
-      'status': '',
-      'remarks': '', 
-     };
-      
 
-    
-      Modal.loading();
-      var response = await ApiService.putAuthenticatedResource('/tasks/${selectedTask.value.id}/status',data);
-      response.fold(
-        (failure) {
-          Get.back();
-          Modal.errorDialog(
-           failure: failure
-          );
-        },
-        (success) {
-         isLoading(false);
-            
-             var data = success.data['data'];
-            Task taskDetails = Task.fromMap(data);
-            selectedTask(taskDetails);
-            update();
-            (success.data['data']['media'] as List<dynamic>).forEach((e){
-              print(e);
-            });
-            Modal.success( message: 'Task Updated 🎉');
-        },
-      );
-    } catch (e) {
-      Get.snackbar("Error", "Something went wrong: $e");
+
+  void updateTaskStatusNoConfirmation(String status, {String? remarks}) async {
+    String actionText;
+
+    // Define the action text based on the status
+    if (status == Task.STATUS_COMPLETED) {
+      actionText = "approve this task as completed";
+    } else if (status == Task.STATUS_NEED_REVISION) {
+      actionText = "mark this task as needing revision";
+    } else if (status == Task.STATUS_REJECTED) {
+      actionText = "reject this task";
+    } else {
+      actionText = "update this task status";
     }
+  
+ try {
+    bool isAdmin = selectedTask.value.status != Task.STATUS_COMPLETED &&
+               (AuthController.controller.user.value.defaultPosition?.grantAccess ?? false);
+          var data = {
+            'status': status,
+            'remarks': remarks,
+            'is_admin_action': isAdmin,
+          };
+          Modal.loading();
+          var response = await ApiService.putAuthenticatedResource(
+              '/tasks/${selectedTask.value.id}/status', data);
+
+          response.fold(
+            (failure) {
+              Get.back(); // Close modal
+              Get.back(); // Close modal
+              Modal.errorDialog(failure: failure); // Display error
+            },
+            (success) {
+              Get.back(); // Close modal
+              Get.back(); // Close modal
+              isLoading(false);
+
+              var data = success.data['data'];
+              Task taskDetails = Task.fromMap(data);
+              selectedTask(taskDetails);
+              
+              update(); // Update UI
+              loadTask();
+              Modal.success(
+                message: status == Task.STATUS_COMPLETED
+                    ? 'Task successfully approved and marked as completed! 🎉'
+                    : status == Task.STATUS_NEED_REVISION
+                        ? 'Task marked as needing revision. Please provide further guidance. 🛠️'
+                        : status == Task.STATUS_REJECTED
+                            ? 'Task has been rejected. 🛑'
+                            : 'Task status updated successfully!',
+              );
+            },
+          );
+        } catch (e) {
+          Get.snackbar("Error", "Something went wrong: $e");
+        }
+    
+    
   }
+
+  void updateTaskStatus(String status, {String? remarks}) async {
+    String actionText;
+
+    // Define the action text based on the status
+    if (status == Task.STATUS_COMPLETED) {
+      actionText = "approve this task as completed";
+    } else if (status == Task.STATUS_NEED_REVISION) {
+      actionText = "mark this task as needing revision";
+    } else if (status == Task.STATUS_REJECTED) {
+      actionText = "reject this task";
+    } else {
+      actionText = "update this task status";
+    }
+  
+
+    Modal.confirmation(
+      titleText: "Confirm Action",
+      contentText:
+          "Are you sure you want to $actionText? This action will update the task's status and notify relevant users.",
+      onConfirm: () async {
+        try {
+       bool isAdmin = selectedTask.value.status != Task.STATUS_COMPLETED &&
+               (AuthController.controller.user.value.defaultPosition?.grantAccess ?? false);
+
+          var data = {
+            'status': status,
+            'remarks': remarks,
+            'is_admin_action': isAdmin,
+          };
+          Modal.loading();
+          var response = await ApiService.putAuthenticatedResource(
+              '/tasks/${selectedTask.value.id}/status', data);
+
+          response.fold(
+            (failure) {
+              Get.back(); // Close modal
+              Get.back(); // Close modal
+              Modal.errorDialog(failure: failure); // Display error
+            },
+            (success) {
+              Get.back(); // Close modal
+              Get.back(); // Close modal
+              isLoading(false);
+
+              var data = success.data['data'];
+              Task taskDetails = Task.fromMap(data);
+              selectedTask(taskDetails);
+              update(); // Update UI
+
+              Modal.success(
+                message: status == Task.STATUS_COMPLETED
+                    ? 'Task successfully approved and marked as completed! 🎉'
+                    : status == Task.STATUS_NEED_REVISION
+                        ? 'Task marked as needing revision. Please provide further guidance. 🛠️'
+                        : status == Task.STATUS_REJECTED
+                            ? 'Task has been rejected. 🛑'
+                            : 'Task status updated successfully!',
+              );
+            },
+          );
+        } catch (e) {
+          Get.snackbar("Error", "Something went wrong: $e");
+        }
+      },
+      onCancel: () {
+        Get.back(); // Close modal on cancel
+      },
+    );
+  }
+
   Future<void> deleteMediaFromServer(int mediaId) async {
     try {
       Modal.loading();
@@ -168,14 +357,13 @@ class TaskController extends GetxController {
       response.fold(
         (failure) {
           Get.back();
-          Modal.errorDialog(
-           failure: failure
-          );
+          Modal.errorDialog(failure: failure);
         },
         (success) {
-           Get.back();
+          Get.back();
           selectedTask.value.media?.removeWhere((media) => media.id == mediaId);
           update();
+          loadTask();
           Modal.success(message: 'File deleted successfully');
         },
       );
@@ -204,25 +392,25 @@ class TaskController extends GetxController {
     );
   }
 
-  void fullScreenDisplay( List<MediaFile> media, MediaFile file) {
-    int initialIndex = media.indexOf(file); 
-     if (file.type!.startsWith('video')) {
-           Get.to(() => FileViewer(
-          mediaFiles: media, // Pass the entire list of files
-          initialIndex:
-          initialIndex, // Set the initial index to the clicked file
-        ));
-        } else if (file.type!.startsWith('image')) {
-           Get.to(() => FileViewer(
-          mediaFiles: media, // Pass the entire list of files
-          initialIndex:
-          initialIndex, // Set the initial index to the clicked file
-        ));
-        } else {
-             Get.to(() => BrowserViewerPage(file: file,)); 
-        }
-
-  
+  void fullScreenDisplay(List<MediaFile> media, MediaFile file) {
+    int initialIndex = media.indexOf(file);
+    if (file.type!.startsWith('video')) {
+      Get.to(() => FileViewer(
+            mediaFiles: media, // Pass the entire list of files
+            initialIndex:
+                initialIndex, // Set the initial index to the clicked file
+          ));
+    } else if (file.type!.startsWith('image')) {
+      Get.to(() => FileViewer(
+            mediaFiles: media, // Pass the entire list of files
+            initialIndex:
+                initialIndex, // Set the initial index to the clicked file
+          ));
+    } else {
+      Get.to(() => BrowserViewerPage(
+            file: file,
+          ));
+    }
   }
 
   Future<void> pickFile() async {
@@ -367,6 +555,7 @@ class TaskController extends GetxController {
 
       Task taskDetails = Task.fromMap(data);
       selectedTask(taskDetails);
+      loadTask();
       update();
     });
   }
@@ -469,8 +658,7 @@ class TaskController extends GetxController {
   Future<void> uploadFile() async {
     Modal.confirmation(
       titleText: "Confirm Upload File",
-      contentText:
-          "Are you sure you want to upload files",
+      contentText: "Are you sure you want to upload files",
       onConfirm: () async {
         try {
           isLoading(true);
@@ -507,14 +695,14 @@ class TaskController extends GetxController {
             isLoading(false);
             uploadProgress.value = 0.0;
             mediaFiles.clear();
-             var data = success.data['data'];
+            var data = success.data['data'];
             Task taskDetails = Task.fromMap(data);
             selectedTask(taskDetails);
             update();
-            (success.data['data']['media'] as List<dynamic>).forEach((e){
+            (success.data['data']['media'] as List<dynamic>).forEach((e) {
               print(e);
             });
-            Modal.success( message: 'Upload  File! Success 🎉');
+            Modal.success(message: 'Upload  File! Success 🎉');
           });
         } catch (e) {
           Get.back();
