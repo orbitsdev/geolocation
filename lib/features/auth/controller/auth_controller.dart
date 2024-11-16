@@ -46,9 +46,11 @@ class AuthController extends GetxController {
           // print('------------TOKEN-------------');
           // print('${token.value}');
           // print('--------------------------------------');
-          // print('------------DEFAULT_POSITION--------------------');
-          // print(user.value.defaultPosition?.grantAccess);
-          // print('--------------------------------------');
+          print('------------DEFAULT_POSITION--------------------');
+          print(user.value.defaultPosition?.grantAccess);
+          print(user.value.defaultPosition?.id);
+          print(user.value.defaultPosition?.councilId);
+          print('--------------------------------------');
         }
       }
     } catch (e) {

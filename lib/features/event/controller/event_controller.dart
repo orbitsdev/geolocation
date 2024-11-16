@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:geolocation/core/api/dio/api_service.dart';
 import 'package:geolocation/core/api/dio/map_service.dart';
 import 'package:geolocation/core/modal/modal.dart';
@@ -30,6 +31,7 @@ class EventController extends GetxController {
   RxBool isLocationSelected = false.obs;
   RxBool isLocationLoading = false.obs;
   var selectedLocationDetails = ''.obs;
+  var placeId = ''.obs;
 
 
   Position? currentPosition;
@@ -59,8 +61,35 @@ class EventController extends GetxController {
  void clearLocation() {
     selectedLocation.value = LatLng(0, 0); // Reset to default LatLng
     isLocationSelected.value = false; // Mark location as unselected
-    radius.value = 100.0; // Optionally reset radius to default
+    radius.value = 50.0; // Optionally reset radius to default
     selectedLocationDetails('');
+    placeId('');
+  }
+
+
+  Future<void> getLocationDetails(LatLng position) async {
+
+     String url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}&key=${MapService.MAP_KEY}";
+
+      isLocationLoading(true);
+      update();
+      var response = await  ApiService.getPublicResource(url);
+      response.fold((failure){
+          isLocationLoading(false);
+          Modal.errorDialog(failure: failure);
+      }, (success){
+          isLocationLoading(false);
+          // print(success.data['----------------------']);
+          // print(success.data['results']);
+          print('------------------------PLACE');
+
+          selectedLocationDetails(success.data['results'][0]['formatted_address']);
+          placeId(success.data['results'][0]['place_id']);
+           print(success.data['results'][0]['place_id']);
+           print(success.data['results'][0]['formatted_address']);
+          print('------------------------END');
+      });
+     
   }
 
   Future<void> setCameraPositionToMyCurrentPosition() async {
@@ -110,8 +139,8 @@ class EventController extends GetxController {
       );
 
       // Update selected location and isLocationSelected flag
-      selectedLocation.value = position;
-      isLocationSelected.value = true;
+     
+      setNewLocation(position);
 
       // Animate the map's camera to the new position
       final GoogleMapController googleMapController = await mapController.future;
@@ -126,71 +155,72 @@ class EventController extends GetxController {
 
   
 
-  void setRadius(double value) {
-    radius.value = value;
+  void setRadius(double newRadius) {
+    radius.value = newRadius.roundToDouble();
     update();
   }
+void createEvent() async {
 
-  void createEvent() {
-    if (formKey.currentState?.saveAndValidate() ?? false) {
-
-
-      if(selectedLocation.value == null){
-        Modal.warning(message: 'Please Select Location First');
-        return ;
-      }
-      final eventData = formKey.currentState?.value;
-      var councilPositionId = AuthController.controller.user.value.defaultPosition?.id; 
-      print(councilPositionId);
-      print(eventData!['title']);
-      print(eventData['description']);
-      print(eventData['start_time']);
-      print(eventData['end_time']);
-      print(eventData['radius']);
-      return ;
+ 
+  if (formKey.currentState?.saveAndValidate() ?? false) {
+    if (selectedLocation.value == LatLng(0, 0)) {
+      Modal.warning(message: 'Please Select Location First');
+      return;
     }
 
-    //  $validatedData = $request->validate([
-    //         'council_position_id' => 'required|exists:council_positions,id',
-    //         'title' => 'required|string|max:255',
-    //         'description' => 'nullable|string',
-    //         'content' => 'nullable|string',
-    //         'latitude' => 'required|numeric',
-    //         'longitude' => 'required|numeric',
-    //         'radius' => 'required|numeric',
-    //         'start_time' => 'required|date',
-    //         'end_time' => 'required|date',
-    //         'is_active' => 'sometimes|boolean',
-    //         'restrict_event' => 'sometimes|boolean',
-    //         'max_capacity' => 'sometimes|nullable|integer|min:1',
-    //         'type' => 'required|string',
-    //     ]);
-  } 
+    // Show loading modal
+    //  Modal.loading();
+
+    // Prepare event data
+    final eventData = formKey.currentState!.value;
+    final councilPositionId = AuthController.controller.user.value.defaultPosition?.id;
+    final councilId = AuthController.controller.user.value.defaultPosition?.councilId;
+
+   
+
+    if (councilId == null || councilPositionId == null) {
+      Get.back(); 
+      Modal.errorDialog(message: 'Council ID or Position ID is missing. Please try again.');
+      return;
+    }
+
+     Map<String, dynamic> data = {
+      'council_position_id': councilPositionId,
+      'councilId': councilId,
+      'title': eventData['title'],
+      'description': eventData['description'],
+      'latitude': selectedLocation.value.latitude,
+      'longitude': selectedLocation.value.longitude,
+      'radius': radius.value,
+      'map_location': selectedLocationDetails.value,
+      'place_id': placeId.value,
+      'start_time': (eventData['start_time'] as DateTime).toIso8601String(), // Convert DateTime to String
+  'end_time': (eventData['end_time'] as DateTime).toIso8601String(),
+    };
+
+    //  print(councilId);
+    //  print(councilPositionId);
+      print('BEFOR SEND');
+      print(data);
+
+  var response = await ApiService.postAuthenticatedResource('councils/${councilId}/events/create', data);
+  response.fold((failure){
+    print('STATUS CODE ${failure.message}');
+    print(failure.statusCode);
+    print(failure.exception);
+  }, (success){
+      print('AFTER SEND------');
+      print(success.data);
+      print('AFTER SEND------------');
+      Modal.success(message: 'Event Created');
+  });
 
 
-  //MAP
-
-
-   Future<void> getLocationDetails(LatLng position) async {
-
-     String url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}&key=${MapService.MAP_KEY}";
-
-      isLocationLoading(true);
-      update();
-      var response = await  ApiService.getPublicResource(url);
-      response.fold((failure){
-          isLocationLoading(false);
-          Modal.errorDialog(failure: failure);
-      }, (success){
-          isLocationLoading(false);
-          // print(success.data['----------------------']);
-          // print(success.data['results']);
-          // print(success.data['------------------------PLACE']);
-          selectedLocationDetails('----------------------  ');
-           print(success.data['results'][0]['formatted_address']);
-          // selectedLocationDetails(success.data['results'][0]['formatted_address']);
-          selectedLocationDetails('--------------------');
-      });
-     
+   
+  } else {
+    Modal.warning(message: 'Please fill out all required fields.');
   }
+}
+
+   
 }

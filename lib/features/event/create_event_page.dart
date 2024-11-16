@@ -46,7 +46,188 @@ class _CreateEventPageState extends State<CreateEventPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Event Title
+              Gap(8),
+              Obx(() => SizedBox(
+                    height: 300, // Adjust as needed
+                    child: Stack(
+                      children: [
+                        GoogleMap(
+                          gestureRecognizers: {
+                            Factory<OneSequenceGestureRecognizer>(
+                              () => EagerGestureRecognizer(),
+                            ),
+                          },
+                          mapType: MapType.normal,
+                          myLocationButtonEnabled: true,
+                          // myLocationEnabled: true,
+                          initialCameraPosition:
+                              controller.cameraPosition as CameraPosition,
+                          onMapCreated:
+                              (GoogleMapController googleMapController) {
+                            controller.mapController
+                                .complete(googleMapController);
+                          },
+                          onTap: (LatLng position) {
+                            controller.setNewLocation(position);
+                          },
+                          markers: controller.isLocationSelected.value
+                              ? {
+                                  Marker(
+                                    markerId: MarkerId('selected-location'),
+                                    position: controller.selectedLocation.value,
+                                  ),
+                                }
+                              : {},
+                          circles: controller.isLocationSelected.value
+                              ? {
+                                  Circle(
+                                    circleId: CircleId('selected-radius'),
+                                    center: controller.selectedLocation.value,
+                                    radius: controller.radius.value,
+                                    fillColor: Palette.PRIMARY.withOpacity(0.2),
+                                    strokeColor: Palette.PRIMARY,
+                                    strokeWidth: 2,
+                                  ),
+                                }
+                              : {},
+                        ),
+                        if (controller.isLocationSelected.value)
+                          Positioned(
+                            top: 8,
+                            right: 8,
+                            child: FloatingActionButton(
+                              backgroundColor: Colors.red,
+                              mini: true,
+                              onPressed: () => controller
+                                  .clearLocation(), // Call the clear location method
+                              child: Icon(Icons.clear, color: Colors.white),
+                              tooltip: "Clear Location",
+                            ),
+                          ),
+                      ],
+                    ),
+                  )),
+              Gap(16),
+
+// Title for Radius Input
+              Text(
+                'Set Event Radius',
+                style: Get.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              Gap(8),
+
+// Explanation Text
+              Text(
+                'Adjust the radius to set the geofence for your event. '
+                'The radius defines the area where users can check in.',
+                style: Get.textTheme.bodyMedium
+                    ?.copyWith(color: Palette.LIGHT_TEXT),
+              ),
+              Gap(8),
+
+// Display Current Radius
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Current Radius',
+                    style: Get.textTheme.bodyMedium?.copyWith(
+                      color: Palette.PRIMARY,
+                    ),
+                  ),
+                  Obx(() => Text(
+                        '${controller.radius.value.round()} meters', // Clearly label the unit
+                        style: Get.textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Palette.PRIMARY,
+                        ),
+                      )),
+                ],
+              ),
+
+              Gap(8),
+
+// Radius Slider
+              Obx(() => Slider(
+                    value: controller.radius.value,
+                    min: 50, // Minimum geofencing radius
+                    max: 1000, // Maximum geofencing radius
+                    divisions: (1000 - 50), // Step increments of 1 meter
+                    label:
+                        '${controller.radius.value.round()} meters', // Show radius in meters
+                    onChanged: (value) {
+                      controller.setRadius(value
+                          .roundToDouble()); // Ensure the radius is an integer
+                    },
+                  )),
+
+
+// Additional Note
+              Text(
+                'Note: Ensure the selected radius covers the event area to allow attendees within the geofence.',
+                style:
+                    Get.textTheme.bodySmall?.copyWith(color: Colors.redAccent),
+              ),
+
+                Gap(16),
+GetBuilder<EventController>(builder: (controller){
+  return controller.selectedLocationDetails.value != ''
+                    ? Container(
+                        decoration: BoxDecoration(
+                        
+    border: Border.all( // Add light gray border
+      color: Colors.grey.shade300,
+      width: 1,
+    ),
+                            borderRadius: BorderRadius.circular(8)),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8,),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Coordinates',
+                                style: Get.textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+                              ),
+                              Text(
+                                ' ${controller.selectedLocation.value.latitude}, '
+                                '${controller.selectedLocation.value.longitude}',
+                                style: Get.textTheme.bodyMedium?.copyWith(
+                                  color: Colors.black87,
+                                ),
+                              ),
+
+                              const SizedBox(height: 8), // Spacing
+                              Divider(color: Colors.grey.shade300),
+                              const SizedBox(height: 8),
+
+                              Text(
+                                'Location Details',
+                                style: Get.textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+                              ),
+                              
+                              Text(
+                                '${controller.selectedLocationDetails.value}',
+                                style:Get.textTheme.bodyMedium?.copyWith(
+                                      color: Colors.black87,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    : Container();
+}),
+            Gap(8),
               Text(
                 'Event Title',
                 style: Get.textTheme.bodyMedium
@@ -142,9 +323,29 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 format: DateFormat(
                     'dd MMM yyyy, hh:mm a'), // Customize display format
                 decoration: InputDecoration(
-                  hintText: 'Select event start time',
                   filled: true,
                   fillColor: Palette.LIGHT_BACKGROUND,
+                  contentPadding:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(width: 0.5, color: Palette.PRIMARY),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  border: OutlineInputBorder(
+                    borderSide:
+                        const BorderSide(width: 1.0, color: Colors.transparent),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide:
+                        const BorderSide(width: 1.0, color: Colors.transparent),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  errorBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(width: 1.0, color: Colors.red),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  hintText: 'Select event start time',
                 ),
                 validator: FormBuilderValidators.compose([
                   FormBuilderValidators.required(),
@@ -175,6 +376,26 @@ class _CreateEventPageState extends State<CreateEventPage> {
                   hintText: 'Select event end time',
                   filled: true,
                   fillColor: Palette.LIGHT_BACKGROUND,
+                  contentPadding:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(width: 0.5, color: Palette.PRIMARY),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  border: OutlineInputBorder(
+                    borderSide:
+                        const BorderSide(width: 1.0, color: Colors.transparent),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide:
+                        const BorderSide(width: 1.0, color: Colors.transparent),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  errorBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(width: 1.0, color: Colors.red),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
                 validator: FormBuilderValidators.compose([
                   FormBuilderValidators.required(),
@@ -199,141 +420,6 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 style: Get.textTheme.bodyMedium
                     ?.copyWith(color: Palette.LIGHT_TEXT),
               ),
-              Gap(8),
-              Obx(() => SizedBox(
-                    height: 300, // Adjust as needed
-                    child: Stack(
-                      children: [
-                        GoogleMap(
-                          gestureRecognizers: {
-                            Factory<OneSequenceGestureRecognizer>(
-                              () => EagerGestureRecognizer(),
-                            ),
-                          },
-                          mapType: MapType.normal,
-                          myLocationButtonEnabled: true,
-                          myLocationEnabled: true,
-                          initialCameraPosition:
-                              controller.cameraPosition as CameraPosition,
-                          onMapCreated:
-                              (GoogleMapController googleMapController) {
-                            controller.mapController
-                                .complete(googleMapController);
-                          },
-                          onTap: (LatLng position) {
-                            controller.setNewLocation(position);
-                          },
-                          markers: controller.isLocationSelected.value
-                              ? {
-                                  Marker(
-                                    markerId: MarkerId('selected-location'),
-                                    position: controller.selectedLocation.value,
-                                  ),
-                                }
-                              : {},
-                          circles: controller.isLocationSelected.value
-                              ? {
-                                  Circle(
-                                    circleId: CircleId('selected-radius'),
-                                    center: controller.selectedLocation.value,
-                                    radius: controller.radius.value,
-                                    fillColor: Colors.blue.withOpacity(0.2),
-                                    strokeColor: Colors.blue,
-                                    strokeWidth: 2,
-                                  ),
-                                }
-                              : {},
-                        ),
-                        if (controller.isLocationSelected.value)
-                          Positioned(
-                            top: 60,
-                            right: 8,
-                            child: FloatingActionButton(
-                              backgroundColor: Colors.red,
-                              mini: true,
-                              onPressed: () => controller
-                                  .clearLocation(), // Call the clear location method
-                              child: Icon(Icons.clear, color: Colors.white),
-                              tooltip: "Clear Location",
-                            ),
-                          ),
-                      ],
-                    ),
-                  )),
-              Gap(16),
-
-              // Radius Input
-              Text(
-                'Set Event Radius (meters)',
-                style: Get.textTheme.bodyMedium
-                    ?.copyWith(color: Palette.LIGHT_TEXT),
-              ),
-              Gap(8),
-              Row(
-                children: [
-                  Expanded(
-                    child: FormBuilderTextField(
-                      name: 'radius',
-                      initialValue: controller.radius.value.toString(),
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Palette.LIGHT_BACKGROUND,
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 10),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide:
-                              BorderSide(width: 0.5, color: Palette.PRIMARY),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        border: OutlineInputBorder(
-                          borderSide: const BorderSide(
-                              width: 1.0, color: Colors.transparent),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(
-                              width: 1.0, color: Colors.transparent),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        errorBorder: OutlineInputBorder(
-                          borderSide:
-                              const BorderSide(width: 1.0, color: Colors.red),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        hintText: 'Enter radius',
-                      ),
-                      onChanged: (value) {
-                        controller.setRadius(
-                            double.tryParse(value as String) ?? 100.0);
-                      },
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly,
-                        RadiusInputFormatter(min: 50, max: 1000),
-                      ],
-                      validator: FormBuilderValidators.compose([
-                        FormBuilderValidators.required(),
-                        FormBuilderValidators.numeric(),
-                        FormBuilderValidators.min(
-                            50), // Minimum radius of 50 meters
-                        FormBuilderValidators.max(
-                            1000), // Maximum radius of 5000 meters
-                      ]),
-                    ),
-                  ),
-                ],
-              ),
-              Gap(8),
-              Obx(() => Slider(
-                    value: controller.radius.value,
-                    min: 50,
-                    max: 5000,
-                    divisions: 100,
-                    label: controller.radius.value.round().toString(),
-                    onChanged: (value) {
-                      controller.setRadius(value);
-                    },
-                  )),
 
               Gap(Get.size.height * 0.05),
             ],

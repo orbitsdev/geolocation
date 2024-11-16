@@ -10,10 +10,16 @@ import 'package:get/get.dart';
 import 'package:geolocation/core/modal/modal.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
 
-class ErrorHandler {
-  static Failure handleDio(DioException exception) {
-    switch (exception.type) {
-      case DioExceptionType.connectionTimeout:
+  class ErrorHandler {
+    static Failure handleDio(DioException exception) {
+      print('RESPONSE_____________');
+      print(exception.response?.data);
+      print(exception.response?.statusCode);
+      print(exception.response?.statusMessage);
+      print(exception.type);
+      print('RESPONSE_____________----------');
+      switch (exception.type) {
+        case DioExceptionType.connectionTimeout:
         return Failure(
             exception: exception,
             message: exception.message,
