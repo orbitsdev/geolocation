@@ -558,6 +558,139 @@ static Future<bool> confirmation2({
 
 
 
+ static warning({
+    String title = "Warning",
+    String message = "Please check your input.",
+    Widget? visualContent,
+    String buttonText = "OK",
+    VoidCallback? onDismiss,
+    bool barrierDismissible = true,
+  }) {
+    Get.dialog(
+      AlertDialog(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (visualContent != null)
+              visualContent
+            else
+              LocalLottieImage(
+                path: lottiesPath('warning.json'), // Add a warning Lottie animation
+                repeat: false,
+              ),
+            const Gap(12),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: Get.textTheme.titleLarge?.copyWith(
+                color: Colors.orange,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const Gap(8),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: Get.textTheme.bodyMedium?.copyWith(
+                color: Colors.black54,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orange, // Warning color
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+              onPressed: onDismiss ?? () => Get.back(),
+              child: Text(
+                buttonText,
+                style: Get.textTheme.bodyMedium?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+      barrierDismissible: barrierDismissible,
+    );
+  }
+
+  // Info Dialog
+  static info({
+    String title = "Information",
+    String message = "Here is some information.",
+    Widget? visualContent,
+    String buttonText = "OK",
+    VoidCallback? onDismiss,
+    bool barrierDismissible = true,
+  }) {
+    Get.dialog(
+      AlertDialog(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (visualContent != null)
+              visualContent
+            else
+              LocalLottieImage(
+                path: lottiesPath('info.json'), // Add an info Lottie animation
+                repeat: false,
+              ),
+            const Gap(12),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: Get.textTheme.titleLarge?.copyWith(
+                color: Palette.PRIMARY,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const Gap(8),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: Get.textTheme.bodyMedium?.copyWith(
+                color: Colors.black54,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Palette.PRIMARY, // Primary info color
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+              onPressed: onDismiss ?? () => Get.back(),
+              child: Text(
+                buttonText,
+                style: Get.textTheme.bodyMedium?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+      barrierDismissible: barrierDismissible,
+    );
+  }
+
 }
 
 

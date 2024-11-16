@@ -1,6 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:geolocation/core/api/dio/api_service.dart';
+import 'package:geolocation/core/api/dio/map_service.dart';
+import 'package:geolocation/core/modal/modal.dart';
+import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:geolocation/features/event/model/event.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -9,29 +13,12 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 class EventController extends GetxController {
 
    var events = <Event>[].obs; 
-    void fetchEvents() {
-    // For now, we'll just add some dummy data
-    events.addAll([
-      Event(
-        id: '1',
-        title: 'University Sports Meet',
-        description: 'Annual sports meet at the university stadium.',
-        date: '2024-09-20',
-        latitude: 37.42796133580664,
-        longitude: -122.085749655962,
-        radius: 100.0,
-      ),
-      Event(
-        id: '2',
-        title: 'Academic Seminar',
-        description: 'Seminar on recent academic developments.',
-        date: '2024-09-22',
-        latitude: 37.4219983,
-        longitude: -122.084,
-        radius: 150.0,
-      ),
-    ]);
-  }
+   
+  
+  
+  
+   
+
 
   static EventController controller = Get.find();
   
@@ -39,8 +26,11 @@ class EventController extends GetxController {
   final Completer<GoogleMapController> mapController = Completer();
   
   Rx<LatLng> selectedLocation = LatLng(0, 0).obs; // Default LatLng
-  RxDouble radius = 100.0.obs; // Default radius in meters
+  RxDouble radius = 50.0.obs; // Default radius in meters
   RxBool isLocationSelected = false.obs;
+  RxBool isLocationLoading = false.obs;
+  var selectedLocationDetails = ''.obs;
+
 
   Position? currentPosition;
   CameraPosition? cameraPosition = CameraPosition(
@@ -56,11 +46,21 @@ class EventController extends GetxController {
     setCameraPositionToMyCurrentPosition(); // Automatically set the camera position to the user's current location
   }
 
+  void setNewLocation(LatLng location) async {
+    selectedLocation(location);
+    isLocationSelected(true);
+    update();
+    print('----------------');
+    print(selectedLocation);
+    print('----------------');
 
-@override
-  void onReady() {
-    super.onReady();
-    fetchEvents(); // Load events when the controller is ready
+     await  getLocationDetails(location);
+  }
+ void clearLocation() {
+    selectedLocation.value = LatLng(0, 0); // Reset to default LatLng
+    isLocationSelected.value = false; // Mark location as unselected
+    radius.value = 100.0; // Optionally reset radius to default
+    selectedLocationDetails('');
   }
 
   Future<void> setCameraPositionToMyCurrentPosition() async {
@@ -104,8 +104,8 @@ class EventController extends GetxController {
       // Update camera position
       cameraPosition = CameraPosition(
         target: position,
-        zoom: 16.999, // Adjust as needed
-        tilt: 40,     // Adjust as needed
+        zoom: 17.999, // Adjust as needed
+        tilt: 30,     // Adjust as needed
         bearing: -1000, // Adjust as needed
       );
 
@@ -124,21 +124,73 @@ class EventController extends GetxController {
     }
   }
 
-  void setLocation(LatLng location) {
-    selectedLocation.value = location;
-    isLocationSelected.value = true;
-  }
+  
 
   void setRadius(double value) {
     radius.value = value;
+    update();
   }
 
   void createEvent() {
     if (formKey.currentState?.saveAndValidate() ?? false) {
+
+
+      if(selectedLocation.value == null){
+        Modal.warning(message: 'Please Select Location First');
+        return ;
+      }
       final eventData = formKey.currentState?.value;
-      print('Event Data: $eventData');
-      // Implement your save logic here
-      Get.back(); // Go back to the previous page after saving
+      var councilPositionId = AuthController.controller.user.value.defaultPosition?.id; 
+      print(councilPositionId);
+      print(eventData!['title']);
+      print(eventData['description']);
+      print(eventData['start_time']);
+      print(eventData['end_time']);
+      print(eventData['radius']);
+      return ;
     }
+
+    //  $validatedData = $request->validate([
+    //         'council_position_id' => 'required|exists:council_positions,id',
+    //         'title' => 'required|string|max:255',
+    //         'description' => 'nullable|string',
+    //         'content' => 'nullable|string',
+    //         'latitude' => 'required|numeric',
+    //         'longitude' => 'required|numeric',
+    //         'radius' => 'required|numeric',
+    //         'start_time' => 'required|date',
+    //         'end_time' => 'required|date',
+    //         'is_active' => 'sometimes|boolean',
+    //         'restrict_event' => 'sometimes|boolean',
+    //         'max_capacity' => 'sometimes|nullable|integer|min:1',
+    //         'type' => 'required|string',
+    //     ]);
+  } 
+
+
+  //MAP
+
+
+   Future<void> getLocationDetails(LatLng position) async {
+
+     String url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}&key=${MapService.MAP_KEY}";
+
+      isLocationLoading(true);
+      update();
+      var response = await  ApiService.getPublicResource(url);
+      response.fold((failure){
+          isLocationLoading(false);
+          Modal.errorDialog(failure: failure);
+      }, (success){
+          isLocationLoading(false);
+          // print(success.data['----------------------']);
+          // print(success.data['results']);
+          // print(success.data['------------------------PLACE']);
+          selectedLocationDetails('----------------------  ');
+           print(success.data['results'][0]['formatted_address']);
+          // selectedLocationDetails(success.data['results'][0]['formatted_address']);
+          selectedLocationDetails('--------------------');
+      });
+     
   }
 }

@@ -35,6 +35,7 @@ import 'package:geolocation/features/council_positions/pages/council_member_posi
 import 'package:geolocation/features/notification/notification_page.dart';
 import 'package:geolocation/features/post/post_page.dart';
 import 'package:geolocation/features/post/widget/post_card.dart';
+import 'package:geolocation/features/task/controller/task_controller.dart';
 import 'package:geolocation/features/task/member_task_page.dart';
 import 'package:geolocation/features/task/task_page.dart';
 import 'package:get/get.dart';
@@ -82,11 +83,14 @@ class _DashboardPageState extends State<DashboardPage>
 
     if (currentUser.isAdmin()) {
       await councilController.fetchCouncils();
+      
     } else if (!currentUser.isAdmin() && currentUser.hasAccess()) {
       final councilId = currentUser.defaultPosition?.councilId;
       if (councilId != null) {
         CouncilPositionController.controller.setCouncilId(councilId);
         await CouncilPositionController.controller.fetchCouncilMembers();
+        await TaskController.controller.loadTask();
+        
       }
     }
   }
@@ -160,17 +164,22 @@ class _DashboardPageState extends State<DashboardPage>
                             ),
                           )),
                         ),
-                        ToSliver(
-                            child: RippleContainer(
-                          onTap: () => Get.to(() => MemberTaskPage(),
-                              transition: Transition.cupertino),
-                          child: OverAllCard(
-                            icon: FaIcon(FontAwesomeIcons.tasks,
-                                size: 34, color: Colors.white), // Tasks
-                            title: 'Tasks',
-                            count: '39',
-                          ),
-                        )),
+                        GetBuilder<TaskController>(
+                          builder: (taskcontroller) {
+                            return ToSliver(
+                                child: RippleContainer(
+                              onTap: () => Get.to(() => MemberTaskPage(),
+                                  transition: Transition.cupertino),
+                              child: OverAllCard(
+                                isLoading: taskcontroller.isLoading.value,
+                                icon: FaIcon(FontAwesomeIcons.tasks,
+                                    size: 34, color: Colors.white), // Tasks
+                                title: 'Tasks',
+                                count: '${taskcontroller.tasks.length}',
+                              ),
+                            ));
+                          }
+                        ),
                         ToSliver(
                             child: RippleContainer(
                           onTap: () => Get.to(() => PostPage(),
