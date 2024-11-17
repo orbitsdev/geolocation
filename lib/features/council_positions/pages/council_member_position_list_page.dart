@@ -16,8 +16,7 @@ class CouncilMemberPositionListPage extends StatefulWidget {
 
 class _CouncilMemberPositionListPageState
     extends State<CouncilMemberPositionListPage> {
-  final CouncilPositionController _controller =
-      Get.put(CouncilPositionController());
+  final CouncilPositionController _controller =Get.put(CouncilPositionController());
   final ScrollController newScrollController = ScrollController();
 
   @override

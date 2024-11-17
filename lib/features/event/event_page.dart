@@ -1,16 +1,40 @@
 import 'package:flutter/material.dart';
-import 'package:geolocation/core/theme/game_pallete.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:geolocation/core/globalwidget/ripple_container.dart';
+import 'package:geolocation/core/globalwidget/sliver_gap.dart';
+import 'package:geolocation/core/globalwidget/to_sliver.dart';
+import 'package:geolocation/core/modal/modal.dart';
 import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/event/controller/event_controller.dart';
 import 'package:geolocation/features/event/create_event_page.dart';
-import 'package:geolocation/features/event/event_details_page.dart';
 import 'package:geolocation/features/event/model/event.dart';
+import 'package:geolocation/features/event/widgets/event_card.dart';
 import 'package:get/get.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
+class EventPage extends StatefulWidget {
+  @override
+  State<EventPage> createState() => _EventPageState();
+}
 
-class EventPage extends StatelessWidget {
+class _EventPageState extends State<EventPage> {
   final EventController controller = Get.find<EventController>();
+  final ScrollController newScrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    if (controller.events.isEmpty) {
+    controller.loadEvents();
+    }
+
+    newScrollController.addListener(() async {
+      if (newScrollController.position.pixels >=
+          newScrollController.position.maxScrollExtent - 200) {
+        controller.loadOnScroll();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,113 +54,97 @@ class EventPage extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.add, color: Palette.PRIMARY),
             onPressed: () {
-              // Navigate to the event creation page
               Get.to(() => CreateEventPage());
             },
           ),
         ],
       ),
-      body: Obx(() {
-        if (controller.events.isEmpty) {
-          return Center(
-            child: Text(
-              'No events available.',
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.grey[600],
-              ),
-            ),
-          );
-        }
-
-        return CustomScrollView(
-          slivers: [
-            SliverPadding(
-              padding: EdgeInsets.all(16),
-              sliver: SliverMasonryGrid.count(
-                crossAxisCount: 1, // Cross-axis count set to 1 for a list-like appearance
-                mainAxisSpacing: 16.0,
-                crossAxisSpacing: 16.0,
-                childCount: controller.events.length,
-                itemBuilder: (context, index) {
-                  final event = controller.events[index];
-                  return GestureDetector(
-                    onTap: () {
-                      // Navigate to the event detail page
-                      Get.to(() => EventDetailPage(event: event));
-                    },
-                    child: _buildEventCard(event),
-                  );
-                },
-              ),
-            ),
-          ],
-        );
-      }),
-    );
-  }
-
-  Widget _buildEventCard(Event event) {
-    return Container(
-      padding: EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Palette.PRIMARY, Palette.DARK_PRIMARY],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+      body: RefreshIndicator(
+        triggerMode: RefreshIndicatorTriggerMode.anywhere,
+        onRefresh: () => controller.loadEvents(),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: GetBuilder<EventController>(
+            builder: (controller) {
+              return CustomScrollView(
+                controller: newScrollController,
+                shrinkWrap: true,
+                physics: const AlwaysScrollableScrollPhysics(),
+                slivers: [
+                  SliverGap(8),
+                  controller.isLoading.value
+                      ? ToSliver(
+                          child: Center(child: CircularProgressIndicator()))
+                      : controller.events.isNotEmpty
+                          ? SliverAlignedGrid.count(
+                              crossAxisSpacing: 8,
+                              mainAxisSpacing: 16,
+                              itemCount: controller.events.length,
+                              crossAxisCount: 1,
+                              itemBuilder: (context, index) {
+                                Event event = controller.events[index];
+                                return Slidable(
+                                  key: Key(event.id.toString()),
+                                  endActionPane: ActionPane(
+                                    motion: const DrawerMotion(),
+                                    extentRatio: 0.5,
+                                    children: [
+                                      // Update Action
+                                      SlidableAction(
+                                        onPressed: (context) {
+                                          if (event.id != null) {
+                                            controller
+                                                .selectItemAndNavigateToUpdatePage(
+                                                    event);
+                                          }
+                                        },
+                                        backgroundColor: Colors.green,
+                                        foregroundColor: Colors.white,
+                                        icon: Icons.edit,
+                                        label: 'Update',
+                                      ),
+                                      // Delete Action
+                                      SlidableAction(
+                                        onPressed: (context) {
+                                          if (event.id != null) {
+                                            controller.delete(event.id!);
+                                          }
+                                        },
+                                        backgroundColor: Colors.red,
+                                        foregroundColor: Colors.white,
+                                        icon: Icons.delete,
+                                        label: 'Delete',
+                                      ),
+                                    ],
+                                  ),
+                                  child: RippleContainer(
+                                    onTap: () {
+                                      // Navigate to event details if required
+                                      // Get.to(() => EventDetailsPage(event: event));
+                                    },
+                                    child: EventCard(event: event),
+                                  ),
+                                );
+                              },
+                            )
+                          : ToSliver(
+                              child: Center(
+                                child: Text(
+                                  'No events found',
+                                  style: TextStyle(
+                                      fontSize: 16, color: Colors.black54),
+                                ),
+                              ),
+                            ),
+                  if (controller.isScrollLoading.value)
+                    ToSliver(
+                      child: const Center(child: CircularProgressIndicator()),
+                    ),
+                ],
+              );
+            },
+          ),
         ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 12,
-            offset: Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Event Icon or Image
-          Icon(
-            Icons.event,
-            color: Colors.white,
-            size: 36,
-          ),
-          SizedBox(height: 16),
-
-          // Event Title
-          Text(
-            event.title,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          SizedBox(height: 8),
-
-          // Event Date
-          Text(
-            'Date: ${event.date}',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.white70,
-            ),
-          ),
-          SizedBox(height: 8),
-
-          // Event Description
-          Text(
-            event.description,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.white,
-            ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
       ),
     );
   }

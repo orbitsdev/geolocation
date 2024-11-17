@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -5,27 +6,41 @@ import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:gap/gap.dart';
-import 'package:geolocation/core/formatters/radius_formatter.dart';
-import 'package:geolocation/core/theme/palette.dart';
-import 'package:geolocation/features/event/controller/event_controller.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 
-class CreateEventPage extends StatefulWidget {
-  const CreateEventPage({Key? key}) : super(key: key);
+import 'package:geolocation/core/formatters/radius_formatter.dart';
+import 'package:geolocation/core/theme/palette.dart';
+import 'package:geolocation/features/event/controller/event_controller.dart';
 
-  @override
-  _CreateEventPageState createState() => _CreateEventPageState();
-}
-
-class _CreateEventPageState extends State<CreateEventPage> {
-  var controller = Get.find<EventController>();
+class CreateEventPage extends StatelessWidget {
+  bool? isEditMode; // To determine if it's edit mode
+   CreateEventPage({
+    Key? key,
+    this.isEditMode,
+  }) : super(key: key);
+  
   @override
   Widget build(BuildContext context) {
+     var controller = Get.find<EventController>();
+
+     
+     
+     if (isEditMode == true) {
+      controller.fillForm();
+    }
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        leading: IconButton(onPressed: (){
+          if(isEditMode == true){
+            controller.clearData();
+             Get.back();
+          }else{
+            Get.back();
+          }
+        }, icon: Icon(Icons.arrow_back)),
         title: const Text('Create Event'),
         actions: [
           // TextButton(
@@ -47,7 +62,8 @@ class _CreateEventPageState extends State<CreateEventPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Gap(8),
-              Obx(() => SizedBox(
+              GetBuilder<EventController>(builder: (eventcontroller){
+               return SizedBox(
                     height: 300, // Adjust as needed
                     child: Stack(
                       children: [
@@ -59,7 +75,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                           },
                           mapType: MapType.normal,
                           myLocationButtonEnabled: true,
-                          // myLocationEnabled: true,
+                          myLocationEnabled: true,
                           initialCameraPosition:
                               controller.cameraPosition as CameraPosition,
                           onMapCreated:
@@ -68,37 +84,19 @@ class _CreateEventPageState extends State<CreateEventPage> {
                                 .complete(googleMapController);
                           },
                           onTap: (LatLng position) {
-                            controller.setNewLocation(position);
+                            eventcontroller.setNewLocation(position);
                           },
-                          markers: controller.isLocationSelected.value
-                              ? {
-                                  Marker(
-                                    markerId: MarkerId('selected-location'),
-                                    position: controller.selectedLocation.value,
-                                  ),
-                                }
-                              : {},
-                          circles: controller.isLocationSelected.value
-                              ? {
-                                  Circle(
-                                    circleId: CircleId('selected-radius'),
-                                    center: controller.selectedLocation.value,
-                                    radius: controller.radius.value,
-                                    fillColor: Palette.PRIMARY.withOpacity(0.2),
-                                    strokeColor: Palette.PRIMARY,
-                                    strokeWidth: 2,
-                                  ),
-                                }
-                              : {},
+                           markers: controller.markers,
+        circles: controller.circles,
                         ),
-                        if (controller.isLocationSelected.value)
+                        if (eventcontroller.isLocationSelected.value)
                           Positioned(
-                            top: 8,
+                            top: 60,
                             right: 8,
                             child: FloatingActionButton(
                               backgroundColor: Colors.red,
                               mini: true,
-                              onPressed: () => controller
+                              onPressed: () => eventcontroller
                                   .clearLocation(), // Call the clear location method
                               child: Icon(Icons.clear, color: Colors.white),
                               tooltip: "Clear Location",
@@ -106,10 +104,11 @@ class _CreateEventPageState extends State<CreateEventPage> {
                           ),
                       ],
                     ),
-                  )),
+                  );
+              }),
               Gap(16),
 
-// Title for Radius Input
+
               Text(
                 'Set Event Radius',
                 style: Get.textTheme.titleLarge?.copyWith(
@@ -117,18 +116,27 @@ class _CreateEventPageState extends State<CreateEventPage> {
                   color: Colors.black,
                 ),
               ),
-              Gap(8),
+              // Gap(8),
 
-// Explanation Text
-              Text(
-                'Adjust the radius to set the geofence for your event. '
-                'The radius defines the area where users can check in.',
-                style: Get.textTheme.bodyMedium
-                    ?.copyWith(color: Palette.LIGHT_TEXT),
-              ),
-              Gap(8),
 
-// Display Current Radius
+              // Text(
+              //   'Adjust the radius to define the geofence for your event. Users will only be able to check in if they are within this radius',
+              //   style: Get.textTheme.bodyMedium
+              //       ?.copyWith(color: Palette.LIGHT_TEXT),
+              // ),
+Gap(8),
+GetBuilder<EventController>(builder: (taskcontroller) {
+  return SizedBox(
+    height: 3, // Ensure a fixed height for both states
+    child: taskcontroller.isLocationLoading.value 
+        ? LinearProgressIndicator(color: Palette.PRIMARY)
+        : Container(color: Colors.transparent), // Transparent to avoid visual impact
+  );
+}),
+Gap(8),
+
+
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -138,41 +146,49 @@ class _CreateEventPageState extends State<CreateEventPage> {
                       color: Palette.PRIMARY,
                     ),
                   ),
-                  Obx(() => Text(
-                        '${controller.radius.value.round()} meters', // Clearly label the unit
+                GetBuilder<EventController>(builder: (eventController){
+                 return Text(
+                        '${eventController.radius.value.round()} meters', // Clearly label the unit
                         style: Get.textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: Palette.PRIMARY,
                         ),
-                      )),
+                      );})
+          
                 ],
               ),
 
               Gap(8),
 
 // Radius Slider
-              Obx(() => Slider(
-                    value: controller.radius.value,
-                    min: 50, // Minimum geofencing radius
-                    max: 1000, // Maximum geofencing radius
-                    divisions: (1000 - 50), // Step increments of 1 meter
-                    label:
-                        '${controller.radius.value.round()} meters', // Show radius in meters
-                    onChanged: (value) {
-                      controller.setRadius(value
-                          .roundToDouble()); // Ensure the radius is an integer
-                    },
-                  )),
+             Obx(() => Slider(
+      value: controller.radius.value,
+      min: 50,
+      max: 1000,
+      divisions: (1000 - 50),
+      label: '${controller.radius.value.round()} meters',
+      onChanged: (value) => controller.setRadius(value),
+)),
+
 
 
 // Additional Note
-              Text(
-                'Note: Ensure the selected radius covers the event area to allow attendees within the geofence.',
-                style:
-                    Get.textTheme.bodySmall?.copyWith(color: Colors.redAccent),
+              Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Palette.LIGHT_BACKGROUND,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(width: 0.2, color:Palette.PRIMARY.withOpacity(0.80))
+                ),
+                child: Text(
+                  'Note: Ensure the selected radius covers the event area to allow attendees within the geofence.',
+                  style:
+                      Get.textTheme.bodySmall?.copyWith(color: Palette.PRIMARY),
+                ),
               ),
-
-                Gap(16),
+              
+                
+                Gap(8),
 GetBuilder<EventController>(builder: (controller){
   return controller.selectedLocationDetails.value != ''
                     ? Container(
@@ -452,7 +468,11 @@ GetBuilder<EventController>(builder: (controller){
                   ),
                 ),
                 onPressed: () {
+                   if (isEditMode == true) {
+                   controller.updateEvent();
+                } else {
                   controller.createEvent();
+                }
                 },
                 child: Text(
                   'Save Event',

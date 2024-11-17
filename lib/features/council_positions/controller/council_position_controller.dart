@@ -15,7 +15,8 @@ import 'package:get/get.dart';
 class CouncilPositionController extends GetxController {
   static CouncilPositionController controller = Get.find();
   var grantAccess = false.obs;
- var isFetchingCouncilPositions = false.obs;
+  
+  var isFetchingCouncilPositions = false.obs;
   var isFetchingUsers = false.obs;
   var isFetchingAvailablePositions = false.obs;
   var isCreatingOrUpdating = false.obs;

@@ -10,7 +10,7 @@ class EventDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(event.title),
+        title: Text('${event.title}'),
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
@@ -18,7 +18,7 @@ class EventDetailPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              event.title,
+              '${event.title}',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -26,7 +26,7 @@ class EventDetailPage extends StatelessWidget {
             ),
             SizedBox(height: 16),
             Text(
-              'Date: ${event.date}',
+             'Date: ${event.startTime} - ${event.endTime} ',
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.grey[600],
@@ -34,7 +34,7 @@ class EventDetailPage extends StatelessWidget {
             ),
             SizedBox(height: 16),
             Text(
-              event.description,
+              '${event.description}',
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.grey[800],

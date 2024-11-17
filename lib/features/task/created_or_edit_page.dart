@@ -16,7 +16,7 @@ import 'package:geolocation/features/task/model/task.dart';
 import 'package:geolocation/features/task/officer_selection_page.dart';
 
 class CreatedOrEditPage extends StatelessWidget {
-     final bool? isEditMode;
+  final bool? isEditMode;
   final Task? task;
 
   const CreatedOrEditPage({

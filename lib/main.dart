@@ -141,7 +141,7 @@ class _GeoLocationAppState extends State<GeoLocationApp>  with WidgetsBindingObs
         GetPage(name: '/create-or-edit', page: () => CreateOrEditCouncilMemberPage(), middlewares: []),
 
         GetPage(name: '/tasks', page: () => MemberTaskPage(), middlewares: []),
-        GetPage(name: '/event', page: () => EventPage(), middlewares: []),
+        GetPage(name: '/events', page: () => EventPage(), middlewares: []),
 
         GetPage(name: '/notifications', page: () => NotificationPage(), middlewares: []),
         
