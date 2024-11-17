@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:gap/gap.dart';
+import 'package:geolocation/core/globalwidget/ripple_container.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
@@ -16,43 +17,35 @@ import 'package:geolocation/features/event/controller/event_controller.dart';
 
 class CreateEventPage extends StatelessWidget {
   bool? isEditMode; // To determine if it's edit mode
-   CreateEventPage({
+  CreateEventPage({
     Key? key,
     this.isEditMode,
   }) : super(key: key);
-  
+
   @override
   Widget build(BuildContext context) {
-     var controller = Get.find<EventController>();
-
-     
-     
-     if (isEditMode == true) {
+    var controller = Get.find<EventController>();
+    if (isEditMode == true) {
+       print('Selected Item in CreateEventPage: ${controller.selectedItem.value}');
       controller.fillForm();
+    }else{
+      controller.setCameraPositionToMyCurrentPosition();
     }
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        leading: IconButton(onPressed: (){
-          if(isEditMode == true){
-            controller.clearData();
-             Get.back();
-          }else{
-            Get.back();
-          }
-        }, icon: Icon(Icons.arrow_back)),
-        title: const Text('Create Event'),
-        actions: [
-          // TextButton(
-          //   onPressed: () {
-          //     controller.createEvent(); // Call controller method to save event
-          //   },
-          //   child: Text(
-          //     'Save',
-          //     style: TextStyle(color: Palette.PRIMARY),
-          //   ),
-          // ),
-        ],
+        leading: IconButton(
+            onPressed: () {
+              if (isEditMode == true) {
+                controller.clearData();
+                Get.back();
+              } else {
+                Get.back();
+              }
+            },
+            icon: Icon(Icons.arrow_back)),
+        title:  Text(isEditMode== true?'Update Event' : 'Create Event'),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
@@ -62,52 +55,49 @@ class CreateEventPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Gap(8),
-              GetBuilder<EventController>(builder: (eventcontroller){
-               return SizedBox(
-                    height: 300, // Adjust as needed
-                    child: Stack(
-                      children: [
-                        GoogleMap(
-                          gestureRecognizers: {
-                            Factory<OneSequenceGestureRecognizer>(
-                              () => EagerGestureRecognizer(),
-                            ),
-                          },
-                          mapType: MapType.normal,
-                          myLocationButtonEnabled: true,
-                          myLocationEnabled: true,
-                          initialCameraPosition:
-                              controller.cameraPosition as CameraPosition,
-                          onMapCreated:
-                              (GoogleMapController googleMapController) {
-                            controller.mapController
-                                .complete(googleMapController);
-                          },
-                          onTap: (LatLng position) {
-                            eventcontroller.setNewLocation(position);
-                          },
-                           markers: controller.markers,
-        circles: controller.circles,
-                        ),
-                        if (eventcontroller.isLocationSelected.value)
-                          Positioned(
-                            top: 60,
-                            right: 8,
-                            child: FloatingActionButton(
-                              backgroundColor: Colors.red,
-                              mini: true,
-                              onPressed: () => eventcontroller
-                                  .clearLocation(), // Call the clear location method
-                              child: Icon(Icons.clear, color: Colors.white),
-                              tooltip: "Clear Location",
-                            ),
+              GetBuilder<EventController>(builder: (eventcontroller) {
+                return SizedBox(
+                  height: 300, // Adjust as needed
+                  child: Stack(
+                    children: [
+                      GoogleMap(
+                        gestureRecognizers: {
+                          Factory<OneSequenceGestureRecognizer>(
+                            () => EagerGestureRecognizer(),
                           ),
-                      ],
-                    ),
-                  );
+                        },
+                        mapType: MapType.normal,
+                        myLocationButtonEnabled: true,
+                        myLocationEnabled: true,
+                        initialCameraPosition:
+                            controller.cameraPosition as CameraPosition,
+                        onMapCreated:
+                            (GoogleMapController googleMapController) {
+                         eventcontroller.googleMapController = googleMapController; // Set the controller once the map is ready
+                        },
+                        onTap: (LatLng position) {
+                          eventcontroller.setLocation(position);
+                        },
+                        markers: controller.markers,
+                        circles: controller.circles,
+                      ),
+                      if (eventcontroller.isLocationSelected.value)
+                        Positioned(
+                          top: 60,
+                          right: 8,
+                          child: FloatingActionButton(
+                            backgroundColor: Colors.red,
+                            mini: true,
+                            onPressed: () => eventcontroller.clearData(),
+                            child: Icon(Icons.clear, color: Colors.white),
+                            tooltip: "Clear Location",
+                          ),
+                        ),
+                    ],
+                  ),
+                );
               }),
               Gap(16),
-
 
               Text(
                 'Set Event Radius',
@@ -116,26 +106,19 @@ class CreateEventPage extends StatelessWidget {
                   color: Colors.black,
                 ),
               ),
-              // Gap(8),
 
-
-              // Text(
-              //   'Adjust the radius to define the geofence for your event. Users will only be able to check in if they are within this radius',
-              //   style: Get.textTheme.bodyMedium
-              //       ?.copyWith(color: Palette.LIGHT_TEXT),
-              // ),
-Gap(8),
-GetBuilder<EventController>(builder: (taskcontroller) {
-  return SizedBox(
-    height: 3, // Ensure a fixed height for both states
-    child: taskcontroller.isLocationLoading.value 
-        ? LinearProgressIndicator(color: Palette.PRIMARY)
-        : Container(color: Colors.transparent), // Transparent to avoid visual impact
-  );
-}),
-Gap(8),
-
-
+              Gap(8),
+              GetBuilder<EventController>(builder: (taskcontroller) {
+                return SizedBox(
+                  height: 3, // Ensure a fixed height for both states
+                  child: taskcontroller.isLocationLoading.value
+                      ? LinearProgressIndicator(color: Palette.PRIMARY)
+                      : Container(
+                          color: Colors
+                              .transparent), // Transparent to avoid visual impact
+                );
+              }),
+              Gap(8),
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -146,29 +129,35 @@ Gap(8),
                       color: Palette.PRIMARY,
                     ),
                   ),
-                GetBuilder<EventController>(builder: (eventController){
-                 return Text(
-                        '${eventController.radius.value.round()} meters', // Clearly label the unit
-                        style: Get.textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Palette.PRIMARY,
-                        ),
-                      );})
-          
+                  GetBuilder<EventController>(builder: (eventController) {
+                    return Text(
+                      '${eventController.radius.value.round()} meters', // Clearly label the unit
+                      style: Get.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Palette.PRIMARY,
+                      ),
+                    );
+                  })
                 ],
               ),
 
               Gap(8),
 
 // Radius Slider
-             Obx(() => Slider(
-      value: controller.radius.value,
+       GetBuilder<EventController>(
+  builder: (eventController) {
+    return Slider(
+      value: eventController.radius.value,
       min: 50,
       max: 1000,
       divisions: (1000 - 50),
-      label: '${controller.radius.value.round()} meters',
-      onChanged: (value) => controller.setRadius(value),
-)),
+      label: '${eventController.radius.value.round()} meters',
+      onChanged: (value) {
+        eventController.setRadius(value); // Update both UI and logic
+      },
+    );
+  },
+),
 
 
 
@@ -176,74 +165,79 @@ Gap(8),
               Container(
                 padding: EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Palette.LIGHT_BACKGROUND,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(width: 0.2, color:Palette.PRIMARY.withOpacity(0.80))
-                ),
+                    color: Palette.LIGHT_BACKGROUND,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                        width: 0.2, color: Palette.PRIMARY.withOpacity(0.80))),
                 child: Text(
                   'Note: Ensure the selected radius covers the event area to allow attendees within the geofence.',
                   style:
                       Get.textTheme.bodySmall?.copyWith(color: Palette.PRIMARY),
                 ),
               ),
-              
-                
-                Gap(8),
-GetBuilder<EventController>(builder: (controller){
-  return controller.selectedLocationDetails.value != ''
-                    ? Container(
-                        decoration: BoxDecoration(
-                        
-    border: Border.all( // Add light gray border
-      color: Colors.grey.shade300,
-      width: 1,
-    ),
-                            borderRadius: BorderRadius.circular(8)),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8,),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Coordinates',
-                                style: Get.textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
+
+              Gap(8),
+              GetBuilder<EventController>(builder: (eventController) {
+                return controller.selectedLocationDetails.value != ''
+                    ? RippleContainer(
+                      onTap: ()=> eventController.moveCamera(LatLng(eventController.selectedItem.value.latitude as double, eventController.selectedItem.value.longitude as double)),
+                      child: Container(
+                          decoration: BoxDecoration(
+                              border: Border.all(
+                                // Add light gray border
+                                color: Colors.grey.shade300,
+                                width: 1,
                               ),
-                              Text(
-                                ' ${controller.selectedLocation.value.latitude}, '
-                                '${controller.selectedLocation.value.longitude}',
-                                style: Get.textTheme.bodyMedium?.copyWith(
-                                  color: Colors.black87,
+                              borderRadius: BorderRadius.circular(8)),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 8.0,
+                              horizontal: 8,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Coordinates',
+                                  style: Get.textTheme.bodyLarge?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
                                 ),
-                              ),
-
-                              const SizedBox(height: 8), // Spacing
-                              Divider(color: Colors.grey.shade300),
-                              const SizedBox(height: 8),
-
-                              Text(
-                                'Location Details',
-                                style: Get.textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-                              ),
-                              
-                              Text(
-                                '${controller.selectedLocationDetails.value}',
-                                style:Get.textTheme.bodyMedium?.copyWith(
-                                      color: Colors.black87,
-                                    ),
-                              ),
-                            ],
+                                Text(
+                                  ' ${controller.selectedLocation.value.latitude}, '
+                                  '${controller.selectedLocation.value.longitude}',
+                                  style: Get.textTheme.bodyMedium?.copyWith(
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                      
+                                const SizedBox(height: 8), // Spacing
+                                Divider(color: Colors.grey.shade300),
+                                const SizedBox(height: 8),
+                      
+                                Text(
+                                  'Location Details',
+                                  style: Get.textTheme.bodyLarge?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                      
+                                Text(
+                                  '${controller.selectedLocationDetails.value}',
+                                  style: Get.textTheme.bodyMedium?.copyWith(
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      )
+                    )
                     : Container();
-}),
-            Gap(8),
+              }),
+              Gap(8),
               Text(
                 'Event Title',
                 style: Get.textTheme.bodyMedium
@@ -468,14 +462,14 @@ GetBuilder<EventController>(builder: (controller){
                   ),
                 ),
                 onPressed: () {
-                   if (isEditMode == true) {
-                   controller.updateEvent();
-                } else {
-                  controller.createEvent();
-                }
+                  if (isEditMode == true) {
+                    controller.updateEvent();
+                  } else {
+                    controller.createEvent();
+                  }
                 },
                 child: Text(
-                  'Save Event',
+                  isEditMode == true?'Update Event' : 'Save Event',
                   style: Get.textTheme.bodyLarge!.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.normal,

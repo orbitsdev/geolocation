@@ -53,7 +53,27 @@ class EventCard extends StatelessWidget {
           ),
           SizedBox(height: 8),
 
-          // Event Date
+          Text(
+            'COODIDATNES: ${event.latitude} - ${event.longitude} ',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.white70,
+            ),
+          ),
+          Text(
+            'PLACEID: ${event.placeId}  ',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.white70,
+            ),
+          ),
+          Text(
+            'RADIUS: ${event.radius}  ',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.white70,
+            ),
+          ),
           Text(
             'Date: ${event.startTime} - ${event.endTime} ',
             style: TextStyle(
@@ -61,6 +81,7 @@ class EventCard extends StatelessWidget {
               color: Colors.white70,
             ),
           ),
+          // Event Date
           SizedBox(height: 8),
 
           // Event Description

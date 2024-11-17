@@ -24,6 +24,8 @@ class _EventPageState extends State<EventPage> {
   @override
   void initState() {
     super.initState();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+
     if (controller.events.isEmpty) {
     controller.loadEvents();
     }
@@ -34,6 +36,7 @@ class _EventPageState extends State<EventPage> {
         controller.loadOnScroll();
       }
     });
+      });
   }
 
   @override
@@ -94,8 +97,7 @@ class _EventPageState extends State<EventPage> {
                                         onPressed: (context) {
                                           if (event.id != null) {
                                             controller
-                                                .selectItemAndNavigateToUpdatePage(
-                                                    event);
+                                                .selectItemAndNavigateToUpdatePage(event);
                                           }
                                         },
                                         backgroundColor: Colors.green,

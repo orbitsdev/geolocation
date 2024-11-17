@@ -12,6 +12,7 @@ import 'package:geolocation/features/event/model/event.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
 
 class EventController extends GetxController {
   static EventController controller = Get.find();
@@ -44,7 +45,7 @@ class EventController extends GetxController {
   var hasData = false.obs;
   var events = <Event>[].obs;
   var selectedItem = Event().obs;
-
+final DateFormat readableDateFormat = DateFormat('EEEE, MMMM d, yyyy, h:mm a');
   Marker? locationMarker;
   Circle? radiusCircle;
   Set<Circle> circles = {};
@@ -57,133 +58,195 @@ class EventController extends GetxController {
   }
 
   void selectItemAndNavigateToUpdatePage(Event item) async {
-    clearData();
-
+   await clearData();
     selectedItem(item);
     update();
-
+  print('VALUE WHEN SELECT');
+  print(selectedItem.value);
+  print('VALUE WHEN SELECT-----------------');
     await Get.to(()=> CreateEventPage(isEditMode: true),transition: Transition.cupertino);
   }
 
-  void selectItem(Event item){
-    selectedItem(item);
-    update();
-  }
+  
+
+  
 
   void fillForm() {
-     WidgetsBinding.instance.addPostFrameCallback((_) {
-      
-  selectedLocation.value = LatLng(
-    selectedItem.value.latitude?.toDouble() ?? 0.0,
-    selectedItem.value.longitude?.toDouble() ?? 0.0,
-  );
-  isLocationSelected(true);
-  
-  if (selectedItem.value.radius != null) {
-    radius.value = selectedItem.value.radius!.toDouble();
-  }
+  print('---------------VALUE IN FILE FORM BEFORE FILL---------------');
+  print(selectedItem.value);
+  print('---------------');
 
-  
-  selectedLocationDetails.value = selectedItem.value.mapLocation ?? '';
-  placeId.value = selectedItem.value.placeId ?? '';
+  // WidgetsBinding.instance.addPostFrameCallback((_) {
+  //   LatLng eventOldLocation = LatLng(
+  //     selectedItem.value.latitude?.toDouble() ?? 0.0,
+  //     selectedItem.value.longitude?.toDouble() ?? 0.0,
+  //   );
 
- 
- controller.formKey.currentState?.patchValue({
-  'title': selectedItem.value.title,
-  'description': selectedItem.value.description,
-  'start_time': selectedItem.value.startTime != null ? DateTime.parse(selectedItem.value.startTime!): null,
-  'end_time': selectedItem.value.endTime != null ? DateTime.parse(selectedItem.value.endTime!) : null,
-});
+  //   print('Old Location: $eventOldLocation');
+  //   setLocation(eventOldLocation); // This sets marker, circle, and updates location
 
- markers = {
-    Marker(
-      markerId: MarkerId('selected-location'),
-      position: selectedLocation.value,
-    ),
-  };
+  //   selectedLocationDetails.value = selectedItem.value.mapLocation ?? '';
+  //   placeId.value = selectedItem.value.placeId ?? '';
 
-  circles = {
-    Circle(
-      circleId: CircleId('selected-radius'),
-      center: selectedLocation.value,
-      radius: radius.value,
-      fillColor: Palette.PRIMARY.withOpacity(0.2),
-      strokeColor: Palette.PRIMARY,
-      strokeWidth: 2,
-    ),
-  };
+    
+  //   if (selectedItem.value.radius != null) {
+  //     radius.value = selectedItem.value.radius!.toDouble(); 
+  //     setCircle(eventOldLocation); 
+  //   }
 
-  update();
-     });
-  
-  
+  //   DateTime? startTime;
+  //   DateTime? endTime;
+  //   try {
+  //     if (selectedItem.value.startTime != null) {
+  //       startTime = readableDateFormat.parse(selectedItem.value.startTime!);
+  //     }
+  //     if (selectedItem.value.endTime != null) {
+  //       endTime = readableDateFormat.parse(selectedItem.value.endTime!);
+  //     }
+  //   } catch (e) {
+  //     print('Error parsing date: $e');
+  //   }
+
+  //   formKey.currentState?.patchValue({
+  //     'title': selectedItem.value.title,
+  //     'description': selectedItem.value.description,
+  //     'start_time': startTime,
+  //     'end_time': endTime,
+  //   });
+
+  //   moveCamera(eventOldLocation); // Move the camera to the selected event's location
+  //   update(); // Ensure all bound UI components update with the latest values
+  // });
 }
 
-  void setNewLocation(LatLng location) async {
+
+
+  void setLocation(LatLng location) async {
     selectedLocation(location);
     isLocationSelected(true);
-    
-     markers = {
-    Marker(
+    print('-------------------------- TAP');
+    print('${location}');
+    print('--------------------------');
+    setMarkers(location);
+    setCircle(location);
+    moveCamera(location);
+    update();
+    await getLocationDetails(location);
+  }
+
+  void setMarkers(LatLng location) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+markers.clear();
+    markers.add(Marker(
       markerId: MarkerId('selected-location'),
       position: location,
-    ),
-  };
+    ));
 
-  circles = {
-    Circle(
+    // update();
+    });
+    
+
+  }
+  void setCircle(LatLng location,) async {
+     WidgetsBinding.instance.addPostFrameCallback((_) {
+circles.clear();
+    circles.add(Circle(
       circleId: CircleId('selected-radius'),
       center: location,
       radius: radius.value,
       fillColor: Palette.PRIMARY.withOpacity(0.2),
       strokeColor: Palette.PRIMARY,
       strokeWidth: 2,
-    ),
-  };
-
-  update();
-
-    await getLocationDetails(location);
+    ));
+    // update();
+     });
+    
   }
 
-  void clearLocation() {
-    selectedLocation.value = LatLng(0, 0); 
-    isLocationSelected.value = false; 
-    radius.value = 50.0; 
 
-  markers.clear();
-  circles.clear();
-    selectedLocationDetails('');
-    placeId('');
+  void setRadius(double newRadius) {
+     WidgetsBinding.instance.addPostFrameCallback((_) {
+ radius.value = newRadius.roundToDouble();
+    setCircle(selectedLocation.value);
     update();
+     });
+   
   }
+ void moveCamera(LatLng position) async {
+  WidgetsBinding.instance.addPostFrameCallback((_) async {
+    cameraPosition = CameraPosition(
+      target: position,
+      zoom: 17.999,
+      tilt: 30,
+      bearing: -1000,
+    );
+
+    if (googleMapController == null) {
+      googleMapController = await mapController.future;
+    }
+
+    if (googleMapController != null) {
+      googleMapController?.animateCamera(
+        CameraUpdate.newCameraPosition(cameraPosition!),
+      );
+    } else {
+      print("GoogleMapController is not initialized yet.");
+    }
+  });
+}
+
+
+  Future<void> clearData() async {
+     WidgetsBinding.instance.addPostFrameCallback((_) {
+ formKey.currentState?.reset();
+     markers.clear();
+    circles.clear();
+     selectedLocation.value = LatLng(0, 0); 
+     isLocationSelected.value = false; 
+     radius.value = 50.0; 
+      selectedLocationDetails('');
+      placeId('');
+
+      update();
+     });
+     
+  }
+
+  
+
 
   Future<void> getLocationDetails(LatLng position) async {
-    String url =
-        "https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}&key=${MapService.MAP_KEY}";
+    print('LCOATION DEATILS POSITONS -------------------------------------------------');
+  String url =
+      "https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}&key=${MapService.MAP_KEY}";
 
-    isLocationLoading(true);
+  isLocationLoading(true);
+  update();
+
+  var response = await ApiService.getPublicResource(url);
+  response.fold((failure) {
+    isLocationLoading(false);
+    Modal.errorDialog(failure: failure);
+  }, (success) {
+    isLocationLoading(false);
+   
+
+    var results = success.data['results'] as List<dynamic>?;
+   
+    if (results != null && results.isNotEmpty) {
+      selectedLocationDetails(results[0]['formatted_address'] ?? '');
+      placeId(results[0]['place_id'] ?? '');
+    } else {
+      // Handle the case where no results are returned
+      selectedLocationDetails('');
+      placeId('');
+      Modal.warning(message: 'No location details found for this position.');
+    }
+
     update();
-    var response = await ApiService.getPublicResource(url);
-    response.fold((failure) {
-      isLocationLoading(false);
-      Modal.errorDialog(failure: failure);
-    }, (success) {
-      isLocationLoading(false);
-      update();
-      // print(success.data['----------------------']);
-      // print(success.data['results']);
-      print('------------------------PLACE');
+  });
+}
 
-      selectedLocationDetails(success.data['results'][0]['formatted_address']);
-      placeId(success.data['results'][0]['place_id']);
-      print(success.data['results'][0]['place_id']);
-      print(success.data['results'][0]['formatted_address']);
-      print('------------------------END');
-
-      moveCamera(position);
-    });
-  }
 
   Future<void> setCameraPositionToMyCurrentPosition() async {
     bool serviceEnabled;
@@ -222,49 +285,27 @@ class EventController extends GetxController {
       );
 
       // Set the map's target position based on the current position
-      LatLng position =
-          LatLng(currentPosition!.latitude, currentPosition!.longitude);
+      LatLng position =LatLng(currentPosition!.latitude, currentPosition!.longitude);
 
       // Update camera position
-      cameraPosition = CameraPosition(
-        target: position,
-        zoom: 17.999, // Adjust as needed
-        tilt: 30, // Adjust as needed
-        bearing: -1000, // Adjust as needed
-      );
+      setLocation(position);
 
-      // Update selected location and isLocationSelected flag
+      // // Update selected location and isLocationSelected flag
 
-      setNewLocation(position);
+      // setNewLocation(position);
 
-      // Animate the map's camera to the new position
-      googleMapController = await mapController.future;
-      googleMapController?.animateCamera(
-        CameraUpdate.newCameraPosition(cameraPosition!),
-      );
+      // // Animate the map's camera to the new position
+      // googleMapController = await mapController.future;
+      // googleMapController?.animateCamera(
+      //   CameraUpdate.newCameraPosition(cameraPosition!),
+      // );
     } catch (e) {
       // Handle any errors (e.g., location unavailable)
       print('Error setting camera position: $e');
     }
   }
 
-  void moveCamera(LatLng position) async {
-    cameraPosition = CameraPosition(
-      target: position as LatLng, zoom: 17.999, // Adjust as needed
-      tilt: 30, // Adjust as needed
-      bearing: -1000,
-    );
-    googleMapController = await mapController.future;
-    googleMapController?.animateCamera(
-      CameraUpdate.newCameraPosition(cameraPosition as CameraPosition),
-    );
-    update();
-  }
-
-  void setRadius(double newRadius) {
-    radius.value = newRadius.roundToDouble();
-    update();
-  }
+  
 
   void createEvent() async {
     if (formKey.currentState?.saveAndValidate() ?? false) {
@@ -273,20 +314,17 @@ class EventController extends GetxController {
         return;
       }
 
-      // Show loading modal
-      //  Modal.loading();
+    
+      Modal.loading();
 
-      // Prepare event data
+    
       final eventData = formKey.currentState!.value;
-      final councilPositionId =
-          AuthController.controller.user.value.defaultPosition?.id;
-      final councilId =
-          AuthController.controller.user.value.defaultPosition?.councilId;
+      final councilPositionId = AuthController.controller.user.value.defaultPosition?.id;
+      final councilId = AuthController.controller.user.value.defaultPosition?.councilId;
 
       if (councilId == null || councilPositionId == null) {
         Get.back();
-        Modal.errorDialog(
-            message: 'Council ID or Position ID is missing. Please try again.');
+        Modal.errorDialog( message: 'Council ID or Position ID is missing. Please try again.');
         return;
       }
 
@@ -300,41 +338,33 @@ class EventController extends GetxController {
         'radius': radius.value,
         'map_location': selectedLocationDetails.value,
         'place_id': placeId.value,
-        'start_time': (eventData['start_time'] as DateTime)
-            .toIso8601String(), // Convert DateTime to String
+        'start_time': (eventData['start_time'] as DateTime) .toIso8601String(), // Convert DateTime to String
         'end_time': (eventData['end_time'] as DateTime).toIso8601String(),
       };
 
-      print('BEFOR SEND');
+      print('BEFORE SEND------------------------');
       print(data);
 
       var response = await ApiService.postAuthenticatedResource(
           'councils/${councilId}/events/create', data);
       response.fold((failure) {
-        print('STATUS CODE ${failure.message}');
-        print(failure.statusCode);
-        print(failure.exception);
+        Get.back();
         Modal.errorDialog(failure: failure);
       }, (success) {
-         clearData();
-          Get.offNamedUntil('/events', (route) => route.isFirst);
-        Modal.success(message: 'Event Created',);
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+      Get.back();
+            clearData();
+            loadEvents();
+            Get.offNamedUntil('/events', (route) => route.isFirst);
+            Modal.success(message: 'Event Created',);
+              });
+       
       });
     } else {
       Modal.warning(message: 'Please fill out all required fields.');
     }
   }
 
-  void clearData() {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-
-    formKey.currentState?.reset();
-    clearLocation();
-    update();
-      });
-  }
-
-  // PAGE
 
   Future<void> loadEvents() async {
     isLoading(true);
@@ -452,15 +482,27 @@ class EventController extends GetxController {
       },
     );
   }
-
-  void updateEvent() async {
+void updateEvent() async {
   if (formKey.currentState?.saveAndValidate() ?? false) {
     if (selectedLocation.value == LatLng(0, 0)) {
       Modal.warning(message: 'Please Select Location First');
       return;
     }
 
+    if (radius.value <= 0 || selectedLocationDetails.value.isEmpty) {
+      Modal.warning(message: 'Please set a valid radius and location.');
+      return;
+    }
+
+    var eventId = selectedItem.value.id;
+    if (eventId == null) {
+      Modal.errorDialog(message: 'Invalid event selected. Please try again.');
+      return;
+    }
+
     final eventData = formKey.currentState!.value;
+
+     
 
     Map<String, dynamic> data = {
       'title': eventData['title'],
@@ -474,8 +516,12 @@ class EventController extends GetxController {
       'end_time': (eventData['end_time'] as DateTime).toIso8601String(),
     };
 
+    print('-----------------UPDATED VALUE');
+    print(data);
+    print('-----------------UPDATED VALUE');
+    print(updateEvent);
     Modal.loading(content: const Text('Updating event...'));
-  var eventId = selectedItem.value.id;
+
     var response = await ApiService.putAuthenticatedResource(
       '/councils/${AuthController.controller.user.value.defaultPosition?.councilId}/events/$eventId',
       data,
@@ -487,15 +533,20 @@ class EventController extends GetxController {
         Modal.errorDialog(failure: failure);
       },
       (success) {
-        clearData();
-        Get.back(); // Close modal
-        Modal.success(message: 'Event updated successfully');
+         WidgetsBinding.instance.addPostFrameCallback((_) {
+
+        Get.back();
+        loadEvents();
+        clearData(); // Optional: Clear data only if navigating away
         Get.offNamedUntil('/events', (route) => route.isFirst);
+        Modal.success(message: 'Event Updated');
+         });
       },
     );
   } else {
     Modal.warning(message: 'Please fill out all required fields.');
   }
 }
+
 
 }
