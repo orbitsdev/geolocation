@@ -14,23 +14,28 @@ import 'package:intl/intl.dart';
 import 'package:geolocation/core/formatters/radius_formatter.dart';
 import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/event/controller/event_controller.dart';
+import 'package:intl/number_symbols_data.dart';
 
 class CreateEventPage extends StatelessWidget {
-  bool? isEditMode; // To determine if it's edit mode
-  CreateEventPage({
-    Key? key,
-    this.isEditMode,
-  }) : super(key: key);
+ 
 
   @override
   Widget build(BuildContext context) {
-    var controller = Get.find<EventController>();
-    if (isEditMode == true) {
-       print('Selected Item in CreateEventPage: ${controller.selectedItem.value}');
+   var controller = Get.find<EventController>();
+
+    // Retrieve the arguments
+    final arguments = Get.arguments;
+    final isEditMode = arguments?['isEditMode'] ?? false;
+    final event = arguments?['event'];
+
+    if (isEditMode == true && event != null) {
+      controller.selectedItem.value = event;
+      print('Selected Item in CreateEventPage: ${controller.selectedItem.value}');
       controller.fillForm();
     }else{
       controller.setCameraPositionToMyCurrentPosition();
     }
+
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -55,48 +60,55 @@ class CreateEventPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Gap(8),
-              GetBuilder<EventController>(builder: (eventcontroller) {
-                return SizedBox(
-                  height: 300, // Adjust as needed
-                  child: Stack(
-                    children: [
-                      GoogleMap(
-                        gestureRecognizers: {
-                          Factory<OneSequenceGestureRecognizer>(
-                            () => EagerGestureRecognizer(),
-                          ),
-                        },
-                        mapType: MapType.normal,
-                        myLocationButtonEnabled: true,
-                        myLocationEnabled: true,
-                        initialCameraPosition:
-                            controller.cameraPosition as CameraPosition,
-                        onMapCreated:
-                            (GoogleMapController googleMapController) {
-                         eventcontroller.googleMapController = googleMapController; // Set the controller once the map is ready
-                        },
-                        onTap: (LatLng position) {
-                          eventcontroller.setLocation(position);
-                        },
-                        markers: controller.markers,
-                        circles: controller.circles,
-                      ),
-                      if (eventcontroller.isLocationSelected.value)
-                        Positioned(
-                          top: 60,
-                          right: 8,
-                          child: FloatingActionButton(
-                            backgroundColor: Colors.red,
-                            mini: true,
-                            onPressed: () => eventcontroller.clearData(),
-                            child: Icon(Icons.clear, color: Colors.white),
-                            tooltip: "Clear Location",
-                          ),
-                        ),
-                    ],
-                  ),
-                );
-              }),
+             GetBuilder<EventController>(builder: (eventcontroller) {
+  return SizedBox(
+    height: 300, // Adjust as needed
+    child: Stack(
+      children: [
+        GoogleMap(
+          gestureRecognizers: {
+            Factory<OneSequenceGestureRecognizer>(
+              () => EagerGestureRecognizer(),
+            ),
+          },
+          mapType: MapType.normal,
+          myLocationButtonEnabled: true,
+          myLocationEnabled: true,
+          initialCameraPosition: controller.cameraPosition as CameraPosition,
+          onMapCreated: (GoogleMapController googleMapController) {
+            eventcontroller.googleMapController = googleMapController;
+            eventcontroller.setMapReady(); // Set the map ready state
+          },
+          onTap: (LatLng position) {
+            eventcontroller.setLocation(position);
+          },
+          markers: controller.markers,
+          circles: controller.circles,
+        ),
+
+        // Overlay Progress Indicator
+        if (!eventcontroller.isMapReady.value)
+          Center(
+            child: CircularProgressIndicator(),
+          ),
+
+        if (eventcontroller.isLocationSelected.value)
+          Positioned(
+            top: 60,
+            right: 8,
+            child: FloatingActionButton(
+              backgroundColor: Colors.red,
+              mini: true,
+              onPressed: () => eventcontroller.clearData(),
+              child: Icon(Icons.clear, color: Colors.white),
+              tooltip: "Clear Location",
+            ),
+          ),
+      ],
+    ),
+  );
+}),
+
               Gap(16),
 
               Text(
@@ -141,7 +153,7 @@ class CreateEventPage extends StatelessWidget {
                 ],
               ),
 
-              Gap(8),
+            
 
 // Radius Slider
        GetBuilder<EventController>(
@@ -199,7 +211,7 @@ class CreateEventPage extends StatelessWidget {
                               children: [
                                 Text(
                                   'Coordinates',
-                                  style: Get.textTheme.bodyLarge?.copyWith(
+                                  style: Get.textTheme.bodyMedium?.copyWith(
                                     fontWeight: FontWeight.bold,
                                     color: Colors.black,
                                   ),
@@ -212,13 +224,13 @@ class CreateEventPage extends StatelessWidget {
                                   ),
                                 ),
                       
-                                const SizedBox(height: 8), // Spacing
+                              
                                 Divider(color: Colors.grey.shade300),
-                                const SizedBox(height: 8),
+                               
                       
                                 Text(
                                   'Location Details',
-                                  style: Get.textTheme.bodyLarge?.copyWith(
+                                  style: Get.textTheme.bodyMedium?.copyWith(
                                     fontWeight: FontWeight.bold,
                                     color: Colors.black,
                                   ),

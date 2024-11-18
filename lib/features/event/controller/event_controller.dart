@@ -50,21 +50,36 @@ final DateFormat readableDateFormat = DateFormat('EEEE, MMMM d, yyyy, h:mm a');
   Circle? radiusCircle;
   Set<Circle> circles = {};
   Set<Marker> markers = {};
-
+RxBool isMapReady = false.obs;
   @override
   void onInit() {
     super.onInit();
     setCameraPositionToMyCurrentPosition(); // Automatically set the camera position to the user's current location
   }
 
-  void selectItemAndNavigateToUpdatePage(Event item) async {
-   await clearData();
-    selectedItem(item);
+ void setMapReady() {
+    isMapReady(true);
+    update();  // Notify listeners
+  }
+
+  // Reset the flag if needed
+  void resetMapReady() {
+    isMapReady(false);
     update();
+  }
+  void selectItemAndNavigateToUpdatePage(Event item) async {
+  //  await clearData();
+   selectedItem(item);
+  update(); // Ensure the UI is updated
+
   print('VALUE WHEN SELECT');
-  print(selectedItem.value);
+  print(selectedItem.value); // Debug print to check the selected item
   print('VALUE WHEN SELECT-----------------');
-    await Get.to(()=> CreateEventPage(isEditMode: true),transition: Transition.cupertino);
+
+  await Get.to(() => CreateEventPage(), arguments: {
+    'event': item,
+    'isEditMode': true, // Set this flag to indicate edit mode
+  }, transition: Transition.cupertino);
   }
 
   
@@ -76,47 +91,49 @@ final DateFormat readableDateFormat = DateFormat('EEEE, MMMM d, yyyy, h:mm a');
   print(selectedItem.value);
   print('---------------');
 
-  // WidgetsBinding.instance.addPostFrameCallback((_) {
-  //   LatLng eventOldLocation = LatLng(
-  //     selectedItem.value.latitude?.toDouble() ?? 0.0,
-  //     selectedItem.value.longitude?.toDouble() ?? 0.0,
-  //   );
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    LatLng eventOldLocation = LatLng(
+      selectedItem.value.latitude?.toDouble() ?? 0.0,
+      selectedItem.value.longitude?.toDouble() ?? 0.0,
+    );
 
-  //   print('Old Location: $eventOldLocation');
-  //   setLocation(eventOldLocation); // This sets marker, circle, and updates location
+  print('---------------VALUE OLD VALUE---------------');
+    print('Old Location: $eventOldLocation');
+   
+     setLocation(eventOldLocation); // This sets marker, circle, and updates location
 
-  //   selectedLocationDetails.value = selectedItem.value.mapLocation ?? '';
-  //   placeId.value = selectedItem.value.placeId ?? '';
+    selectedLocationDetails.value = selectedItem.value.mapLocation ?? '';
+    placeId.value = selectedItem.value.placeId ?? '';
 
     
-  //   if (selectedItem.value.radius != null) {
-  //     radius.value = selectedItem.value.radius!.toDouble(); 
-  //     setCircle(eventOldLocation); 
-  //   }
+    if (selectedItem.value.radius != null) {
+      radius.value = selectedItem.value.radius!.toDouble(); 
+      setCircle(eventOldLocation); 
+    }
 
-  //   DateTime? startTime;
-  //   DateTime? endTime;
-  //   try {
-  //     if (selectedItem.value.startTime != null) {
-  //       startTime = readableDateFormat.parse(selectedItem.value.startTime!);
-  //     }
-  //     if (selectedItem.value.endTime != null) {
-  //       endTime = readableDateFormat.parse(selectedItem.value.endTime!);
-  //     }
-  //   } catch (e) {
-  //     print('Error parsing date: $e');
-  //   }
+    DateTime? startTime;
+    DateTime? endTime;
+    try {
+      if (selectedItem.value.startTime != null) {
+        startTime = readableDateFormat.parse(selectedItem.value.startTime!);
+      }
+      if (selectedItem.value.endTime != null) {
+        endTime = readableDateFormat.parse(selectedItem.value.endTime!);
+      }
+    } catch (e) {
+      print('Error parsing date: $e');
+    }
 
-  //   formKey.currentState?.patchValue({
-  //     'title': selectedItem.value.title,
-  //     'description': selectedItem.value.description,
-  //     'start_time': startTime,
-  //     'end_time': endTime,
-  //   });
+    formKey.currentState?.patchValue({
+      'title': selectedItem.value.title,
+      'description': selectedItem.value.description,
+      'start_time': startTime,
+      'end_time': endTime,
+    });
 
-  //   moveCamera(eventOldLocation); // Move the camera to the selected event's location
-  //   update(); // Ensure all bound UI components update with the latest values
-  // });
+    moveCamera(eventOldLocation); // Move the camera to the selected event's location
+    update(); // Ensure all bound UI components update with the latest values
+  });
 }
 
 
@@ -131,7 +148,7 @@ final DateFormat readableDateFormat = DateFormat('EEEE, MMMM d, yyyy, h:mm a');
     setCircle(location);
     moveCamera(location);
     update();
-    await getLocationDetails(location);
+    getLocationDetails(location);
   }
 
   void setMarkers(LatLng location) async {
@@ -196,29 +213,36 @@ circles.clear();
 }
 
 
-  Future<void> clearData() async {
-     WidgetsBinding.instance.addPostFrameCallback((_) {
- formKey.currentState?.reset();
-     markers.clear();
+  Future<void> clearData({bool resetSelectedItem = false}) async {
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    formKey.currentState?.reset();
+    markers.clear();
     circles.clear();
-     selectedLocation.value = LatLng(0, 0); 
-     isLocationSelected.value = false; 
-     radius.value = 50.0; 
-      selectedLocationDetails('');
-      placeId('');
+    selectedLocation.value = LatLng(0, 0);
+    isLocationSelected.value = false;
+    radius.value = 50.0;
+    selectedLocationDetails('');
+    placeId('');
 
-      update();
-     });
-     
+    if (resetSelectedItem) {
+      selectedItem.value = Event(); // Reset if required
+    }
+
+    update();
+  });
+
+
   }
 
   
 
 
   Future<void> getLocationDetails(LatLng position) async {
-    print('LCOATION DEATILS POSITONS -------------------------------------------------');
-  String url =
-      "https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}&key=${MapService.MAP_KEY}";
+
+    if(position != LatLng(0, 0));
+    print('GETL LOCATION DEATAILS  ---------------------------------------------|-');
+    print(position);
+  String url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}&key=${MapService.MAP_KEY}";
 
   isLocationLoading(true);
   update();
@@ -226,25 +250,28 @@ circles.clear();
   var response = await ApiService.getPublicResource(url);
   response.fold((failure) {
     isLocationLoading(false);
+    update();
     Modal.errorDialog(failure: failure);
   }, (success) {
     isLocationLoading(false);
    
 
-    var results = success.data['results'] as List<dynamic>?;
+    var results = success.data['results'];
+    print(results);
    
-    if (results != null && results.isNotEmpty) {
-      selectedLocationDetails(results[0]['formatted_address'] ?? '');
-      placeId(results[0]['place_id'] ?? '');
-    } else {
-      // Handle the case where no results are returned
-      selectedLocationDetails('');
-      placeId('');
-      Modal.warning(message: 'No location details found for this position.');
-    }
+    // if (results != null && results.isNotEmpty) {
+    //   selectedLocationDetails(results[0]['formatted_address'] ?? '');
+    //   placeId(results[0]['place_id'] ?? '');
+    // } else {
+    //   // Handle the case where no results are returned
+    //   selectedLocationDetails('');
+    //   placeId('');
+    //   Modal.warning(message: 'No location details found for this position.');
+    // }
 
     update();
   });
+    print('LCOATION DEATILS POSITONS -------------------------------------------------');
 }
 
 
@@ -288,7 +315,7 @@ circles.clear();
       LatLng position =LatLng(currentPosition!.latitude, currentPosition!.longitude);
 
       // Update camera position
-      setLocation(position);
+       setLocation(position);
 
       // // Update selected location and isLocationSelected flag
 
@@ -333,9 +360,11 @@ circles.clear();
         'councilId': councilId,
         'title': eventData['title'],
         'description': eventData['description'],
-        'latitude': selectedLocation.value.latitude,
-        'longitude': selectedLocation.value.longitude,
-        'radius': radius.value,
+        // 'latitude': '6.632762066900767',
+        // 'longitude': '124.59982473403215',
+        'latitude': '${selectedLocation.value.latitude}',
+        'longitude': '${selectedLocation.value.longitude}',
+        'radius': '${radius.value}',
         'map_location': selectedLocationDetails.value,
         'place_id': placeId.value,
         'start_time': (eventData['start_time'] as DateTime) .toIso8601String(), // Convert DateTime to String
@@ -344,6 +373,7 @@ circles.clear();
 
       print('BEFORE SEND------------------------');
       print(data);
+      print('BEFORE SEND--------------------------------------');
 
       var response = await ApiService.postAuthenticatedResource(
           'councils/${councilId}/events/create', data);
@@ -351,8 +381,10 @@ circles.clear();
         Get.back();
         Modal.errorDialog(failure: failure);
       }, (success) {
+        Get.back();
+        // print(success.data);
           WidgetsBinding.instance.addPostFrameCallback((_) {
-      Get.back();
+            Get.back();
             clearData();
             loadEvents();
             Get.offNamedUntil('/events', (route) => route.isFirst);
