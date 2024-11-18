@@ -121,8 +121,7 @@ class _EventPageState extends State<EventPage> {
                                   ),
                                   child: RippleContainer(
                                     onTap: () {
-                                      // Navigate to event details if required
-                                      // Get.to(() => EventDetailsPage(event: event));
+                                        controller.viewEvent(event);
                                     },
                                     child: EventCard(event: event),
                                   ),

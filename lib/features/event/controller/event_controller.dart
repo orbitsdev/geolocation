@@ -8,6 +8,7 @@ import 'package:geolocation/core/modal/modal.dart';
 import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:geolocation/features/event/create_event_page.dart';
+import 'package:geolocation/features/event/event_details_page.dart';
 import 'package:geolocation/features/event/model/event.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -63,7 +64,11 @@ final DateFormat readableDateFormat = DateFormat('EEEE, MMMM d, yyyy, h:mm a');
     update();
   }
 
- 
+ void viewEvent(Event item){
+    selectedItem(item);
+    update();
+    Get.to(()=> EventDetailsPage(), transition: Transition.cupertino);
+ }
   void resetMapReady() {
     isMapReady(false);
     update();
@@ -564,5 +569,33 @@ void updateEvent() async {
   }
 }
 
+Future<void> refreshEventDetails() async {
+      isLoading(true);
+      update();
+      var eventId = selectedItem.value.id;
+      var councilId = selectedItem.value.council?.id;
+
+      if(eventId != null){
+        var response = await ApiService.getAuthenticatedResource(
+      '/councils/${councilId}/events/$eventId',
+   
+    );
+
+    response.fold(
+      (failure) {
+     isLoading(false);
+      update();
+        Modal.errorDialog(failure: failure);
+      },
+      (success) {
+          isLoading(false);
+          selectedItem(Event.fromMap(success.data['data']));
+          update();
+ 
+      },
+    );
+      }
+     
+}
 
 }
