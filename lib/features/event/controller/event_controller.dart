@@ -50,19 +50,20 @@ final DateFormat readableDateFormat = DateFormat('EEEE, MMMM d, yyyy, h:mm a');
   Circle? radiusCircle;
   Set<Circle> circles = {};
   Set<Marker> markers = {};
-RxBool isMapReady = false.obs;
+  RxBool isMapReady = false.obs;
+  
   @override
   void onInit() {
     super.onInit();
-    setCameraPositionToMyCurrentPosition(); // Automatically set the camera position to the user's current location
+    
   }
 
  void setMapReady() {
     isMapReady(true);
-    update();  // Notify listeners
+    update();
   }
 
-  // Reset the flag if needed
+ 
   void resetMapReady() {
     isMapReady(false);
     update();
@@ -101,7 +102,7 @@ RxBool isMapReady = false.obs;
     print('Old Location: $eventOldLocation');
    
      setLocation(eventOldLocation); // This sets marker, circle, and updates location
-
+    selectedLocation.value = eventOldLocation;
     selectedLocationDetails.value = selectedItem.value.mapLocation ?? '';
     placeId.value = selectedItem.value.placeId ?? '';
 
@@ -164,10 +165,11 @@ markers.clear();
     
 
   }
+
   void setCircle(LatLng location,) async {
      WidgetsBinding.instance.addPostFrameCallback((_) {
-circles.clear();
-    circles.add(Circle(
+     circles.clear();
+     circles.add(Circle(
       circleId: CircleId('selected-radius'),
       center: location,
       radius: radius.value,
@@ -177,13 +179,12 @@ circles.clear();
     ));
     // update();
      });
-    
   }
 
 
   void setRadius(double newRadius) {
      WidgetsBinding.instance.addPostFrameCallback((_) {
- radius.value = newRadius.roundToDouble();
+     radius.value = newRadius.roundToDouble();
     setCircle(selectedLocation.value);
     update();
      });
@@ -218,15 +219,11 @@ circles.clear();
     formKey.currentState?.reset();
     markers.clear();
     circles.clear();
-    selectedLocation.value = LatLng(0, 0);
     isLocationSelected.value = false;
     radius.value = 50.0;
     selectedLocationDetails('');
     placeId('');
 
-    if (resetSelectedItem) {
-      selectedItem.value = Event(); // Reset if required
-    }
 
     update();
   });
@@ -234,7 +231,6 @@ circles.clear();
 
   }
 
-  
 
 
   Future<void> getLocationDetails(LatLng position) async {
@@ -259,15 +255,15 @@ circles.clear();
     var results = success.data['results'];
     print(results);
    
-    // if (results != null && results.isNotEmpty) {
-    //   selectedLocationDetails(results[0]['formatted_address'] ?? '');
-    //   placeId(results[0]['place_id'] ?? '');
-    // } else {
-    //   // Handle the case where no results are returned
-    //   selectedLocationDetails('');
-    //   placeId('');
-    //   Modal.warning(message: 'No location details found for this position.');
-    // }
+    if (results != null && results.isNotEmpty) {
+      selectedLocationDetails(results[0]['formatted_address'] ?? 'Unknown Address');
+      placeId(results[0]['place_id'] ?? 'Unknown Place ID');
+    } else {
+      // Handle the case where no results are returned
+      selectedLocationDetails('Unknown Address');
+      placeId('Unknown Place ID');
+      Modal.warning(message: 'No location details found for this position.');
+    }
 
     update();
   });
@@ -279,15 +275,13 @@ circles.clear();
     bool serviceEnabled;
     LocationPermission permission;
 
-    // Check if location services are enabled
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      // Location services are not enabled, show a message or handle accordingly
+
       print('Location services are disabled.');
       return;
     }
 
-    // Check for location permissions
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
@@ -311,23 +305,15 @@ circles.clear();
         desiredAccuracy: LocationAccuracy.high,
       );
 
-      // Set the map's target position based on the current position
+      
       LatLng position =LatLng(currentPosition!.latitude, currentPosition!.longitude);
 
-      // Update camera position
+      
        setLocation(position);
 
-      // // Update selected location and isLocationSelected flag
-
-      // setNewLocation(position);
-
-      // // Animate the map's camera to the new position
-      // googleMapController = await mapController.future;
-      // googleMapController?.animateCamera(
-      //   CameraUpdate.newCameraPosition(cameraPosition!),
-      // );
+     
     } catch (e) {
-      // Handle any errors (e.g., location unavailable)
+      
       print('Error setting camera position: $e');
     }
   }
@@ -405,7 +391,6 @@ circles.clear();
     lastTotalValue(0);
     events.clear();
     update();
-    update();
     var councilId =
         AuthController.controller.user.value.defaultPosition?.councilId;
     Map<String, dynamic> data = {
@@ -425,7 +410,6 @@ circles.clear();
       Modal.errorDialog(failure: failed);
     }, (success) {
       var data = success.data;
-
       List<Event> newData = (data['data'] as List<dynamic>)
           .map((task) => Event.fromMap(task))
           .toList();
