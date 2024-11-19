@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -16,11 +17,70 @@ class AttendanceController extends GetxController {
   // Observables
   var isLoading = false.obs;
   RxBool isMapReady = false.obs;
+  RxBool isWithinRadius = false.obs; // To enable/disable the button
   RxList<Circle> geofenceCircles = <Circle>[].obs;
   RxList<Marker> markers = <Marker>[].obs;
   var selectedItem = Event().obs;
 
   GoogleMapController? _googleMapController;
+  late StreamSubscription<Position> _positionStream;
+
+  @override
+  void onInit() {
+    super.onInit();
+    _requestLocationPermission(); // Check permissions
+  }
+
+  @override
+  void onClose() {
+    _positionStream.cancel();
+    super.onClose();
+  }
+
+  // Request location permissions and start location updates
+  Future<void> _requestLocationPermission() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      Get.snackbar('Error', 'Location services are disabled. Please enable them.');
+      return;
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        Get.snackbar('Permission Denied', 'Location permission is required.');
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      Get.snackbar('Permission Denied Forever',
+          'Location permissions are permanently denied. Please enable them in settings.');
+      return;
+    }
+
+    startListeningToPosition(); // Start position updates
+  }
+
+  void startListeningToPosition() {
+    _positionStream = Geolocator.getPositionStream(
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 5,
+      ),
+    ).listen((Position position) {
+      final distance = Geolocator.distanceBetween(
+        position.latitude,
+        position.longitude,
+        selectedItem.value.latitude?.toDouble() ?? 0.0,
+        selectedItem.value.longitude?.toDouble() ?? 0.0,
+      );
+
+      isWithinRadius.value = distance <= (selectedItem.value.radius?.toDouble() ?? 50);
+      update();
+    });
+  }
 
   // Map initial position
   CameraPosition get initialPosition => CameraPosition(
@@ -31,15 +91,14 @@ class AttendanceController extends GetxController {
         zoom: _getZoomLevel(selectedItem.value.radius?.toDouble() ?? 50),
       );
 
-  // Called when the map is created
   void onMapCreated(GoogleMapController mapController) {
     _googleMapController = mapController;
     setMarker();
     setGeofenceCircle();
     isMapReady(true);
+    update();
   }
 
-  // Add marker for the event location
   void setMarker() {
     markers.clear();
     markers.add(
@@ -58,7 +117,6 @@ class AttendanceController extends GetxController {
     update();
   }
 
-  // Add geofence circle for the event location
   void setGeofenceCircle() {
     geofenceCircles.clear();
     geofenceCircles.add(
@@ -77,44 +135,22 @@ class AttendanceController extends GetxController {
     update();
   }
 
-  // Check if the user is within the geofence
-  Future<void> checkInOrOut() async {
-    Position position = await _determinePosition();
-    final distance = Geolocator.distanceBetween(
-      position.latitude,
-      position.longitude,
-      selectedItem.value.latitude?.toDouble() ?? 0.0,
-      selectedItem.value.longitude?.toDouble() ?? 0.0,
-    );
-
-    if (distance <= (selectedItem.value.radius?.toDouble() ?? 50)) {
-      Get.snackbar('Success', 'You are within the geofence. Attendance marked!');
-    } else {
-      Get.snackbar('Error', 'You are outside the geofence. Move closer!');
+  void moveCamera() {
+    if (_googleMapController != null && isMapReady.isTrue) {
+      _googleMapController!.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: LatLng(
+              selectedItem.value.latitude?.toDouble() ?? 0.0,
+              selectedItem.value.longitude?.toDouble() ?? 0.0,
+            ),
+            zoom: _getZoomLevel(selectedItem.value.radius?.toDouble() ?? 50),
+          ),
+        ),
+      );
     }
   }
 
-  // Get the user's current position
-  Future<Position> _determinePosition() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) throw 'Location services are disabled.';
-
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        throw 'Location permissions are denied.';
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      throw 'Location permissions are permanently denied.';
-    }
-
-    return await Geolocator.getCurrentPosition();
-  }
-
-  // Refresh event details from API
   Future<void> refreshEventDetails() async {
     isLoading(true);
     update();
@@ -124,7 +160,7 @@ class AttendanceController extends GetxController {
 
     if (eventId != null) {
       var response = await ApiService.getAuthenticatedResource(
-        '/councils/${councilId}/events/$eventId',
+        '/councils/$councilId/events/$eventId',
       );
 
       response.fold(
@@ -142,26 +178,12 @@ class AttendanceController extends GetxController {
     }
   }
 
-  // Move Camera to Event Location
-  void moveCamera() {
-    if (_googleMapController != null) {
-      _googleMapController!.animateCamera(
-        CameraUpdate.newCameraPosition(
-          CameraPosition(
-            target: LatLng(
-              selectedItem.value.latitude?.toDouble() ?? 0.0,
-              selectedItem.value.longitude?.toDouble() ?? 0.0,
-            ),
-zoom: _getZoomLevel(selectedItem.value.radius?.toDouble()??0.0),
-            // zoom: 16,
-            // tilt: 30,
-          ),
-        ),
-      );
-    }
-  }
+ void selectAndNavigateToAttendancePage(Event item) {
+  Get.to(() => MakeAttendancePage(), arguments: item);
+}
 
-  // Calculate dynamic zoom level based on radius
+
+
   double _getZoomLevel(double radius) {
     double zoomLevel = 16;
     if (radius > 0) {
@@ -170,11 +192,26 @@ zoom: _getZoomLevel(selectedItem.value.radius?.toDouble()??0.0),
     }
     return zoomLevel.clamp(0.0, 20.0);
   }
-  
-void selectAndNavigateToAttendancePage(Event item){
-    selectedItem(item);
-    update();
-    Get.to(()=> MakeAttendancePage());
 
+  Future<void> checkInOrOut() async {
+    Position position = await _determinePosition();
+    final distance = Geolocator.distanceBetween(
+      position.latitude,
+      position.longitude,
+      selectedItem.value.latitude?.toDouble() ?? 0.0,
+      selectedItem.value.longitude?.toDouble() ?? 0.0,
+    );
+
+    if (distance <= (selectedItem.value.radius?.toDouble() ?? 50)) {
+      Get.snackbar('Success', 'You are within the geofence. Attendance marked!');
+    } else {
+      Get.snackbar('Error', 'You are outside the geofence.');
+    }
+  }
+
+  Future<Position> _determinePosition() async {
+    return await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
   }
 }

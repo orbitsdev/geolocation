@@ -23,7 +23,7 @@ class EventController extends GetxController {
   GoogleMapController? googleMapController;
 
   Rx<LatLng> selectedLocation = LatLng(0, 0).obs; // Default LatLng
-  RxDouble radius = 50.0.obs; // Default radius in meters
+  RxDouble radius = 10.0.obs; // Default radius in meters
   RxBool isLocationSelected = false.obs;
   RxBool isLocationLoading = false.obs;
   var selectedLocationDetails = ''.obs;
@@ -225,7 +225,7 @@ markers.clear();
     markers.clear();
     circles.clear();
     isLocationSelected.value = false;
-    radius.value = 50.0;
+    radius.value = 10.0;
     selectedLocationDetails('');
     placeId('');
 

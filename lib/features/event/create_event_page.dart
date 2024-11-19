@@ -164,9 +164,9 @@ class CreateEventPage extends StatelessWidget {
                 builder: (eventController) {
                   return Slider(
                     value: eventController.radius.value,
-                    min: 50,
+                    min: 10,
                     max: 1000,
-                    divisions: (1000 - 50),
+                    divisions: (1000 - 10),
                     label: '${eventController.radius.value.round()} meters',
                     onChanged: (value) {
                       eventController
