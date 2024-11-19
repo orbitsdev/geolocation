@@ -159,7 +159,7 @@ class EventDetailsPage extends StatelessWidget {
         ),
       ),
     );
-  }
+  } 
 
   void _moveToFitBounds(EventController controller, GoogleMapController mapController) {
     if (controller.selectedItem.value.latitude != null &&

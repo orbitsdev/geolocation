@@ -1,88 +1,114 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
+import 'package:geolocation/core/globalwidget/ripple_container.dart';
+import 'package:geolocation/core/theme/palette.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:geolocation/features/attendance/controller/attendance_controller.dart';
 
-class AttendanceController extends GetxController {
-  // Observables
-  RxBool isMapReady = false.obs;
-  RxList<Circle> geofenceCircles = <Circle>[].obs;
-  Rx<LatLng> currentPosition = LatLng(0, 0).obs;
+class MakeAttendancePage extends StatelessWidget {
+  const MakeAttendancePage({Key? key}) : super(key: key);
 
-  // Map initial position
-  CameraPosition initialPosition = const CameraPosition(
-    target: LatLng(6.632986, 124.598800), // Default target location
-    zoom: 15,
-  );
+  @override
+  Widget build(BuildContext context) {
+    final AttendanceController controller = Get.put(AttendanceController());
 
-  // Geofence radius and center
-  final double geofenceRadius = 50.0; // Example 50 meters
-  final LatLng geofenceCenter = LatLng(6.632986, 124.598800); // Example center
-
-  // Called when the map is created
-  void onMapCreated(GoogleMapController controller) {
-    _initializeGeofence();
-    isMapReady(true); // Mark map as ready
-  }
-
-  // Initialize Geofence on Map
-  void _initializeGeofence() {
-    geofenceCircles.add(
-      Circle(
-        circleId: const CircleId('geofence'),
-        center: geofenceCenter,
-        radius: geofenceRadius,
-        fillColor: Colors.blue.withOpacity(0.2),
-        strokeColor: Colors.blue,
-        strokeWidth: 2,
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Mark Attendance'),
+        centerTitle: true,
+      ),
+      body: RefreshIndicator(
+        triggerMode: RefreshIndicatorTriggerMode.anywhere,
+        onRefresh: () => controller.refreshEventDetails(),
+        child: Stack(
+          children: [
+            Obx(() => GoogleMap(
+              padding:EdgeInsets.only(bottom: Get.size.height /3),
+                  onMapCreated: controller.onMapCreated,
+                  initialCameraPosition: controller.initialPosition,
+                  myLocationEnabled: true,
+                  myLocationButtonEnabled: true,
+                  markers: controller.markers.toSet(),
+                  circles: controller.geofenceCircles.toSet(),
+                )),
+            Positioned(
+              bottom: 20,
+              left: 12,
+              right: 12,
+              child: Container(
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.white,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      controller.selectedItem.value.title ?? 'Event',
+                      style: Get.textTheme.titleLarge,
+                    ),
+                    Gap(16),
+                    RippleContainer(
+                      onTap: () => controller.moveCamera(),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Icon(Icons.calendar_today, size: 34, color: Palette.PRIMARY),
+                              Gap(8),
+                              Expanded(
+                                child: Text(
+                                  '${controller.selectedItem.value.startTime ?? ''} - ${controller.selectedItem.value.endTime ?? ''}',
+                                  style: Get.textTheme.bodyMedium,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Gap(4),
+                          Row(
+                            children: [
+                              Icon(Icons.location_on, size: 34, color: Palette.PRIMARY),
+                              Gap(8),
+                              Expanded(
+                                child: Text(
+                                  controller.selectedItem.value.mapLocation ?? 'Location not available',
+                                  style: Get.textTheme.bodyMedium,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    Gap(12),
+                    SizedBox(
+                      width: Get.size.width,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Palette.PRIMARY,
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onPressed: controller.checkInOrOut,
+                        child: Text(
+                          'Check In',
+                          style: Get.textTheme.bodyLarge?.copyWith(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
-    update(); // Notify UI changes
-  }
-
-  // Function to check attendance
-  Future<void> checkInOrOut() async {
-    Position position = await _determinePosition();
-
-    final distance = Geolocator.distanceBetween(
-      position.latitude,
-      position.longitude,
-      geofenceCenter.latitude,
-      geofenceCenter.longitude,
-    );
-
-    if (distance <= geofenceRadius) {
-      Get.snackbar('Success', 'You are within the geofence. Attendance marked!');
-      // TODO: Call API to mark attendance
-    } else {
-      Get.snackbar('Error', 'You are outside the geofence. Move closer!');
-    }
-  }
-
-  // Helper to get current position
-  Future<Position> _determinePosition() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    // Test if location services are enabled.
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return Future.error('Location services are disabled.');
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return Future.error('Location permissions are denied.');
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    }
-
-    return await Geolocator.getCurrentPosition();
   }
 }

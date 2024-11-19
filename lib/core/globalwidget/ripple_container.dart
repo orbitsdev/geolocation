@@ -6,6 +6,7 @@ import 'package:touch_ripple_effect/touch_ripple_effect.dart';
 class RippleContainer extends StatelessWidget {
 
 Function()? onTap;
+Function()? onLongPress;
 Widget? child;
 BorderRadius? borderRadius;
 Color? color;

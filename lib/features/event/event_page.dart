@@ -5,6 +5,9 @@ import 'package:geolocation/core/globalwidget/sliver_gap.dart';
 import 'package:geolocation/core/globalwidget/to_sliver.dart';
 import 'package:geolocation/core/modal/modal.dart';
 import 'package:geolocation/core/theme/palette.dart';
+import 'package:geolocation/features/attendance/attendance_page.dart';
+import 'package:geolocation/features/attendance/controller/attendance_controller.dart';
+import 'package:geolocation/features/attendance/make_attendace_page.dart';
 import 'package:geolocation/features/event/controller/event_controller.dart';
 import 'package:geolocation/features/event/create_event_page.dart';
 import 'package:geolocation/features/event/model/event.dart';
@@ -120,8 +123,11 @@ class _EventPageState extends State<EventPage> {
                                     ],
                                   ),
                                   child: RippleContainer(
+                                
                                     onTap: () {
-                                        controller.viewEvent(event);
+
+                                        AttendanceController.controller.selectAndNavigateToAttendancePage(event);
+                                        // controller.viewEvent(event);
                                     },
                                     child: EventCard(event: event),
                                   ),
