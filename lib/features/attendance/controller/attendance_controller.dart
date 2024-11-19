@@ -70,6 +70,8 @@ class AttendanceController extends GetxController {
         distanceFilter: 5,
       ),
     ).listen((Position position) {
+      print('START LESTINGIGN-------------------');
+      print('----');
       final distance = Geolocator.distanceBetween(
         position.latitude,
         position.longitude,
