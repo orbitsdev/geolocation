@@ -85,6 +85,10 @@ class CreateEventPage extends StatelessWidget {
                           eventcontroller
                               .setMapReady(); // Set the map ready state
                         },
+                        onLongPress: (LatLng position){
+                          eventcontroller.setLocation(position);
+
+                        },
                         onTap: (LatLng position) {
                           eventcontroller.setLocation(position);
                         },

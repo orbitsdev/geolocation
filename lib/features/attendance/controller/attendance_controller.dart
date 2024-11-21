@@ -7,6 +7,7 @@ import 'package:geolocation/core/modal/modal.dart';
 import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/attendance/make_attendace_page.dart';
 import 'package:geolocation/features/event/model/event.dart';
+import 'package:geolocation/features/event/model/event_attendance.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -20,7 +21,7 @@ class AttendanceController extends GetxController {
   RxBool isWithinRadius = false.obs; // To enable/disable the button
   RxList<Circle> geofenceCircles = <Circle>[].obs;
   RxList<Marker> markers = <Marker>[].obs;
-  var selectedItem = Event().obs;
+  var selectedItem = EventAttendance().obs;
 
   GoogleMapController? _googleMapController;
   late StreamSubscription<Position> _positionStream;
@@ -37,6 +38,41 @@ class AttendanceController extends GetxController {
     super.onClose();
   }
 
+
+  Future<void> initializeData(Event event) async {
+    Modal.loading();
+    isLoading(true); // Set loading to true
+    update();
+
+    var response = await ApiService.getAuthenticatedResource(
+      '/councils/${event.council?.id}/events/${event.id}/attendance',
+    );
+
+    response.fold(
+      (failure) {
+        Get.back();
+          isLoading(false); // Set loading to false once initialization is complete
+         update();
+        Modal.errorDialog(failure: failure); // Handle API failure
+      },
+      (success) async  {
+        Get.back();
+        isLoading(false);
+         isWithinRadius(false);
+          update();
+          selectedItem(EventAttendance.fromMap(success.data['data']));
+           await calculateInitialDistance(); 
+           startListeningToPosition();
+          
+      },
+    );
+
+    // Perform initial distance calculation with the updated data
+   
+  
+
+
+  }
   // Request location permissions and start location updates
   Future<void> _requestLocationPermission() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -63,6 +99,46 @@ class AttendanceController extends GetxController {
     startListeningToPosition(); // Start position updates
   }
 
+
+Future<void> calculateInitialDistance() async {
+  try {
+    // Get the user's current position
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+
+    final double eventLatitude = selectedItem.value.latitude?.toDouble() ?? 0.0;
+    final double eventLongitude = selectedItem.value.longitude?.toDouble() ?? 0.0;
+    final double radius = selectedItem.value.radius?.toDouble() ?? 50;
+
+    // Calculate the distance
+    final double distance = Geolocator.distanceBetween(
+      position.latitude,
+      position.longitude,
+      eventLatitude,
+      eventLongitude,
+    );
+
+    // Determine if the user is within the radius
+    isWithinRadius.value = distance <= radius;
+
+    // Print the initial data
+    print('-INITIAL CALCULATION------------------------------------');
+    print('Current User Coordinates: Latitude: ${position.latitude}, Longitude: ${position.longitude}');
+    print('Event Coordinates: Latitude: $eventLatitude, Longitude: $eventLongitude');
+    print('Calculated Distance: $distance meters');
+    print(isWithinRadius.value
+        ? 'User is within the radius of $radius meters.'
+        : 'User is outside the radius of $radius meters.');
+    print('-END INITIAL CALCULATION--------------------------------');
+
+    update(); // Notify UI changes
+  } catch (e) {
+    print('Error calculating initial distance: $e');
+    Modal.showToast(msg: 'Failed to fetch your location for initial calculation.');
+  }
+}
+
   void startListeningToPosition() {
     _positionStream = Geolocator.getPositionStream(
       locationSettings: const LocationSettings(
@@ -70,17 +146,48 @@ class AttendanceController extends GetxController {
         distanceFilter: 5,
       ),
     ).listen((Position position) {
-      print('START LESTINGIGN-------------------');
-      print('----');
-      final distance = Geolocator.distanceBetween(
-        position.latitude,
-        position.longitude,
-        selectedItem.value.latitude?.toDouble() ?? 0.0,
-        selectedItem.value.longitude?.toDouble() ?? 0.0,
-      );
+      // print('START LESTINGIGN-------------------');
+      // print('----');
+      // final distance = Geolocator.distanceBetween(
+      //   position.latitude,
+      //   position.longitude,
+      //   selectedItem.value.latitude?.toDouble() ?? 0.0,
+      //   selectedItem.value.longitude?.toDouble() ?? 0.0,
+      // );
 
-      isWithinRadius.value = distance <= (selectedItem.value.radius?.toDouble() ?? 50);
-      update();
+      // isWithinRadius.value = distance <= (selectedItem.value.radius?.toDouble() ?? 50);
+      // update();
+
+
+    final double eventLatitude = selectedItem.value.latitude?.toDouble() ?? 0.0;
+    final double eventLongitude = selectedItem.value.longitude?.toDouble() ?? 0.0;
+    final double radius = selectedItem.value.radius?.toDouble() ?? 50;
+
+    final double distance = Geolocator.distanceBetween(
+      position.latitude,
+      position.longitude,
+      eventLatitude,
+      eventLongitude,
+    );
+
+    isWithinRadius.value = distance <= radius;
+
+    // Print user and event coordinates
+    print('-START LESTINING----------------------------------------');
+    print('Current User Coordinates: Latitude: ${position.latitude}, Longitude: ${position.longitude}');
+    print('Event Coordinates: Latitude: $eventLatitude, Longitude: $eventLongitude');
+    print('Calculated Distance: $distance meters');
+
+    // Check and print if within radius
+    if (isWithinRadius.value) {
+      print('User is within the radius of $radius meters.');
+    } else {
+      print('User is outside the radius of $radius meters.');
+    }
+
+    update(); // Notify UI changes
+    print('-END LESTINING----------------------------------------');
+  
     });
   }
 
@@ -162,7 +269,7 @@ class AttendanceController extends GetxController {
 
     if (eventId != null) {
       var response = await ApiService.getAuthenticatedResource(
-        '/councils/$councilId/events/$eventId',
+        '/councils/$councilId/events/$eventId/attendance',
       );
 
       response.fold(
@@ -172,7 +279,7 @@ class AttendanceController extends GetxController {
         },
         (success) {
           isLoading(false);
-          selectedItem(Event.fromMap(success.data['data']));
+          selectedItem(EventAttendance.fromMap(success.data['data']));
           setMarker();
           setGeofenceCircle();
         },
@@ -180,8 +287,10 @@ class AttendanceController extends GetxController {
     }
   }
 
- void selectAndNavigateToAttendancePage(Event item) {
-  Get.to(() => MakeAttendancePage(), arguments: item);
+void selectAndNavigateToAttendancePage(Event item) async {
+   await Get.to(() => MakeAttendancePage(), arguments: {
+          'event':item, 
+        });
 }
 
 
