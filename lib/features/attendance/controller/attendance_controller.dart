@@ -3,29 +3,37 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:geolocation/core/api/dio/api_service.dart';
+import 'package:geolocation/core/api/dio/failure.dart';
 import 'package:geolocation/core/modal/modal.dart';
 import 'package:geolocation/core/theme/palette.dart';
+import 'package:geolocation/features/attendance/confirm_attendance_page.dart';
 import 'package:geolocation/features/attendance/make_attendace_page.dart';
+import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:geolocation/features/event/model/event.dart';
 import 'package:geolocation/features/event/model/event_attendance.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:dio/dio.dart' as dio;
 
 class AttendanceController extends GetxController {
   static AttendanceController controller = Get.find();
 
   // Observables
   var isLoading = false.obs;
+  var isUploading = false.obs;
   RxBool isMapReady = false.obs;
   RxBool isWithinRadius = false.obs; // To enable/disable the button
   RxList<Circle> geofenceCircles = <Circle>[].obs;
   RxList<Marker> markers = <Marker>[].obs;
   var selectedItem = EventAttendance().obs;
+  var selfiePath = ''.obs; // Observable for the selfie path
 
   Rxn<Position> checkInPosition = Rxn<Position>();
-Rxn<Position> checkOutPosition = Rxn<Position>();
+  Rxn<Position> checkOutPosition = Rxn<Position>();
 
+var uploadProgress = 0.0.obs;
   GoogleMapController? _googleMapController;
   late StreamSubscription<Position> _positionStream;
 
@@ -80,9 +88,13 @@ Rxn<Position> checkOutPosition = Rxn<Position>();
 Future<void> checkIn() async {
   try {
     // Fetch the current position
+
+    Modal.loading();
     Position position = await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.high,
     );
+
+    Get.back();
 
     // Store the check-in position
     checkInPosition.value = position;
@@ -92,10 +104,12 @@ Future<void> checkIn() async {
     print('Latitude: ${position.latitude}, Longitude: ${position.longitude}');
     print('--- End Check-In ---');
 
-    // Proceed to take a selfie or show a confirmation dialog
-    print('Check-in successful! Now proceed to take a selfie.');
+    // Navigate to Confirm Attendance page
+    print('caleed');
+    navigateToConfirmPage(position, isCheckIn: true);
   } catch (e) {
-    print('Error during check-in: $e');
+        Get.back();
+        Modal.showToast(msg: 'Error during check-in: $e');
   }
 }
 
@@ -114,12 +128,24 @@ Future<void> checkOut() async {
     print('Latitude: ${position.latitude}, Longitude: ${position.longitude}');
     print('--- End Check-Out ---');
 
-    // Proceed to take a selfie or show a confirmation dialog
-    print('Check-out successful! Now proceed to take a selfie.');
+    // Navigate to Confirm Attendance page
+    navigateToConfirmPage(position, isCheckIn: false);
   } catch (e) {
     print('Error during check-out: $e');
   }
 }
+
+void navigateToConfirmPage(Position position, {required bool isCheckIn}) {
+
+  Get.to(
+    () => const ConfirmAttendancePage(),
+    arguments: {
+      'position': position,
+      'isCheckIn': isCheckIn,
+    },
+  );
+}
+
 
   // Request location permissions and start location updates
   Future<void> _requestLocationPermission() async {
@@ -373,4 +399,124 @@ void selectAndNavigateToAttendancePage(Event item) async {
       desiredAccuracy: LocationAccuracy.high,
     );
   }
+
+  
+
+  // Function to capture a selfie
+  Future<void> takeSelfie() async {
+    final ImagePicker picker = ImagePicker();
+
+    try {
+      final XFile? image = await picker.pickImage(source: ImageSource.camera);
+      if (image != null) {
+        selfiePath.value = image.path; // Update the selfie path
+        print('Selfie captured at: ${image.path}');
+      } else {
+        print('No selfie captured.');
+      }
+    } catch (e) {
+      print('Error capturing selfie: $e');
+    }
+  }
+  Future<void> clearSelfie() async {
+
+  try {
+    // Clear the stored selfie path
+    selfiePath.value = '';
+   
+  } catch (e) {
+    
+  }
+}
+Future<void> takeAttendance(bool isCheckIn) async {
+  try {
+    Modal.loading(); // Show loading modal
+
+    // Get the current position for check-in or check-out
+    var position = isCheckIn ? checkInPosition.value : checkOutPosition.value;
+
+    // Validate that the position is captured
+    if (position == null) {
+      Modal.errorDialog(failure: Failure(message: 'Location not captured. Please try again.'));
+      return;
+    }
+
+     var officer=    AuthController.controller.user.value.defaultPosition?.id;
+     var counciId=   AuthController.controller.user.value.defaultPosition?.councilId;
+     var eventId=     selectedItem.value.id;
+
+    // Prepare the FormData for the request
+    var data = dio.FormData.fromMap({
+      'check_${isCheckIn ? 'in' : 'out'}_coordinates': {
+        'latitude': '${position.latitude}',
+        'longitude': '${position.longitude}',
+      },
+      'event_id': selectedItem.value.id,
+      'council_position_id': officer,
+      if (selfiePath.value.isNotEmpty)
+        'selfie_image': await dio.MultipartFile.fromFile(
+          selfiePath.value,
+          filename: '${isCheckIn ? 'check_in' : 'check_out'}_selfie.jpg',
+        ),
+    });
+
+// Print FormData details
+print('--- ATTENDANCE DATA ---');
+data.fields.forEach((field) {
+  print('Field: ${field.key} = ${field.value}');
+});
+data.files.forEach((file) {
+  print('File: ${file.key} -> Filename: ${file.value.filename}');
+});
+print('--- END OF ATTENDANCE DATA ---');
+
+print(counciId);
+print('--- 0 ---');
+print(eventId);
+  
+ 
+ isUploading(true);
+ update();
+    String endpoint = '/councils/${counciId}/events/${eventId}/attendance/${isCheckIn ? 'check-in' : 'check-out'}';
+
+    // Make the API call
+    var response = await ApiService.filePostAuthenticatedResource(endpoint, data, onSendProgress: (int sent, int total) {
+              uploadProgress.value = sent / total;
+              update();
+            },);
+
+   
+    response.fold(
+      (failure) {
+         isUploading(false);
+
+          uploadProgress.value = 0.0;
+          update();
+        Get.back(); // Close loading modal
+        Modal.errorDialog(failure: failure); // Show error modal
+      },
+      (success) {
+          isUploading(false);
+          uploadProgress.value = 0.0;
+           update();
+
+        Get.back(); // Close loading modal
+        Modal.success(message: 'Attendance ${isCheckIn ? 'Check-In' : 'Check-Out'} recorded successfully.');
+        // Reset the selfie path and positions
+        selfiePath.value = '';
+        if (isCheckIn) {
+          checkInPosition.value = null;
+        } else {
+          checkOutPosition.value = null;
+        }
+        // Navigate back to the events page
+        Get.offNamedUntil('/events', (route) => route.isFirst);
+      },
+    );
+  } catch (e) {
+    Get.back(); // Close loading modal
+    Modal.errorDialog(failure: Failure(message: 'An error occurred: $e'));
+  }
+}
+
 }

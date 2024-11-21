@@ -111,8 +111,7 @@ class MakeAttendancePage extends StatelessWidget {
                           ),
                           Gap(12),
                          // Check-In Button
-    if (attendanceController.selectedItem.value.attendance?.checkInTime == null &&
-        attendanceController.isWithinRadius.value)
+    if (attendanceController.selectedItem.value.attendance?.checkInTime == null )
       SizedBox(
         width: Get.size.width,
         child: ElevatedButton(
@@ -134,8 +133,7 @@ class MakeAttendancePage extends StatelessWidget {
       ),
     Gap(12),
     // Check-Out Button
-    if (attendanceController.selectedItem.value.attendance?.checkOutTime == null &&
-        attendanceController.isWithinRadius.value)
+    if (attendanceController.selectedItem.value.attendance?.checkOutTime == null )
       SizedBox(
         width: Get.size.width,
         child: ElevatedButton(
