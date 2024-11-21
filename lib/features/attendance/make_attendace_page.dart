@@ -109,29 +109,52 @@ class MakeAttendancePage extends StatelessWidget {
                               ],
                             ),
                           ),
-                          const Gap(12),
-                          SizedBox(
-                            width: Get.size.width,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Palette.PRIMARY,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 16),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              onPressed: attendanceController
-                                      .isWithinRadius.value
-                                  ? attendanceController.checkInOrOut
-                                  : null,
-                              child: Text(
-                                'Check In',
-                                style: Get.textTheme.bodyLarge
-                                    ?.copyWith(color: Colors.white),
-                              ),
-                            ),
-                          ),
+                          Gap(12),
+                         // Check-In Button
+    if (attendanceController.selectedItem.value.attendance?.checkInTime == null &&
+        attendanceController.isWithinRadius.value)
+      SizedBox(
+        width: Get.size.width,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Palette.PRIMARY,
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          onPressed: attendanceController.isWithinRadius.value
+              ? attendanceController.checkIn
+              : null,
+          child: Text(
+            'Check In',
+            style: Get.textTheme.bodyLarge?.copyWith(color: Colors.white),
+          ),
+        ),
+      ),
+    Gap(12),
+    // Check-Out Button
+    if (attendanceController.selectedItem.value.attendance?.checkOutTime == null &&
+        attendanceController.isWithinRadius.value)
+      SizedBox(
+        width: Get.size.width,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red,
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          onPressed: attendanceController.isWithinRadius.value
+              ? attendanceController.checkOut
+              : null,
+          child: Text(
+            'Check Out',
+            style: Get.textTheme.bodyLarge?.copyWith(color: Colors.white),
+          ),
+        ),
+      ),
                         ],
                       ),
                     );

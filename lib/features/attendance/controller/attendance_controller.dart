@@ -23,6 +23,9 @@ class AttendanceController extends GetxController {
   RxList<Marker> markers = <Marker>[].obs;
   var selectedItem = EventAttendance().obs;
 
+  Rxn<Position> checkInPosition = Rxn<Position>();
+Rxn<Position> checkOutPosition = Rxn<Position>();
+
   GoogleMapController? _googleMapController;
   late StreamSubscription<Position> _positionStream;
 
@@ -73,6 +76,51 @@ class AttendanceController extends GetxController {
 
 
   }
+
+Future<void> checkIn() async {
+  try {
+    // Fetch the current position
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+
+    // Store the check-in position
+    checkInPosition.value = position;
+
+    // Print the position
+    print('--- Check-In Location ---');
+    print('Latitude: ${position.latitude}, Longitude: ${position.longitude}');
+    print('--- End Check-In ---');
+
+    // Proceed to take a selfie or show a confirmation dialog
+    print('Check-in successful! Now proceed to take a selfie.');
+  } catch (e) {
+    print('Error during check-in: $e');
+  }
+}
+
+Future<void> checkOut() async {
+  try {
+    // Fetch the current position
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+
+    // Store the check-out position
+    checkOutPosition.value = position;
+
+    // Print the position
+    print('--- Check-Out Location ---');
+    print('Latitude: ${position.latitude}, Longitude: ${position.longitude}');
+    print('--- End Check-Out ---');
+
+    // Proceed to take a selfie or show a confirmation dialog
+    print('Check-out successful! Now proceed to take a selfie.');
+  } catch (e) {
+    print('Error during check-out: $e');
+  }
+}
+
   // Request location permissions and start location updates
   Future<void> _requestLocationPermission() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
