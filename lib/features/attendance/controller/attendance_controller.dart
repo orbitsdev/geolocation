@@ -441,7 +441,8 @@ Future<void> takeAttendance(bool isCheckIn) async {
       return;
     }
 
-     var officer=    AuthController.controller.user.value.defaultPosition?.id;
+
+     var officerId=    AuthController.controller.user.value.defaultPosition?.id;
      var counciId=   AuthController.controller.user.value.defaultPosition?.councilId;
      var eventId=     selectedItem.value.id;
 
@@ -452,7 +453,7 @@ Future<void> takeAttendance(bool isCheckIn) async {
         'longitude': '${position.longitude}',
       },
       'event_id': selectedItem.value.id,
-      'council_position_id': officer,
+      'council_position_id': officerId,
       if (selfiePath.value.isNotEmpty)
         'selfie_image': await dio.MultipartFile.fromFile(
           selfiePath.value,
@@ -470,11 +471,13 @@ data.files.forEach((file) {
 });
 print('--- END OF ATTENDANCE DATA ---');
 
+print(officerId);
+print('--- 1 ---');
 print(counciId);
 print('--- 0 ---');
 print(eventId);
   
- 
+ return ;
  isUploading(true);
  update();
     String endpoint = '/councils/${counciId}/events/${eventId}/attendance/${isCheckIn ? 'check-in' : 'check-out'}';
