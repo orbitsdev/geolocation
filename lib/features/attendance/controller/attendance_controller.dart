@@ -496,6 +496,9 @@ print(eventId);
         Modal.errorDialog(failure: failure); // Show error modal
       },
       (success) {
+        print('SUCCESs--------------');
+        print(success.data['data']);
+        print('SUCCESs-----------------');
           isUploading(false);
           uploadProgress.value = 0.0;
            update();
