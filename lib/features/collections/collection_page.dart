@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:geolocation/core/theme/palette.dart';
-import 'package:geolocation/features/collections/create_collection_page.dart';
+import 'package:geolocation/features/collections/create_or_edit_collection_page.dart';
 import 'package:get/get.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -19,7 +19,7 @@ class CollectionPage extends StatelessWidget {
               TextButton.icon(
                 onPressed: () {
                   // Navigate to Create Post Page
-                  Get.to(() => CreateCollectionPage(), transition: Transition.cupertino);
+                  Get.to(() => CreateOrEditCollectionPage(), transition: Transition.cupertino);
                 },
                 icon: Icon(Icons.create, color: Palette.PRIMARY),
                 label: Text(
