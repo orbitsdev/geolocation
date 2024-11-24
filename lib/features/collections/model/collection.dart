@@ -4,14 +4,15 @@ import 'dart:convert';
 import 'package:geolocation/features/auth/model/council_position.dart';
 import 'package:geolocation/features/collections/model/collection_item.dart';
 import 'package:geolocation/features/councils/model/council.dart';
+import 'package:intl/intl.dart';
 
 class Collection {
   int? id;
   String? title;
   String? type;
   String? description;
-  double? totalAmount;
-  int? itemCount;
+  num? totalAmount;
+  num? itemCount;
   String? lastUpdated;
   Council? council;
   CouncilPosition? councilPosition;
@@ -78,8 +79,8 @@ class Collection {
       type: map['type'] != null ? map['type'] as String : null,
       description: map['description'] != null ? map['description'] as String : null,
       totalAmount:
-          map['total_amount'] != null ? map['total_amount'] as double : null,
-      itemCount: map['item_count'] != null ? map['item_count'] as int : null,
+          map['total_amount'] != null ? map['total_amount'] as num : null,
+      itemCount: map['item_count'] != null ? map['item_count'] as num : null,
       lastUpdated:
           map['last_updated'] != null ? map['last_updated'] as String : null,
       council:
@@ -102,5 +103,10 @@ class Collection {
   @override
   String toString() {
     return 'Collection(id: $id, title: $title, type: $type, description: $description, totalAmount: $totalAmount, itemCount: $itemCount, lastUpdated: $lastUpdated, council: $council, councilPosition: $councilPosition, items: $items)';
+  }
+
+   String formattedTotalAmount() {
+    final formatter = NumberFormat('#,##0'); // Adjust format as needed
+    return totalAmount != null ? formatter.format(totalAmount) : '0.00';
   }
 }

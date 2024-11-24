@@ -3,6 +3,8 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:geolocation/core/globalwidget/ripple_container.dart';
+import 'package:geolocation/features/collections/controller/collection_controller.dart';
+import 'package:geolocation/features/event/controller/event_controller.dart';
 import 'package:geolocation/features/home/dashboard/widget/over_all_card.dart';
 import 'package:geolocation/features/home/dashboard/widget/profile_section.dart';
 import 'package:get/get.dart';
@@ -40,8 +42,12 @@ class _DashboardPageState extends State<DashboardPage> {
       final councilId = user.defaultPosition?.councilId;
       if (councilId != null) {
         positionController.setCouncilId(councilId);
-        await positionController.fetchCouncilMembers();
-        await TaskController.controller.loadTask();
+       await Future.wait([
+        positionController.fetchCouncilMembers(),
+        TaskController.controller.loadTask(),
+        EventController.controller.loadEvents(),
+        CollectionController.controller.loadData(),
+      ]);
       }
     }
   }
@@ -134,13 +140,15 @@ class _DashboardPageState extends State<DashboardPage> {
             _buildGridItem(
             icon: FontAwesomeIcons.calendarCheck,
             title: 'Events',
-            count: '16',
+            count: EventController.controller.events.length.toString(),
+             isLoading: EventController.controller.isLoading.value,
             onTap: () => Get.toNamed('/events'),
           ),
             _buildGridItem(
             icon: FontAwesomeIcons.solidFolder,
             title: 'Collections',
-            count: '180',
+            count: CollectionController.controller.collections.length.toString(),
+            isLoading: CollectionController.controller.isPageLoading.value,
             onTap: () => Get.toNamed('/collections'),
           ),
           _buildGridItem(

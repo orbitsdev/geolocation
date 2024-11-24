@@ -143,6 +143,8 @@ class _EventPageState extends State<EventPage> {
                     ToSliver(
                       child: const Center(child: CircularProgressIndicator()),
                     ),
+
+                      SliverGap(Get.size.height * 0.10)
                 ],
               );
             },

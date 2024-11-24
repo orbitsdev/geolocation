@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/collections/controller/collection_controller.dart';
+import 'package:geolocation/features/collections/model/collection.dart';
 import 'package:get/get.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:gap/gap.dart';
@@ -14,6 +15,19 @@ class CreateOrEditCollectionPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+final CollectionController controller = Get.find<CollectionController>();
+     // Call fillForm outside the builder if in edit mode
+    // Call fillForm or clearForm based on the mode
+    if (isEditMode) {
+      final Collection? selectedCollection = Get.arguments;
+      if (selectedCollection != null) {
+        controller.setSelectedItemAndFilForm(selectedCollection);
+      }
+    } else {
+      controller.clearForm(); // Clear form for new collections
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -38,7 +52,7 @@ class CreateOrEditCollectionPage extends StatelessWidget {
         padding: EdgeInsets.all(16.0),
         child: GetBuilder<CollectionController>(
           builder: (controller) {
-            if (isEditMode) controller.fillForm();
+            
 
             return FormBuilder(
               key: controller.formKey,
@@ -155,65 +169,64 @@ class CreateOrEditCollectionPage extends StatelessWidget {
   }
 
   Widget _buildCollectionItemField(CollectionController controller, int index) {
-    final item = controller.collectionItems[index];
+  final item = controller.collectionItems[index];
 
-    return Row(
-      children: [
-        Expanded(
-          flex: 3,
-          child: FormBuilderTextField(
-            name: 'items[$index][label]',
-            initialValue: item.label,
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Palette.LIGHT_BACKGROUND,
-              hintText: 'Enter item label',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
-              ),
+  return Row(
+    children: [
+      Expanded(
+        flex: 3,
+        child: FormBuilderTextField(
+          name: 'items[$index][label]',
+          initialValue: item.label,
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: Palette.LIGHT_BACKGROUND,
+            hintText: 'Enter item label',
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
             ),
-            validator: FormBuilderValidators.required(),
           ),
+          onChanged: (value) {
+            controller.collectionItems[index].label = value ?? '';
+          },
+          validator: FormBuilderValidators.required(),
         ),
-        Gap(8),
-        Expanded(
-  flex: 2,
-  child: FormBuilderTextField(
-    name: 'items[$index][amount]',
-    initialValue: item.amount?.toString(),
-    decoration: InputDecoration(
-      filled: true,
-      fillColor: Palette.LIGHT_BACKGROUND,
-      hintText: '0.00',
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide.none,
       ),
-    ),
-    keyboardType: TextInputType.numberWithOptions(decimal: true),
-    inputFormatters: [
-      TextInputFormatter.withFunction((oldValue, newValue) {
-        // Use regex to allow only numeric input with a single decimal point
-        final regExp = RegExp(r'^\d*\.?\d{0,2}$');
-        if (regExp.hasMatch(newValue.text)) {
-          return newValue; // Valid input
-        }
-        return oldValue; // Revert to old value if input is invalid
-      }),
-    ],
-    validator: FormBuilderValidators.compose([
-      FormBuilderValidators.required(),
-      FormBuilderValidators.numeric(),
-    ]),
-  ),
-),
-
-        IconButton(
-          icon: Icon(Icons.remove_circle, color: Colors.red),
-          onPressed: () => controller.removeItem(index),
+      Gap(8),
+      Expanded(
+        flex: 2,
+        child: FormBuilderTextField(
+          name: 'items[$index][amount]',
+          initialValue: item.amount?.toStringAsFixed(0),
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: Palette.LIGHT_BACKGROUND,
+            hintText: '0.00',
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+          ),
+          keyboardType: TextInputType.numberWithOptions(decimal: true),
+          inputFormatters: [
+            FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
+          ],
+          onChanged: (value) {
+            controller.collectionItems[index].amount = double.tryParse(value ?? '0') ?? 0.0;
+          },
+          validator: FormBuilderValidators.compose([
+            FormBuilderValidators.required(),
+            FormBuilderValidators.numeric(),
+          ]),
         ),
-      ],
-    );
-  }
+      ),
+      IconButton(
+        icon: Icon(Icons.remove_circle, color: Colors.red),
+        onPressed: () => controller.removeItem(index),
+      ),
+    ],
+  );
+}
+
 }

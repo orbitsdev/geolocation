@@ -1,279 +1,139 @@
 import 'package:flutter/material.dart';
+import 'package:geolocation/core/globalwidget/sliver_gap.dart';
+import 'package:geolocation/core/globalwidget/to_sliver.dart';
+import 'package:geolocation/core/modal/modal.dart';
 import 'package:geolocation/core/theme/palette.dart';
+import 'package:geolocation/features/collections/controller/collection_controller.dart';
 import 'package:geolocation/features/collections/create_or_edit_collection_page.dart';
+import 'package:geolocation/features/collections/model/collection.dart';
+import 'package:geolocation/features/collections/widgets/collection_card.dart';
 import 'package:get/get.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:fl_chart/fl_chart.dart';
 
-class CollectionPage extends StatelessWidget {
+class CollectionPage extends StatefulWidget {
   const CollectionPage({Key? key}) : super(key: key);
+
+  @override
+  State<CollectionPage> createState() => _CollectionPageState();
+}
+
+class _CollectionPageState extends State<CollectionPage> {
+  final CollectionController controller = Get.find<CollectionController>();
+  final ScrollController newScrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (controller.collections.isEmpty) {
+        controller.loadData(); // Load initial data
+      }
+
+      // Debounce scroll listener
+      newScrollController.addListener(() async {
+        if (newScrollController.position.pixels >=
+                newScrollController.position.maxScrollExtent - 200 &&
+            !controller.isScrollLoading.value &&
+            controller.hasData.value) {
+          controller.loadDataOnScroll();
+        }
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Collections', ),
-
-         actions: [
-              TextButton.icon(
-                onPressed: () {
-                  // Navigate to Create Post Page
-                  Get.to(() => CreateOrEditCollectionPage(), transition: Transition.cupertino);
-                },
-                icon: Icon(Icons.create, color: Palette.PRIMARY),
-                label: Text(
-                  'Create Collection',
-                  style: TextStyle(color: Palette.PRIMARY),
-                ),
-              ),
-            ],
-      ),
-      body: CustomScrollView(
-        slivers: [
-          SliverPadding(
-            padding: EdgeInsets.all(16.0),
-            sliver: SliverMasonryGrid.count(
-              crossAxisCount: 1,
-              mainAxisSpacing: 16.0,
-              crossAxisSpacing: 16.0,
-              childCount: 3, // Three types of charts for demonstration
-              itemBuilder: (context, index) {
-                switch (index) {
-                  case 0:
-                    return _buildCollectionCard(
-                      context,
-                      title: 'Pie Chart Collection',
-                      description:
-                          'This collection displays the data using a pie chart.',
-                      date: 'Sep 10, 2024',
-                      chartType: 'pie',
-                      data: [30, 50, 20], // Example data for the chart
-                      labels: ['Label1', 'Label2', 'Label3'], // Labels for the chart
-                    );
-                  case 1:
-                    return _buildCollectionCard(
-                      context,
-                      title: 'Bar Chart Collection',
-                      description:
-                          'This collection displays the data using a bar chart.',
-                      date: 'Sep 11, 2024',
-                      chartType: 'bar',
-                      data: [30, 50, 20], // Example data for the chart
-                      labels: ['Label1', 'Label2', 'Label3'], // Labels for the chart
-                    );
-                  case 2:
-                    return _buildCollectionCard(
-                      context,
-                      title: 'Line Chart Collection',
-                      description:
-                          'This collection displays the data using a line chart.',
-                      date: 'Sep 12, 2024',
-                      chartType: 'line',
-                      data: [30, 50, 20], // Example data for the chart
-                      labels: ['Label1', 'Label2', 'Label3'], // Labels for the chart
-                    );
-                  default:
-                    return Container(); // Fallback in case of index out of bounds
-                }
-              },
-            ),
+        title: const Text(
+          'Collections',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.add, color: Palette.PRIMARY),
+            onPressed: () {
+              CollectionController.controller.clearForm();
+              
+              Get.to(() => CreateOrEditCollectionPage());
+            },
           ),
         ],
+      ),
+      body: RefreshIndicator(
+        triggerMode: RefreshIndicatorTriggerMode.anywhere,
+        onRefresh: () => controller.loadData(),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: GetBuilder<CollectionController>(
+            builder: (controller) {
+              return CustomScrollView(
+                controller: newScrollController,
+                shrinkWrap: true,
+                physics: const AlwaysScrollableScrollPhysics(),
+                slivers: [
+                  // Add spacing at the top
+                  SliverToBoxAdapter(child: const SizedBox(height: 8)),
+
+                  // Main content
+                  controller.isPageLoading.value
+                      ? const SliverToBoxAdapter(
+                          child: Center(child: CircularProgressIndicator()),
+                        )
+                      : controller.collections.isNotEmpty
+                          ? SliverMasonryGrid.count(
+                              crossAxisSpacing: 16,
+                              mainAxisSpacing: 16,
+                              crossAxisCount: 1,
+                              childCount: controller.collections.length,
+                              itemBuilder: (context, index) {
+                                Collection collection =
+                                    controller.collections[index];
+                                return CollectionCard(
+                                  collection: collection,
+                                  onEdit: () {
+                                    controller
+                                        .selectItemAndNavigateToUpdatePage(
+                                            collection);
+                                  },
+                                  onDelete: () async {
+                                   controller.deleteCollection(collection
+                                          .id!); 
+                                  },
+                                );
+                              },
+                            )
+                          : const SliverToBoxAdapter(
+                              child: Center(
+                                child: Text(
+                                  'No collections found',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.black54,
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                  // Scroll-loading indicator
+                  if (controller.isScrollLoading.value)
+                    const SliverToBoxAdapter(
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
+
+                  SliverGap(Get.size.height * 0.10)
+                ],
+              );
+            },
+          ),
+        ),
       ),
     );
-  }
-
- Widget _buildCollectionCard(
-    BuildContext context, {
-    required String title,
-    required String date,
-    String? description,
-    required String chartType,
-    required List<double> data,
-    required List<String> labels,
-  }) {
-  return Container(
-    padding: EdgeInsets.all(16.0),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(12),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black12,
-          blurRadius: 10,
-          offset: Offset(0, 4),
-        ),
-      ],
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Title, Date, and 3-Dot Menu
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  date,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
-                ),
-              ],
-            ),
-            IconButton(
-              icon: Icon(Icons.more_vert, color: Colors.grey[600]),
-              onPressed: () {
-                _showCollectionMenu(context);
-              },
-            ),
-          ],
-        ),
-        SizedBox(height: 8),
-
-        // Optional Description
-        if (description != null) ...[
-          Text(
-            description,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[800],
-            ),
-          ),
-          SizedBox(height: 16),
-        ],
-
-        // Chart
-        SizedBox(
-          height: 200, // Adjust as needed
-          child: _buildChart(chartType, data, labels),
-        ),
-      ],
-    ),
-  );
-}
-
-void _showCollectionMenu(BuildContext context) {
-  showModalBottomSheet(
-    context: context,
-    builder: (BuildContext context) {
-      return Wrap(
-        children: [
-          ListTile(
-            leading: Icon(Icons.edit, ),
-            title: Text('Edit Collection'),
-            onTap: () {
-              // Handle edit action
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.delete,),
-            title: Text('Delete Collection'),
-            onTap: () {
-              // Handle delete action
-              Navigator.pop(context);
-            },
-          ),
-        ],
-      );
-    },
-  );
-}
-
-  Widget _buildChart(String chartType, List<double> data, List<String> labels) {
-    switch (chartType) {
-      case 'pie':
-        return PieChart(
-          PieChartData(
-            sections: _buildPieChartSections(data, labels),
-            borderData: FlBorderData(show: false),
-          ),
-        );
-      case 'bar':
-        return BarChart(
-          BarChartData(
-            barGroups: _buildBarChartGroups(data),
-            borderData: FlBorderData(show: false),
-          ),
-        );
-      case 'line':
-        return LineChart(
-          LineChartData(
-            lineBarsData: _buildLineChartData(data),
-            borderData: FlBorderData(show: false),
-          ),
-        );
-      default:
-        return Center(child: Text('Invalid chart type'));
-    }
-  }
-
-  List<PieChartSectionData> _buildPieChartSections(List<double> data, List<String> labels) {
-    return List.generate(data.length, (i) {
-      return PieChartSectionData(
-        color: _getColor(i),
-        value: data[i],
-        title: '${labels[i]}: ${data[i]}',
-        radius: 50,
-        titleStyle: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
-        ),
-      );
-    });
-  }
-
-  List<BarChartGroupData> _buildBarChartGroups(List<double> data) {
-    return List.generate(data.length, (i) {
-      return BarChartGroupData(
-        x: i,
-        barRods: [
-          BarChartRodData(
-            toY: data[i],
-            color: _getColor(i),
-            width: 20,
-          ),
-        ],
-      );
-    });
-  }
-
-  List<LineChartBarData> _buildLineChartData(List<double> data) {
-    return [
-      LineChartBarData(
-        spots: List.generate(data.length, (i) => FlSpot(i.toDouble(), data[i])),
-        isCurved: true,
-        color:Colors.blue,
-        barWidth: 3,
-        isStrokeCapRound: true,
-        dotData: FlDotData(show: false),
-      ),
-    ];
-  }
-
-  Color _getColor(int index) {
-    switch (index) {
-      case 0:
-        return Colors.green;
-      case 1:
-        return Colors.blue;
-      case 2:
-        return Colors.orange;
-      default:
-        return Colors.grey;
-    }
   }
 }

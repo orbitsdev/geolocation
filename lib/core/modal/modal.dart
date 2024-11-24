@@ -821,6 +821,37 @@ static Widget _buildOption({
 }
 
 
+//
+static showCollectionMenu() {
+  Get.bottomSheet(
+    Wrap(
+      children: [
+        ListTile(
+          leading: Icon(Icons.edit),
+          title: Text('Edit Collection'),
+          onTap: () {
+            // Handle edit action
+            Get.back(); // Close the bottom sheet
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.delete),
+          title: Text('Delete Collection'),
+          onTap: () {
+            // Handle delete action
+            Get.back(); // Close the bottom sheet
+          },
+        ),
+      ],
+    ),
+    isScrollControlled: true,
+    backgroundColor: Colors.white,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+    ),
+  );
+}
+
 }
 
 

@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:geolocation/core/api/dio/api_service.dart';
 import 'package:geolocation/core/modal/modal.dart';
+import 'package:geolocation/features/collections/create_or_edit_collection_page.dart';
 import 'package:geolocation/features/collections/model/collection.dart';
 import 'package:geolocation/features/collections/model/collection_item.dart';
 import 'package:get/get.dart';
 
 class CollectionController extends GetxController {
+  static CollectionController controller = Get.find();
   final formKey = GlobalKey<FormBuilderState>();
 
   // Static chart options
@@ -14,8 +16,8 @@ class CollectionController extends GetxController {
     'Pie Chart',
     'Bar Chart',
     'Line Chart',
-    'Scatter Chart',
-    'Radar Chart'
+    // 'Scatter Chart',
+    // 'Radar Chart'
   ];
 
   var isPageLoading = false.obs;
@@ -30,7 +32,7 @@ class CollectionController extends GetxController {
   var selectedItem = Collection().obs;
 
   /// Fetch collections for a council
-  Future<void> fetchByCouncil() async {
+  Future<void> loadData() async {
     isPageLoading(true);
     update();
 
@@ -39,6 +41,8 @@ class CollectionController extends GetxController {
       queryParameters: {'page': page.value, 'perPage': perPage.value},
     );
 
+
+
     response.fold(
       (failure) {
         isPageLoading(false);
@@ -46,8 +50,9 @@ class CollectionController extends GetxController {
         Modal.errorDialog(failure: failure);
       },
       (success) {
-        var data = success.data['data'];
-        collections.value = List<Collection>.from(data.map((e) => Collection.fromMap(e)));
+        var data = success.data;
+      
+        collections.value = List<Collection>.from((data['data'] as List<dynamic>).map((e) => Collection.fromMap(e)));
         lastTotalValue.value = success.data['pagination']['total'];
         hasData.value = collections.length < lastTotalValue.value;
         isPageLoading(false);
@@ -55,6 +60,65 @@ class CollectionController extends GetxController {
       },
     );
   }
+  Future<void> loadDataOnScroll() async {
+  if (isScrollLoading.value) return;
+
+  isScrollLoading(true);
+  update();
+
+  var response = await ApiService.getAuthenticatedResource(
+    '/collections/council',
+    queryParameters: {'page': page.value, 'perPage': perPage.value},
+  );
+
+  response.fold(
+    (failure) {
+      isScrollLoading(false); // Ensure it's reset even on failure
+      update();
+      Modal.errorDialog(failure: failure);
+    },
+    (success) {
+      var data = success.data;
+
+        print('SCROLL----------------');
+        print(data);
+        print('COLECIOn----------------');
+
+      // Check if the total count has changed; refresh the data if necessary
+      if (lastTotalValue.value != data['pagination']['total']) {
+        isScrollLoading(false); // Reset loading state
+        loadData();
+        return;
+      }
+
+      // Prevent additional calls if we've reached the total number of items
+      if (collections.length == data['pagination']['total']) {
+        isScrollLoading(false); // Reset loading state
+        return;
+      }
+
+      // Add the new data to the collection
+      List<Collection> newData = (data['data'] as List<dynamic>)
+          .map((task) => Collection.fromMap(task))
+          .toList();
+      collections.addAll(newData);
+
+      // Update pagination values
+      page.value++;
+      lastTotalValue.value = data['pagination']['total'];
+      hasData.value = collections.length < lastTotalValue.value;
+
+      // Reset loading state
+      isScrollLoading(false);
+      update();
+        
+  print('----------------');
+  print(isScrollLoading);
+  print('------------------');
+    },
+  );
+}
+
 
   /// Create a new collection
   Future<void> createCollection() async {
@@ -67,10 +131,11 @@ class CollectionController extends GetxController {
     Modal.warning(message: 'Please add at least one item to the collection.');
     return;
   }
+    Modal.loading();
 
     final formData = formKey.currentState!.value;
 
-    // isLoading(true);
+     isLoading(true);
     update();
 
     var requestData = {
@@ -80,65 +145,93 @@ class CollectionController extends GetxController {
       'items': collectionItems.map((item) => {'label': item.label, 'amount': item.amount}).toList(),
     };
 
-    print('-----------------------');
-    print(requestData);
-    print('-----------------------');
-    return;
+   
+  print('----------------');
+  print(requestData);
+  print('------------------');
+   
     var response = await ApiService.postAuthenticatedResource('/collections', requestData);
 
     response.fold(
       (failure) {
+        Get.back();
         isLoading(false);
         update();
         Modal.errorDialog(failure: failure);
       },
       (success) {
+         Get.back();
         isLoading(false);
         update();
+              loadData();
+        Get.offNamedUntil('/collections', (route) => route.isFirst);
         Modal.success(message: 'Collection created successfully');
-        Get.back(); // Navigate back to the previous page
+            
       },
     );
   }
 
   /// Update an existing collection
-  Future<void> updateCollection() async {
-    if (!formKey.currentState!.saveAndValidate()) {
-      Modal.warning(message: 'Please correct the errors in the form.');
-      return;
-    }
-
-    final formData = formKey.currentState!.value;
-    final collectionId = selectedItem.value.id;
-
-    isLoading(true);
-    update();
-
-    var requestData = {
-      'title': formData['title'],
-      'type': formData['chart_type'],
-      'description': formData['description'],
-      'items': collectionItems.map((item) {
-        return {'id': item.id, 'label': item.label, 'amount': item.amount};
-      }).toList(),
-    };
-
-    var response = await ApiService.putAuthenticatedResource('/collections/$collectionId', requestData);
-
-    response.fold(
-      (failure) {
-        isLoading(false);
-        update();
-        Modal.errorDialog(failure: failure);
-      },
-      (success) {
-        isLoading(false);
-        update();
-        Modal.success(message: 'Collection updated successfully');
-        Get.back();
-      },
-    );
+ Future<void> updateCollection() async {
+  if (!formKey.currentState!.saveAndValidate()) {
+    
+    return;
   }
+
+  if (collectionItems.isEmpty) {
+    Modal.warning(message: 'Please add at least one item to the collection.');
+    return;
+  }
+
+  Modal.loading();
+
+  final formData = formKey.currentState!.value;
+  final collectionId = selectedItem.value.id;
+
+  isLoading(true);
+  update();
+
+  var requestData = {
+    'title': formData['title'],
+    'type': formData['chart_type'],
+    'description': formData['description'],
+    'items': collectionItems.map((item) {
+      return {
+        'id': item.id, // Optional, can be null for new items
+        'label': item.label,
+        'amount': item.amount,
+      };
+    }).toList(),
+  };
+
+  print('--- Update Collection Request ---');
+  print(requestData);
+  print('--------------------------------');
+
+  var response = await ApiService.putAuthenticatedResource(
+    '/collections/$collectionId',
+    requestData,
+  );
+
+  response.fold(
+    (failure) {
+      Get.back(); // Close the loading dialog
+      isLoading(false);
+      update();
+      Modal.errorDialog(failure: failure);
+    },
+    (success) {
+      Get.back(); // Close the loading dialog
+      isLoading(false);
+      update();
+      loadData();
+      Get.offNamedUntil('/collections', (route) => route.isFirst);
+      
+      Modal.success(message: 'Collection updated successfully');
+    },
+  );
+}
+
 
   /// Remove an item from the database
   Future<void> removeItemFromDatabase(int collectionId, int itemId) async {
@@ -168,7 +261,7 @@ class CollectionController extends GetxController {
         Modal.warning(message: 'You can only add up to 10 items.');
         return;
     }
-    collectionItems.add(CollectionItem(label: '', amount: 0.0));
+    collectionItems.add(CollectionItem(label: '', amount: 0));
     update();
 }
 
@@ -186,13 +279,73 @@ class CollectionController extends GetxController {
 
   /// Fill the form for editing
   void fillForm() {
-    final formData = {
-      'title': selectedItem.value.title,
-      'chart_type': selectedItem.value.type,
-      'description': selectedItem.value.description,
-    };
+    if (selectedItem.value.id == null) return;
 
-    formKey.currentState?.patchValue(formData);
+    final formData = {
+      'title': selectedItem.value.title ?? '',
+      'chart_type': selectedItem.value.type ?? '',
+      'description': selectedItem.value.description ?? '',
+    };
+     WidgetsBinding.instance.addPostFrameCallback((_) {
+      formKey.currentState?.patchValue(formData); // Populate the form with values
     collectionItems.value = selectedItem.value.items ?? [];
+    update();
+      update(); // Ensure GetX reflects state
+    });
+    
+  }
+
+   Future<void> deleteCollection(int collectionId) async {
+    Modal.confirmation(
+      titleText: 'Delete Collection',
+      contentText: 'Are you sure you want to delete this collection?',
+      onConfirm: () async {
+        isLoading(true);
+        update();
+
+        var response = await ApiService.deleteAuthenticatedResource(
+          '/collections/$collectionId',
+        );
+
+        response.fold(
+          (failure) {
+            isLoading(false);
+            update();
+            Modal.errorDialog(failure: failure);
+          },
+          (success) {
+            collections.removeWhere((collection) => collection.id == collectionId);
+            isLoading(false);
+            update();
+            Modal.success(message: 'Collection deleted successfully');
+          },
+        );
+      },
+    );
+  }
+
+  void selectItemAndNavigateToUpdatePage(Collection collection) {
+  // Navigate to the CreateOrEditCollectionPage with arguments
+  Get.to(() => CreateOrEditCollectionPage(isEditMode: true), arguments: collection);
+}
+
+
+  void setSelectedItemAndFilForm(Collection item){
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+    selectedItem(item);
+    update();
+    fillForm();
+
+    });
+  }
+
+
+   void clearForm() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+       selectedItem(Collection());
+    collectionItems.clear();
+    formKey.currentState?.reset(); // Reset the form fields
+    });
+   
   }
 }

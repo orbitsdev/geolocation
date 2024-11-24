@@ -4,7 +4,7 @@ import 'dart:convert';
 class CollectionItem {
   int? id;
   String? label;
-  double? amount;
+  num? amount;
 
   CollectionItem({
     this.id,
@@ -15,7 +15,7 @@ class CollectionItem {
   CollectionItem copyWith({
     int? id,
     String? label,
-    double? amount,
+    num? amount,
   }) {
     return CollectionItem(
       id: id ?? this.id,
@@ -36,7 +36,7 @@ class CollectionItem {
     return CollectionItem(
       id: map['id'] != null ? map['id'] as int : null,
       label: map['label'] != null ? map['label'] as String : null,
-      amount: map['amount'] != null ? map['amount'] as double : null,
+      amount: map['amount'] != null ? map['amount'] as num : null,
     );
   }
 
