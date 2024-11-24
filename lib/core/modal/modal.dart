@@ -8,8 +8,11 @@ import 'package:geolocation/core/constant/path.dart';
 import 'package:geolocation/core/constant/style.dart';
 import 'package:geolocation/core/globalwidget/images/local_lottie_image.dart';
 import 'package:geolocation/core/globalwidget/loading_widget.dart';
+import 'package:geolocation/core/globalwidget/ripple_container.dart';
 import 'package:geolocation/core/theme/palette.dart';
+import 'package:geolocation/features/event/model/event.dart';
 import 'package:get/get.dart';
+import 'package:heroicons/heroicons.dart';
 
 
 class Modal {
@@ -690,6 +693,133 @@ static Future<bool> confirmation2({
       barrierDismissible: barrierDismissible,
     );
   }
+
+
+static void showEventOptions({
+  required Event event,
+
+  required VoidCallback onViewDetails,
+  required VoidCallback onViewAttendance,
+  required VoidCallback onUpdateEvent,
+  required VoidCallback onDeleteEvent,
+}) {
+  Get.bottomSheet(
+    Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      decoration: BoxDecoration(
+        color: Palette.BACKGROUND, // Use the correct background color
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(16),
+          topRight: Radius.circular(16),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, -4),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Header with Close Button
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.event,
+                    size: 28,
+                    color: Palette.TEXT_DARK, // Text dark color
+                  ), // Event icon
+                  const SizedBox(width: 8),
+                  Text(
+                    'Event Options',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Palette.TEXT_DARK,
+                    ),
+                  ),
+                ],
+              ),
+              GestureDetector(
+                onTap: () => Get.back(),
+                child: Icon(
+                  Icons.close,
+                  color: Palette.LIGHT_TEXT, // Light text color for close button
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          _buildOption(
+            icon: Icons.info_outline,
+            text: 'View Event Details',
+            onTap: onViewDetails,
+            iconColor: Palette.DARK_PRIMARY,
+          ),
+          const SizedBox(height: 12),
+          _buildOption(
+            icon: Icons.access_time,
+            text: 'View Attendance',
+            onTap: onViewAttendance,
+            iconColor: Palette.DARK_PRIMARY,
+          ),
+          const SizedBox(height: 12),
+          _buildOption(
+            icon: Icons.edit,
+            text: 'Update Event',
+            onTap: onUpdateEvent,
+            iconColor: Palette.DARK_PRIMARY,
+          ),
+          const SizedBox(height: 12),
+          _buildOption(
+            icon: Icons.delete_outline,
+            text: 'Delete Event',
+            onTap: onDeleteEvent,
+            iconColor: Palette.DARK_PRIMARY,
+          ),
+        ],
+      ),
+    ),
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+  );
+}
+
+static Widget _buildOption({
+  required IconData icon,
+  required String text,
+  required VoidCallback onTap,
+   Color? iconColor,
+}) {
+  return RippleContainer(
+    onTap: onTap,
+    child: Row(
+      children: [
+        Icon(
+          icon,
+          size: 24,
+          color: iconColor ?? null, // Use the correct color for the icon
+        ),
+        const SizedBox(width: 12),
+        Text(
+          text,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: Palette.TEXT_DARK, // Text dark color for options
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
 
 }
 

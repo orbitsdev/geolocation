@@ -89,48 +89,35 @@ class _EventPageState extends State<EventPage> {
                               crossAxisCount: 1,
                               itemBuilder: (context, index) {
                                 Event event = controller.events[index];
-                                return Slidable(
-                                  key: Key(event.id.toString()),
-                                  endActionPane: ActionPane(
-                                    motion: const DrawerMotion(),
-                                    extentRatio: 0.5,
-                                    children: [
-                                      // Update Action
-                                      SlidableAction(
-                                        onPressed: (context) {
-                                          if (event.id != null) {
-                                            controller
-                                                .selectItemAndNavigateToUpdatePage(event);
-                                          }
-                                        },
-                                        backgroundColor: Colors.green,
-                                        foregroundColor: Colors.white,
-                                        icon: Icons.edit,
-                                        label: 'Update',
-                                      ),
-                                      // Delete Action
-                                      SlidableAction(
-                                        onPressed: (context) {
-                                          if (event.id != null) {
-                                            controller.delete(event.id!);
-                                          }
-                                        },
-                                        backgroundColor: Colors.red,
-                                        foregroundColor: Colors.white,
-                                        icon: Icons.delete,
-                                        label: 'Delete',
-                                      ),
-                                    ],
-                                  ),
-                                  child: RippleContainer(
+                                return RippleContainer(
+                                                                
+                                  onTap: () {
                                 
-                                    onTap: () {
-
-                                        AttendanceController.controller.selectAndNavigateToAttendancePage(event);
-                                        // controller.viewEvent(event);
-                                    },
-                                    child: EventCard(event: event),
-                                  ),
+                                     Modal.showEventOptions(
+                                      event: event,
+                                   
+                                      onViewDetails: () {
+                                          controller.viewEvent(event);
+                                          // AttendanceController.controller.selectAndNavigateToAttendancePage(event);
+                                      },
+                                      onViewAttendance: () {
+                                        print("View attendance for event ID: 123");
+                                        // Navigate to attendance page
+                                      },
+                                      onUpdateEvent: () {
+                                       if (event.id != null) {
+                                          controller
+                                              .selectItemAndNavigateToUpdatePage(event);
+                                        }
+                                      },
+                                      onDeleteEvent: () {
+                                         if (event.id != null) {
+                                                     controller.delete(event.id!);
+                                        }
+                                      },
+                                    );
+                                  },
+                                  child: EventCard(event: event),
                                 );
                               },
                             )

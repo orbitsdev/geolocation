@@ -4,7 +4,9 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:geolocation/core/api/dio/api_service.dart';
 import 'package:geolocation/core/api/dio/failure.dart';
+import 'package:geolocation/core/globalcontroller/device_controller.dart';
 import 'package:geolocation/core/modal/modal.dart';
+import 'package:geolocation/core/services/firebase_service.dart';
 import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/attendance/confirm_attendance_page.dart';
 import 'package:geolocation/features/attendance/make_attendace_page.dart';
@@ -440,11 +442,22 @@ Future<void> takeAttendance(bool isCheckIn) async {
       Modal.errorDialog(failure: Failure(message: 'Location not captured. Please try again.'));
       return;
     }
-
+    //officer & council data
 
      var officerId=    AuthController.controller.user.value.defaultPosition?.id;
      var counciId=   AuthController.controller.user.value.defaultPosition?.councilId;
      var eventId=     selectedItem.value.id;
+
+     // device data 
+     String? deviceToken = await FirebaseService.getDeviceToken();
+      Map<String, dynamic> deviceData = await DeviceController().getDeviceInfo();
+
+      // Map<String, dynamic> deviceData = {
+      //   "device_token": deviceToken,
+      //   "device_id": deviceData['id'],
+      //   "device_name": deviceData['model'],
+     
+      // };
 
     // Prepare the FormData for the request
     var data = dio.FormData.fromMap({
@@ -453,32 +466,31 @@ Future<void> takeAttendance(bool isCheckIn) async {
         'longitude': '${position.longitude}',
       },
       'event_id': selectedItem.value.id,
-      'council_position_id': officerId,
+  'council_position_id': officerId, 
       if (selfiePath.value.isNotEmpty)
         'selfie_image': await dio.MultipartFile.fromFile(
           selfiePath.value,
           filename: '${isCheckIn ? 'check_in' : 'check_out'}_selfie.jpg',
         ),
+      "device_id": deviceData['id'],
+      "device_name": deviceData['model'],
     });
 
-// Print FormData details
-print('--- ATTENDANCE DATA ---');
-data.fields.forEach((field) {
-  print('Field: ${field.key} = ${field.value}');
-});
-data.files.forEach((file) {
-  print('File: ${file.key} -> Filename: ${file.value.filename}');
-});
-print('--- END OF ATTENDANCE DATA ---');
+ print('--- ATTENDANCE DATA ---');
+    for (final field in data.fields) {
+      print('Field: ${field.key} = ${field.value}');
+    }
+    for (final file in data.files) {
+      print('File: ${file.key} = ${file.value.filename}, Path: ${file.value.filename}');
+    }
+    print('--- END OF ATTENDANCE DATA ---');
 
-print(officerId);
-print('--- 1 ---');
-print(counciId);
-print('--- 0 ---');
-print(eventId);
+
   
- return ;
- isUploading(true);
+
+ if (data.files.isNotEmpty) {
+      isUploading(true); // Only set isUploading to true if a file exists
+    }
  update();
     String endpoint = '/councils/${counciId}/events/${eventId}/attendance/${isCheckIn ? 'check-in' : 'check-out'}';
 
@@ -517,6 +529,9 @@ print(eventId);
         }
         // Navigate back to the events page
         Get.offNamedUntil('/events', (route) => route.isFirst);
+Modal.success(message: isCheckIn 
+    ? 'Check-In successful! Have a great day ahead.' 
+    : 'Check-Out successful! See you next time.');
       },
     );
   } catch (e) {

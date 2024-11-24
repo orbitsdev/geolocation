@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:geolocation/core/globalwidget/ripple_container.dart';
 import 'package:geolocation/core/theme/palette.dart';
+import 'package:geolocation/features/attendance/model/attendance.dart';
 import 'package:geolocation/features/event/model/event.dart';
 import 'package:geolocation/features/event/model/event_attendance.dart';
+import 'package:geolocation/features/event/widgets/time_card.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocation/features/attendance/controller/attendance_controller.dart';
@@ -50,115 +52,129 @@ class MakeAttendancePage extends StatelessWidget {
                   circles: attendanceController.geofenceCircles.toSet(),
                 );
               }),
-              Positioned(
-                bottom: 20,
-                left: 12,
-                right: 12,
-                child: GetBuilder<AttendanceController>(
-                  builder: (attendanceController) {
-                    return Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: Colors.white,
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            attendanceController.selectedItem.value.title ??
-                                'Event',
-                            style: Get.textTheme.titleLarge,
-                          ),
-                          const Gap(16),
-                          RippleContainer(
-                            onTap: () => attendanceController.moveCamera(),
-                            child: Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    Icon(Icons.calendar_today,
-                                        size: 34, color: Palette.PRIMARY),
-                                    const Gap(8),
-                                    Expanded(
-                                      child: Text(
-                                        '${attendanceController.selectedItem.value.startTime ?? ''} - ${attendanceController.selectedItem.value.endTime ?? ''}',
-                                        style: Get.textTheme.bodyMedium,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const Gap(4),
-                                Row(
-                                  children: [
-                                    Icon(Icons.location_on,
-                                        size: 34, color: Palette.PRIMARY),
-                                    const Gap(8),
-                                    Expanded(
-                                      child: Text(
-                                        attendanceController.selectedItem.value
-                                                .mapLocation ??
-                                            'Location not available',
-                                        style: Get.textTheme.bodyMedium,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          Gap(12),
-                         // Check-In Button
-    if (attendanceController.selectedItem.value.attendance?.checkInTime == null )
-      SizedBox(
-        width: Get.size.width,
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Palette.PRIMARY,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-          onPressed: attendanceController.isWithinRadius.value
-              ? attendanceController.checkIn
-              : null,
-          child: Text(
-            'Check In',
-            style: Get.textTheme.bodyLarge?.copyWith(color: Colors.white),
-          ),
+             Positioned(
+  bottom: 20,
+  left: 12,
+  right: 12,
+  child: GetBuilder<AttendanceController>(
+    builder: (attendanceController) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          color: Colors.white,
         ),
-      ),
-    Gap(12),
-    // Check-Out Button
-    if (attendanceController.selectedItem.value.attendance?.checkOutTime == null )
-      SizedBox(
-        width: Get.size.width,
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.red,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-          onPressed: attendanceController.isWithinRadius.value
-              ? attendanceController.checkOut
-              : null,
-          child: Text(
-            'Check Out',
-            style: Get.textTheme.bodyLarge?.copyWith(color: Colors.white),
-          ),
-        ),
-      ),
-                        ],
-                      ),
-                    );
-                  },
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Event Title
+              Text(
+                attendanceController.selectedItem.value.title ?? 'Event',
+                style: Get.textTheme.titleLarge,
+              ),
+              const Gap(16),
+              // Event Details
+              RippleContainer(
+                onTap: () => attendanceController.moveCamera(),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.calendar_today,
+                            size: 34, color: Palette.PRIMARY),
+                        const Gap(8),
+                        Expanded(
+                          child: Text(
+                            '${attendanceController.selectedItem.value.startTime ?? ''} - ${attendanceController.selectedItem.value.endTime ?? ''}',
+                            style: Get.textTheme.bodyMedium,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Gap(4),
+                    Row(
+                      children: [
+                        Icon(Icons.location_on,
+                            size: 34, color: Palette.PRIMARY),
+                        const Gap(8),
+                        Expanded(
+                          child: Text(
+                            attendanceController.selectedItem.value.mapLocation ??
+                                'Location not available',
+                            style: Get.textTheme.bodyMedium,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
+              const Gap(12),
+              // Check-In TimeCard
+              if (attendanceController.selectedItem.value.attendance?.checkInTime != null || attendanceController.selectedItem.value.attendance?.checkOutTime != null )
+                TimeCard(
+                  attendance: attendanceController.selectedItem.value.attendance
+                      as Attendance,
+                ),
+              const Gap(12),
+              // Check-Out TimeCard
+              
+              const Gap(12),
+              // Check-In Button
+              if (attendanceController.selectedItem.value.attendance?.checkInTime == null)
+                SizedBox(
+                  width: Get.size.width,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Palette.PRIMARY,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: attendanceController.isWithinRadius.value
+                        ? attendanceController.checkIn
+                        : null,
+                    child: Text(
+                      'Check In',
+                      style:
+                          Get.textTheme.bodyLarge?.copyWith(color: Colors.white),
+                    ),
+                  ),
+                ),
+              const Gap(12),
+              // Check-Out Button
+              if (attendanceController.selectedItem.value.attendance?.checkOutTime == null)
+                SizedBox(
+                  width: Get.size.width,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: attendanceController.isWithinRadius.value
+                        ? attendanceController.checkOut
+                        : null,
+                    child: Text(
+                      'Check Out',
+                      style:
+                          Get.textTheme.bodyLarge?.copyWith(color: Colors.white),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      );
+    },
+  ),
+),
+
             ],
           ),
         );
