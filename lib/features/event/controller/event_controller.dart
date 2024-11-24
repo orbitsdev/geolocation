@@ -6,6 +6,7 @@ import 'package:geolocation/core/api/dio/api_service.dart';
 import 'package:geolocation/core/api/dio/map_service.dart';
 import 'package:geolocation/core/modal/modal.dart';
 import 'package:geolocation/core/theme/palette.dart';
+import 'package:geolocation/features/attendance/event_attendance_list_page.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:geolocation/features/event/create_event_page.dart';
 import 'package:geolocation/features/event/event_details_page.dart';
@@ -73,10 +74,11 @@ final DateFormat readableDateFormat = DateFormat('EEEE, MMMM d, yyyy, h:mm a');
     isMapReady(false);
     update();
   }
+
   void selectItemAndNavigateToUpdatePage(Event item) async {
-  //  await clearData();
+  
    selectedItem(item);
-  update(); // Ensure the UI is updated
+  update(); 
 
   print('VALUE WHEN SELECT');
   print(selectedItem.value); // Debug print to check the selected item
@@ -396,8 +398,7 @@ markers.clear();
     lastTotalValue(0);
     events.clear();
     update();
-    var councilId =
-        AuthController.controller.user.value.defaultPosition?.councilId;
+    var councilId = AuthController.controller.user.value.defaultPosition?.councilId;
     Map<String, dynamic> data = {
       'page': page,
       'per_page': perPage,

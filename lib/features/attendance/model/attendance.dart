@@ -48,6 +48,38 @@ class Attendance {
     this.event,
   });
 
+
+  factory Attendance.fromMap(Map<String, dynamic> map) {
+    return Attendance(
+      id: map['id'] != null ? map['id'] as int : null,
+      eventId: map['event_id'] != null ? map['event_id'] as int : null,
+      councilPositionId: map['council_position_id'] != null ? map['council_position_id'] as int : null,
+      checkInTime: map['check_in_time'] != null ? map['check_in_time'] as String : null,
+      checkOutTime: map['check_out_time'] != null ? map['check_out_time'] as String : null,
+      checkInCoordinates: map['check_in_coordinates'] != null
+          ? Map<String, double>.from((map['check_in_coordinates'] as Map).map(
+              (key, value) => MapEntry(key, (value as num).toDouble()),
+            ))
+          : null,
+      checkOutCoordinates: map['check_out_coordinates'] != null
+          ? Map<String, double>.from((map['check_out_coordinates'] as Map).map(
+              (key, value) => MapEntry(key, (value as num).toDouble()),
+            ))
+          : null,
+      checkInSelfieUrl: map['check_in_selfie_url'] != null ? map['check_in_selfie_url'] as String : null,
+      checkOutSelfieUrl: map['check_out_selfie_url'] != null ? map['check_out_selfie_url'] as String : null,
+      status: map['status'] != null ? map['status'] as String : null,
+      attendanceTime: map['attendance_time'] != null ? map['attendance_time'] as String : null,
+      deviceId: map['device_id'] != null ? map['device_id'] as String : null,
+      deviceName: map['device_name'] != null ? map['device_name'] as String : null,
+      attendanceAllowed: map['attendance_allowed'] ?? false,
+      notes: map['notes'] != null ? map['notes'] as String : null,
+      createdAt: map['created_at'] != null ? map['created_at'] as String : null,
+      updatedAt: map['updated_at'] != null ? map['updated_at'] as String : null,
+      councilPosition: map['council_position'] != null ? CouncilPosition.fromMap(map['council_position']) : null,
+      event: map['event'] != null ? Event.fromMap(map['event']) : null,
+    );
+  }
   // Factory for JSON
   factory Attendance.fromJson(Map<String, dynamic> json) {
     return Attendance(

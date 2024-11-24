@@ -97,21 +97,30 @@ class _EventPageState extends State<EventPage> {
                                       event: event,
                                    
                                       onViewDetails: () {
-                                          controller.viewEvent(event);
-                                          // AttendanceController.controller.selectAndNavigateToAttendancePage(event);
+                                         Get.back();
+                                         controller.viewEvent(event);
+                                        // AttendanceController.controller.testLoad(event);
+                                        // AttendanceController.controller.selectAndNavigateToAttendancePage(event);
+                                          
                                       },
                                       onViewAttendance: () {
-                                        print("View attendance for event ID: 123");
-                                        // Navigate to attendance page
+                                         if (event.id != null) {
+                                         Get.back();
+                                         AttendanceController.controller.selectAndNavigateToAttendanceRecord(event);
+                                        }
                                       },
                                       onUpdateEvent: () {
                                        if (event.id != null) {
+                                                                                Get.back();
+
                                           controller
                                               .selectItemAndNavigateToUpdatePage(event);
                                         }
                                       },
                                       onDeleteEvent: () {
                                          if (event.id != null) {
+                                                                                  Get.back();
+
                                                      controller.delete(event.id!);
                                         }
                                       },

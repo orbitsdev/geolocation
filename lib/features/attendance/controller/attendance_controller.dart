@@ -9,7 +9,9 @@ import 'package:geolocation/core/modal/modal.dart';
 import 'package:geolocation/core/services/firebase_service.dart';
 import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/attendance/confirm_attendance_page.dart';
+import 'package:geolocation/features/attendance/event_attendance_list_page.dart';
 import 'package:geolocation/features/attendance/make_attendace_page.dart';
+import 'package:geolocation/features/attendance/model/attendance.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:geolocation/features/event/model/event.dart';
 import 'package:geolocation/features/event/model/event_attendance.dart';
@@ -29,15 +31,28 @@ class AttendanceController extends GetxController {
   RxBool isWithinRadius = false.obs; // To enable/disable the button
   RxList<Circle> geofenceCircles = <Circle>[].obs;
   RxList<Marker> markers = <Marker>[].obs;
-  var selectedItem = EventAttendance().obs;
+
   var selfiePath = ''.obs; // Observable for the selfie path
 
   Rxn<Position> checkInPosition = Rxn<Position>();
   Rxn<Position> checkOutPosition = Rxn<Position>();
 
-var uploadProgress = 0.0.obs;
+ var uploadProgress = 0.0.obs;
   GoogleMapController? _googleMapController;
   late StreamSubscription<Position> _positionStream;
+
+   // PAGE DATA
+  var isPageLoading = false.obs;
+  var isScrollLoading = false.obs;
+  var page = 1.obs;
+  var perPage = 20.obs;
+  var lastTotalValue = 0.obs;
+  var hasData = false.obs;
+  var attendance = <Attendance>[].obs;
+  var selectedItem = EventAttendance().obs;
+
+  //for viewing
+  var selectedEvent = Event().obs;
 
   @override
   void onInit() {
@@ -222,17 +237,7 @@ Future<void> calculateInitialDistance() async {
         distanceFilter: 5,
       ),
     ).listen((Position position) {
-      // print('START LESTINGIGN-------------------');
-      // print('----');
-      // final distance = Geolocator.distanceBetween(
-      //   position.latitude,
-      //   position.longitude,
-      //   selectedItem.value.latitude?.toDouble() ?? 0.0,
-      //   selectedItem.value.longitude?.toDouble() ?? 0.0,
-      // );
-
-      // isWithinRadius.value = distance <= (selectedItem.value.radius?.toDouble() ?? 50);
-      // update();
+    
 
 
     final double eventLatitude = selectedItem.value.latitude?.toDouble() ?? 0.0;
@@ -367,6 +372,12 @@ void selectAndNavigateToAttendancePage(Event item) async {
    await Get.to(() => MakeAttendancePage(), arguments: {
           'event':item, 
         });
+}
+
+void selectAndNavigateToAttendanceRecord(Event item) async {
+  selectedEvent(item);
+  update();
+   await Get.to(() => AttendanceListPage());
 }
 
 
@@ -540,4 +551,163 @@ Modal.success(message: isCheckIn
   }
 }
 
+
+
+
+Future<void> testLoad(Event item) async {
+
+
+
+  Modal.loading();
+  var eventId = item.id;
+  var councilId = item.council?.id;
+   var endpoint = '/councils/${councilId}/events/${eventId}/attendance-record';
+
+
+
+  Map<String, dynamic> queryParameters = {
+    'page': page.value,
+    'perPage': perPage.value,
+  };
+
+  var response = await ApiService.getAuthenticatedResource(
+    endpoint,
+    queryParameters: queryParameters,
+  );
+
+  response.fold(
+    (failure) {
+      Get.back();
+      Modal.errorDialog(failure: failure);
+    },
+    (success) {
+            Get.back();
+
+      print('------------------- ATTENDANCE RECORD');
+
+      Attendance newAttendance = Attendance.fromMap((success.data['data'][0]));
+      print(newAttendance.toJson());
+      print('-------------------');
+     
+    },
+  );
+}
+Future<void> loadData() async {
+
+
+  isPageLoading(true);
+  page(1);
+  perPage(20);
+  lastTotalValue(0);
+  attendance.clear();
+  update();
+
+  var eventId = selectedEvent.value.id;
+  var councilId = selectedEvent.value.council?.id;
+
+  // Debug the eventId and councilId
+  print("Event ID: $eventId");
+  print("Council ID: $councilId");
+
+  if (eventId == null || councilId == null) {
+    isPageLoading(false);
+    Modal.errorDialog(message: "Event ID or Council ID is null.");
+    return;
+  }
+
+  var endpoint = '/councils/$councilId/events/$eventId/attendance-record';
+  // var endpoint = '/councils/28/events/8/attendance-record';
+
+  Map<String, dynamic> queryParameters = {
+    'page': page.value,
+    'perPage': perPage.value,
+  };
+
+  var response = await ApiService.getAuthenticatedResource(
+    endpoint,
+    queryParameters: queryParameters,
+  );
+
+  response.fold(
+    (failure) {
+      isPageLoading(false);
+      update();
+      Modal.errorDialog(failure: failure);
+    },
+    (success) {
+      print('------------------- ATTENDA RECORD');
+      print(success.data['data'][0]['check_out_coordinates']);
+      print('-------------------');
+      var data = success.data;
+
+      
+
+      List<Attendance> newData = (data['data'] as List<dynamic>)
+          .map((record) => Attendance.fromMap(record))
+          .toList();
+
+      attendance(newData);
+      page.value++;
+      lastTotalValue.value = data['pagination']['total'];
+      hasData.value = attendance.length < lastTotalValue.value;
+      isPageLoading(false);
+      update();
+    },
+  );
+}
+
+
+
+
+  
+  void loadOnScroll() async {
+    if (isScrollLoading.value) return;
+
+    isScrollLoading(true);
+    update();
+   
+  
+  var eventId = selectedItem.value.id;
+  var councilId = selectedItem.value.council?.id;
+
+  
+  var endpoint = '/councils/$councilId/events/$eventId/attendance-record';
+
+   
+    Map<String, dynamic> queryParameters = {
+      'page': page.value,
+      'perPage': perPage.value,
+    };
+
+
+    var response = await ApiService.getAuthenticatedResource(endpoint,
+        queryParameters: queryParameters);
+    response.fold((failed) {
+      isScrollLoading(false);
+      update();
+      Modal.errorDialog(failure: failed);
+    }, (success) {
+      isScrollLoading(false);
+      update();
+
+      var data = success.data;
+      if (lastTotalValue.value != data['pagination']['total']) {
+        loadData();
+        return;
+      }
+
+      if (attendance.length == data['pagination']['total']) {
+        return;
+      }
+
+      List<Attendance> newData = (data['data'] as List<dynamic>)
+          .map((task) => Attendance.fromMap(task))
+          .toList();
+      attendance.addAll(newData);
+      page.value++;
+      lastTotalValue.value = data['pagination']['total'];
+      hasData.value = attendance.length < lastTotalValue.value;
+      update();
+    });
+  }
 }
