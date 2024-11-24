@@ -12,6 +12,7 @@ import 'package:geolocation/core/theme/app_theme.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:geolocation/features/auth/middleware/auth_middleware.dart';
 import 'package:geolocation/features/auth/middleware/guest_middleware.dart';
+import 'package:geolocation/features/collections/collection_page.dart';
 import 'package:geolocation/features/council_positions/pages/create_or_edit_council_member_page.dart';
 import 'package:geolocation/features/councils/pages/council_list_page.dart';
 import 'package:geolocation/features/event/event_page.dart';
@@ -141,6 +142,7 @@ class _GeoLocationAppState extends State<GeoLocationApp>  with WidgetsBindingObs
         GetPage(name: '/create-or-edit', page: () => CreateOrEditCouncilMemberPage(), middlewares: []),
 
         GetPage(name: '/tasks', page: () => MemberTaskPage(), middlewares: []),
+        GetPage(name: '/collections', page: () => CollectionPage(), middlewares: []),
         GetPage(name: '/events', page: () => EventPage(), middlewares: []),
 
         GetPage(name: '/notifications', page: () => NotificationPage(), middlewares: []),

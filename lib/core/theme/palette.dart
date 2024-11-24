@@ -54,4 +54,8 @@ static Color  SHIMMER1 = Color(0xFFefefef);
 static Color  SHIMMER2 = Color(0xFFefefef);
 static Color  SHIMMER3 = Color(0xffF7F7F7);
 
+
+//FINAL COLOR
+static Color  FBG = Color(0xffF4F4F4);
+static Color  FBGPRIMARY = Color(0xff3EB075);
 }

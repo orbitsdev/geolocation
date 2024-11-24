@@ -2,46 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
-import 'package:geolocation/core/globalwidget/custom_tab_indicator.dart';
-import 'package:geolocation/core/globalwidget/custom_tab_indicator2.dart';
-import 'package:geolocation/core/globalwidget/icon_with_badge.dart';
-import 'package:geolocation/core/globalwidget/images/online_image.dart';
 import 'package:geolocation/core/globalwidget/ripple_container.dart';
-import 'package:geolocation/core/globalwidget/tittle_with_icon_action.dart';
-import 'package:geolocation/core/globalwidget/to_sliver.dart';
-import 'package:geolocation/core/localdata/sample_data.dart';
-import 'package:geolocation/core/theme/game_pallete.dart';
-import 'package:geolocation/core/theme/palette.dart';
-import 'package:geolocation/features/auth/controller/auth_controller.dart';
-import 'package:geolocation/features/auth/model/user.dart';
-import 'package:geolocation/features/collections/collection_page.dart';
-import 'package:geolocation/features/council_positions/controller/council_position_controller.dart';
-import 'package:geolocation/features/councils/controller/council_controller.dart';
-import 'package:geolocation/features/councils/pages/council_list_page.dart';
-import 'package:geolocation/features/event/event_page.dart';
-import 'package:geolocation/features/file/file_page.dart';
-import 'package:geolocation/features/home/all_tab.dart';
-import 'package:geolocation/features/home/attendance_tab.dart';
-import 'package:geolocation/features/home/collections_tab.dart';
-import 'package:geolocation/features/home/dashboard/widget/event_time_line_tile.dart';
-import 'package:geolocation/features/home/dashboard/widget/event_time_line_tile_active.dart';
-import 'package:geolocation/features/home/dashboard/widget/member_user_card.dart';
 import 'package:geolocation/features/home/dashboard/widget/over_all_card.dart';
 import 'package:geolocation/features/home/dashboard/widget/profile_section.dart';
-import 'package:geolocation/features/home/files_tab.dart';
-import 'package:geolocation/features/home/posts_tab.dart';
-import 'package:geolocation/core/globalwidget/scroll_container.dart';
-import 'package:geolocation/features/council_positions/pages/council_member_position_list_page.dart';
-import 'package:geolocation/features/notification/notification_page.dart';
-import 'package:geolocation/features/post/post_page.dart';
-import 'package:geolocation/features/post/widget/post_card.dart';
-import 'package:geolocation/features/task/controller/task_controller.dart';
-import 'package:geolocation/features/task/member_task_page.dart';
-import 'package:geolocation/features/task/task_page.dart';
 import 'package:get/get.dart';
-import 'package:heroicons/heroicons.dart';
-import 'package:sliver_tools/sliver_tools.dart';
-import 'package:timeline_tile/timeline_tile.dart';
+import 'package:geolocation/core/theme/palette.dart';
+import 'package:geolocation/features/auth/controller/auth_controller.dart';
+import 'package:geolocation/features/council_positions/controller/council_position_controller.dart';
+import 'package:geolocation/features/councils/controller/council_controller.dart';
+import 'package:geolocation/features/task/controller/task_controller.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({Key? key}) : super(key: key);
@@ -50,47 +19,29 @@ class DashboardPage extends StatefulWidget {
   State<DashboardPage> createState() => _DashboardPageState();
 }
 
-class _DashboardPageState extends State<DashboardPage>
-    with SingleTickerProviderStateMixin {
+class _DashboardPageState extends State<DashboardPage> {
   final ScrollController scrollController = ScrollController();
   final councilController = Get.find<CouncilController>();
-  final authcontroller = Get.find<AuthController>();
+  final authController = Get.find<AuthController>();
   final positionController = Get.find<CouncilPositionController>();
-  late TabController _tabController;
+
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 5, vsync: this);
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      loadData();
-
-      scrollController.addListener(() {
-        if (scrollController.position.pixels ==
-            scrollController.position.maxScrollExtent) {}
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
+    WidgetsBinding.instance.addPostFrameCallback((_) => loadData());
   }
 
   Future<void> loadData() async {
-    final User currentUser = AuthController.controller.user.value;
+    final user = AuthController.controller.user.value;
 
-    if (currentUser.isAdmin()) {
+    if (user.isAdmin()) {
       await councilController.fetchCouncils();
-      
-    } else if (!currentUser.isAdmin() && currentUser.hasAccess()) {
-      final councilId = currentUser.defaultPosition?.councilId;
+    } else if (!user.isAdmin() && user.hasAccess()) {
+      final councilId = user.defaultPosition?.councilId;
       if (councilId != null) {
-        CouncilPositionController.controller.setCouncilId(councilId);
-        await CouncilPositionController.controller.fetchCouncilMembers();
+        positionController.setCouncilId(councilId);
+        await positionController.fetchCouncilMembers();
         await TaskController.controller.loadTask();
-        
       }
     }
   }
@@ -98,295 +49,150 @@ class _DashboardPageState extends State<DashboardPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Palette.BACKGROUND,
+      backgroundColor: Palette.FBG,
       body: SafeArea(
         child: RefreshIndicator(
-          triggerMode: RefreshIndicatorTriggerMode.anywhere,
-          onRefresh: () => loadData(),
+          onRefresh: loadData,
           child: CustomScrollView(
-            physics: AlwaysScrollableScrollPhysics(),
+            physics:  const AlwaysScrollableScrollPhysics(),
             controller: scrollController,
             slivers: [
               ProfileSection(),
-              SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                sliver: ToSliver(
-                    child: Text(
-                  'Dashboard',
-                  style: Get.textTheme.headlineMedium
-                      ?.copyWith(fontWeight: FontWeight.bold),
-                )),
-              ),
-              SliverGap(16),
-              GetBuilder<AuthController>(
-                builder: (authController) {
-                  return authController.user.value.isAdmin()
-                      ? ToSliver(
-                          child: RippleContainer(
-                            onTap: () => Get.to(() => CouncilListPage(),
-                                transition: Transition.cupertino),
-                            child: GetBuilder<CouncilController>(
-                              builder: (councilController) {
-                                return OverAllCard(
-                                  icon: FaIcon(FontAwesomeIcons.users,
-                                      size: 34, color: Colors.white), // Members
-                                  title: 'Councils',
-                                  // Dynamic count using the observable list length
-                                  count:
-                                      '${councilController.councils.length}', // Dynamic council count
-                                );
-                              },
-                            ),
-                          ),
-                        )
-                      : ToSliver(child: Container());
-                },
-              ),
-
-              Obx(() {
-                return authcontroller.user.value.hasAccess()
-                    ? MultiSliver(children: [
-                        Obx(
-                          () => ToSliver(
-                              child: RippleContainer(
-                            onTap: () {
-                              if (positionController.isPageLoading.value == false) {
-                                   positionController.selectAndNavigateToCouncilMemberPage(authcontroller.user.value.defaultPosition?.councilId as int);
-                              }
-                            },
-                            child: OverAllCard(
-                              isLoading: positionController.isPageLoading.value,
-                              icon: FaIcon(FontAwesomeIcons.tasks,
-                                  size: 34, color: Colors.white), // Tasks
-                              title: 'Members',
-                              count:
-                                  '${positionController.councilMembers.length}',
-                            ),
-                          )),
-                        ),
-                        GetBuilder<TaskController>(
-                          builder: (taskcontroller) {
-                            return ToSliver(
-                                child: RippleContainer(
-                              onTap: () => Get.to(() => MemberTaskPage(),
-                                  transition: Transition.cupertino),
-                              child: OverAllCard(
-                                isLoading: taskcontroller.isLoading.value,
-                                icon: FaIcon(FontAwesomeIcons.tasks,
-                                    size: 34, color: Colors.white), // Tasks
-                                title: 'Tasks',
-                                count: '${taskcontroller.tasks.length}',
-                              ),
-                            ));
-                          }
-                        ),
-                        ToSliver(
-                            child: RippleContainer(
-                          onTap: () => Get.to(() => PostPage(),
-                              transition: Transition.cupertino),
-                          child: OverAllCard(
-                            icon: FaIcon(FontAwesomeIcons.bullhorn,
-                                size: 34, color: Colors.white), // Posts
-                            title: 'Posts',
-                            count: '58',
-                          ),
-                        )),
-                        ToSliver(
-                            child: RippleContainer(
-                          onTap: () => Get.to(() => CollectionPage(),
-                              transition: Transition.cupertino),
-                          child: OverAllCard(
-                            icon: FaIcon(FontAwesomeIcons.solidFolder,
-                                size: 34, color: Colors.white), // Collections
-                            title: 'Collections',
-                            count: '180',
-                          ),
-                        )),
-                        ToSliver(
-                            child: RippleContainer(
-                          onTap: () => Get.to(() => EventPage(),
-                              transition: Transition.cupertino),
-                          child: OverAllCard(
-                            icon: FaIcon(FontAwesomeIcons.calendarCheck,
-                                size: 34, color: Colors.white), // Events
-                            title: 'Events',
-                            count: '16',
-                          ),
-                        )),
-                        ToSliver(
-                            child: RippleContainer(
-                          onTap: () => Get.to(() => FilesPage(),
-                              transition: Transition.cupertino),
-                          child: OverAllCard(
-                            icon: FaIcon(FontAwesomeIcons.folderOpen,
-                                size: 34, color: Colors.white), // Files
-                            title: 'Files',
-                            count: '87',
-                          ),
-                        )),
-                      ])
-                    : ToSliver(child: Container());
-              }),
-              //     ToSliver(child: RippleContainer(
-              // onTap: ()=> Get.to(()=> CouncilPositionListPage(),transition: Transition.cupertino),
-              // child: OverAllCard(
-              //   icon: FaIcon(FontAwesomeIcons.users, size: 34, color: Colors.white), // Members
-              //   title: 'Members',
-              //   count: '242',
-              // ),
-              //     )),
-
-              // SliverPadding(
-              //   padding: EdgeInsets.symmetric(
-              //     horizontal: 16,
-              //   ),
-              //   sliver: ToSliver(
-              //     child: Container(
-              //       height: 90, // Explicit height
-
-              //       child: ListView.builder(
-              //         scrollDirection: Axis.horizontal,
-              //         itemCount: 10,
-              //         itemBuilder: (context, index) {
-              //           return MemberUserCard();
-              //         },
-              //       ),
-              //     ),
-              //   ),
-              // ),
-              // SliverGap(24),
-              // ToSliver(
-              //     child: TittleWithIconAction(
-              //   title: 'Upcoming Events',
-              //   onTap: () {
-              //     Get.to(() => EventPage(), transition: Transition.cupertino);
-              //   },
-              // )),
-
-              // SliverPadding(
-              //   padding: EdgeInsets.symmetric(
-              //     horizontal: 16,
-              //   ),
-              //   sliver: SliverAlignedGrid.count(
-
-              //       //  SliverMasonryGrid.count(
-              //       crossAxisSpacing: 0,
-              //       mainAxisSpacing: 6,
-              //       itemCount: 3,
-              //       // childCount: sampleProductCategory.length,
-              //       crossAxisCount: 1,
-              //       itemBuilder: (context, index) {
-              //         if (index == 0) {
-              //           return EventTimeLineTileActive();
-              //         } else {
-              //           return EventTimeLineTile();
-              //         }
-              //       }),
-              // ),
-
-              // SliverGap(24),
-              // ToSliver(
-              //     child: TittleWithIconAction(
-              //   title: 'Recent Post',
-              //   onTap: () {
-              //     Get.to(() => PostPage(), transition: Transition.cupertino);
-              //   },
-              // )),
-
-              // SliverPadding(
-              //   padding: EdgeInsets.symmetric(
-              //     horizontal: 16,
-              //   ),
-              //   sliver: SliverAlignedGrid.count(
-
-              //       //  SliverMasonryGrid.count(
-              //       crossAxisSpacing: 0,
-              //       mainAxisSpacing: 6,
-              //       itemCount: 3,
-              //       // childCount: sampleProductCategory.length,
-              //       crossAxisCount: 1,
-              //       itemBuilder: (context, index) {
-              //         return PostCard();
-              //         })
-              // ),
-
-              // SliverGap(24),
-              // SliverPadding(
-              //   padding: const EdgeInsets.only(left: 16),
-              //   sliver: ToSliver(
-              //     child: TabBar(
-              //         padding: EdgeInsets.all(0),
-              //         tabAlignment: TabAlignment.start,
-              //         dividerColor: Colors.transparent,
-              //         labelStyle: Get.textTheme.bodyLarge
-              //             ?.copyWith(fontWeight: FontWeight.bold),
-              //         isScrollable: true,
-              //         controller: _tabController,
-              //         labelColor: Palette.DARK_PRIMARY,
-              //         unselectedLabelStyle: Get.textTheme.bodyMedium
-              //             ?.copyWith(color: Palette.BLACK_SIMI),
-              //         unselectedLabelColor: Palette.LIGHT_PRIMARY,
-              //         indicatorSize: TabBarIndicatorSize.tab,
-              //         // indicator: BoxDecoration(
-              //         //   borderRadius: BorderRadius.circular(4),
-              //         //   gradient: LinearGradient(
-              //         //     begin: Alignment.topCenter,
-              //         //     end: Alignment.bottomCenter,
-              //         //     colors: [
-              //         //       Palette.PRIMARY,
-              //         //       Palette.DARK_PRIMARY,
-              //         //     ],
-              //         //   ),
-              //         // ),
-              //         tabs: [
-              //           Tab(
-              //             child: Text(
-              //               "All".toUpperCase(),
-              //             ),
-              //           ),
-              //           Tab(
-              //             child: Text(
-              //               "ATTENDANCE".toUpperCase(),
-              //             ),
-              //           ),
-              //           Tab(
-              //             child: Text(
-              //               "POST".toUpperCase(),
-              //             ),
-              //           ),
-              //           Tab(
-              //             child: Text(
-              //               "COLLECTIONS".toUpperCase(),
-              //             ),
-              //           ),
-              //           Tab(
-              //             child: Text(
-              //               "FILES".toUpperCase(),
-              //             ),
-              //           ),
-              //         ]),
-              //   ),
-              // ),
-
-              // SliverFillRemaining(
-              //     child: Container(
-              //   height: 300,
-              //   child: TabBarView(
-              //     controller: _tabController,
-              //     children: [
-              //       AllTab(),
-              //       AttendanceTab(),
-              //       PostsTab(),
-              //       CollectionsTab(),
-              //       FilesTab(),
-              //     ],
-              //   ),
-              // ))
-
-              SliverGap(Get.size.height * 0.05)
+              SliverGap(24),
+              // _buildDashboardTitle(),
+              _buildGridContent(),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  // Profile Section
+  Widget _buildProfileSection() {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Text(
+          'Welcome, ${authController.user.value.fullName}',
+          style: Get.textTheme.headlineSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Dashboard Title
+  Widget _buildDashboardTitle() {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Text(
+          'Dashboard',
+          style: Get.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+  }
+
+  // Grid Content
+  Widget _buildGridContent() {
+    return Obx(() {
+      final user = authController.user.value;
+
+      final gridItems = <Widget>[];
+
+      if (user.isAdmin()) {
+        gridItems.add(_buildGridItem(
+          icon: FontAwesomeIcons.users,
+          title: 'Councils',
+          count: councilController.councils.length.toString(),
+          onTap: () => Get.toNamed('/councils'),
+        ));
+      }
+
+      if (user.hasAccess()) {
+        gridItems.addAll([
+          _buildGridItem(
+            icon: FontAwesomeIcons.tasks,
+            title: 'Members',
+            count: positionController.councilMembers.length.toString(),
+            isLoading: positionController.isPageLoading.value,
+            onTap: () => positionController.selectAndNavigateToCouncilMemberPage(
+              user.defaultPosition?.councilId ?? 0,
+            ),
+          ),
+          _buildGridItem(
+            icon: FontAwesomeIcons.tasks,
+            title: 'Tasks',
+            count: TaskController.controller.tasks.length.toString(),
+            isLoading: TaskController.controller.isLoading.value,
+            onTap: () => Get.toNamed('/tasks'),
+          ),
+
+            _buildGridItem(
+            icon: FontAwesomeIcons.calendarCheck,
+            title: 'Events',
+            count: '16',
+            onTap: () => Get.toNamed('/events'),
+          ),
+            _buildGridItem(
+            icon: FontAwesomeIcons.solidFolder,
+            title: 'Collections',
+            count: '180',
+            onTap: () => Get.toNamed('/collections'),
+          ),
+          _buildGridItem(
+            icon: FontAwesomeIcons.bullhorn,
+            title: 'Posts',
+            count: '58',
+            onTap: () => Get.toNamed('/posts'),
+          ),
+        
+        
+          _buildGridItem(
+            icon: FontAwesomeIcons.folderOpen,
+            title: 'Files',
+            count: '87',
+            onTap: () => Get.toNamed('/files'),
+          ),
+        ]);
+      }
+
+      return SliverPadding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        sliver: SliverGrid(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            childAspectRatio: 1,
+          ),
+          delegate: SliverChildBuilderDelegate(
+            (context, index) => gridItems[index],
+            childCount: gridItems.length,
+          ),
+        ),
+      );
+    });
+  }
+
+  // Grid Item
+  Widget _buildGridItem({
+    required IconData icon,
+    required String title,
+    required String count,
+    VoidCallback? onTap,
+    bool isLoading = false,
+  }) {
+    return RippleContainer(
+      onTap: onTap,
+      child: OverAllCard(
+        icon: FaIcon(icon, size: 34, color: Colors.white),
+        title: title,
+        count: count,
+        isLoading: isLoading,
       ),
     );
   }

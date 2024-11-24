@@ -384,6 +384,7 @@ class TaskController extends GetxController {
         deleteMediaFromServer(mediaFile.id ?? 0);
       },
       onCancel: () {
+        Get.back();
         // Optional cancel logic if needed
       },
       confirmText: 'Delete',

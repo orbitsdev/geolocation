@@ -1,68 +1,80 @@
 import 'package:flutter/material.dart';
 import 'package:geolocation/core/globalwidget/circular_loading.dart';
 import 'package:geolocation/core/theme/game_pallete.dart';
+import 'package:geolocation/core/theme/palette.dart';
 import 'package:get/get.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
 class OverAllCard extends StatelessWidget {
   final String title;
   final Widget icon;
   final String count;
-  bool? isLoading;
+  final bool? isLoading;
 
   OverAllCard({
     Key? key,
     required this.title,
     required this.icon,
     required this.count,
-     this.isLoading,
+    this.isLoading,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: BoxConstraints(
-      ),
-      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      padding: EdgeInsets.all(16),
+      width: Get.size.width,
+      padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(12),
         gradient: LinearGradient(
           colors: [
-            GamePalette.darkBackground,
-            GamePalette.tealGreen,
+            // GamePalette.darkBackground,
+            Palette.PRIMARY,
+            Palette.PRIMARY
+            // GamePalette.tealGreen,
           ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            offset: Offset(0, 4),
-            blurRadius: 8,
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          begin: Alignment.bottomRight,
+          end: Alignment.topLeft,
+        ),),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          icon,
-          SizedBox(width: 16),
-          Expanded(
-            child: Text(
-              title,
-              style: Get.textTheme.titleMedium?.copyWith(
-                color: GamePalette.textWhite,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+          // Icon Section
+          Container(
+            // padding: const EdgeInsets.all(12),
+            // decoration: BoxDecoration(
+            //   shape: BoxShape.circle,
+            //   gradient: LinearGradient(
+            //     colors: [
+            //       GamePalette.tealGreen,
+            //       GamePalette.darkBackground,
+            //     ],
+            //     begin: Alignment.topLeft,
+            //     end: Alignment.bottomRight,
+            //   ),
+            // ),
+            child: icon,
           ),
-          (isLoading ==  true)? CircularLoading() : Text(
-            count,
-            style: Get.textTheme.headlineSmall?.copyWith(
+          const SizedBox(height: 8),
+          // Title Section
+          Text(
+            title,
+            style: Get.textTheme.bodyLarge?.copyWith(
+              fontWeight: FontWeight.w600,
               color: GamePalette.textWhite,
-              fontWeight: FontWeight.bold,
             ),
+            textAlign: TextAlign.center,
           ),
+          const SizedBox(height: 8),
+          // Count Section
+          isLoading == true
+              ? CircularLoading()
+              : Text(
+                  '${count}',
+                  style: Get.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: GamePalette.textWhite,
+                  ),
+                ),
         ],
       ),
     );
