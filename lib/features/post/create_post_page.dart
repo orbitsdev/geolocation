@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:geolocation/core/globalwidget/file_preview.dart';
+import 'package:geolocation/core/globalwidget/progress_bar_submit.dart';
 import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/post/controller/post_controller.dart';
 import 'package:get/get.dart';
@@ -40,6 +42,24 @@ class CreatePostPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+
+                   Obx(() {
+                                      if (controller.isLoading.value) {
+                                        return Container(
+                                              margin: EdgeInsets.only(bottom: 12),
+                                              child: controller
+                                                      .mediaFiles.isNotEmpty
+                                                  ? ProgressBarSubmit(
+                                                      progress:
+                                                          controller
+                                                              .uploadProgress.value)
+                                                  : LinearProgressIndicator());
+                                      } else {
+                                        return  SizedBox(
+                                              height:
+                                                  8); // Placeholder when not loading
+                                      }
+                                    }),
                   // Title Field
                   Text(
                     'Title',
@@ -159,37 +179,55 @@ class CreatePostPage extends StatelessWidget {
                       } else {
                         // Display media files
                         File file = controller.mediaFiles[index - 1];
-                        return Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            GestureDetector(
-                              onTap: () => controller.viewFile(file),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[300],
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: file.path.endsWith('.mp4')
-                                    ? const Icon(Icons.play_circle, size: 40)
-                                    : Image.file(file, fit: BoxFit.cover),
-                              ),
-                            ),
-                            Positioned(
-                              top: -10,
-                              right: -10,
-                              child: GestureDetector(
-                                onTap: () => controller.removeFileLocal(index - 1),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.red,
-                                  ),
-                                  padding: const EdgeInsets.all(4),
-                                  child: const Icon(Icons.close, color: Colors.white, size: 16),
-                                ),
-                              ),
-                            ),
-                          ],
+                        return GestureDetector(
+                          onTap: () {
+                                                              controller
+                                                                  .viewFile(file);
+                                                            },
+                          child: Stack(
+                                                                clipBehavior: Clip.none,
+                                                                children: [
+                                                                  FilePreviewWidget(filePath: file.path),
+                                                                  // "X" button to remove the file
+                                                                  Positioned(
+                                                                    top: -10,
+                                                                    right: -10,
+                                                                    child: GestureDetector(
+                                                                      behavior: HitTestBehavior
+                                                                          .opaque, // Makes the entire area tappable
+                                                                      onTap: () =>
+                                                                          controller.removeFileLocal(  index - 1), 
+                                                                      child: Container(
+                                                                        decoration: BoxDecoration(
+                                                                          shape: BoxShape.circle,
+                                                                          gradient:
+                                                                              LinearGradient(
+                                                                            colors: [
+                                                                              Colors.black
+                                                                                  .withOpacity(
+                                                                                      0.7),
+                                                                              Colors.black
+                                                                                  .withOpacity(
+                                                                                      0.4),
+                                                                            ],
+                                                                            begin:
+                                                                                Alignment.topLeft,
+                                                                            end: Alignment
+                                                                                .bottomRight,
+                                                                          ),
+                                                                        ),
+                                                                        padding: EdgeInsets.all(
+                                                                            4), // Larger touch area
+                                                                        child: Icon(
+                                                                          Icons.close,
+                                                                          color: Colors.white,
+                                                                          size: 16,
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  )
+                                                                ],
+                                                              ),
                         );
                       }
                     },

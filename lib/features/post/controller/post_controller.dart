@@ -1,11 +1,15 @@
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocation/core/api/dio/api_service.dart';
 import 'package:geolocation/core/globalwidget/browser_view_page.dart';
 import 'package:geolocation/core/globalwidget/images/local_file_image_full_screen_display.dart';
 import 'package:geolocation/core/modal/modal.dart';
+import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/file/model/media_file.dart';
 import 'package:geolocation/features/post/model/post.dart';
 import 'package:geolocation/features/video/file_viewer.dart';
@@ -36,72 +40,99 @@ class PostController extends GetxController {
 
   Future<void> loadData() async {}
   Future<void> loadDataOnScroll() async {}
+
   Future<void> createPost() async {
-    if (formKey.currentState?.saveAndValidate() ?? false) {
-      isLoading(true);
-      update();
+  if (formKey.currentState?.saveAndValidate() ?? false) {
+    isLoading(true);
+    update();
 
-      try {
-
-         var formData = formKey.currentState!.value;
+    try {
+      Modal.loading();
+      // Gather form data
+      var formValues = formKey.currentState!.value;
 
       // Debug print to log form data
       print("Form Data:------------");
-      formData.forEach((key, value) {
+      formValues.forEach((key, value) {
         print("$key: $value");
       });
 
-      // Prepare files for API
-      var mediaFilesData = mediaFiles.map((file) => file.path).toList();
+      // Prepare FormData for API request
+      var formData = dio.FormData();
+
+      // Add form fields to FormData
+      // Add form fields to FormData
+formValues.forEach((key, value) {
+  // Ensure boolean for `is_publish` field
+  if (key == 'is_publish' && value is bool) {
+    formData.fields.add(MapEntry(key, value ? '1' : '0')); // Send as 1 or 0 for boolean
+  } else {
+    formData.fields.add(MapEntry(key, value.toString()));
+  }
+});
+
+      // is_publish
+
+      // Add media files to FormData
+      for (var file in mediaFiles) {
+        formData.files.add(MapEntry(
+          'media[]',
+          await dio.MultipartFile.fromFile(
+            file.path,
+            filename: file.path.split('/').last,
+          ),
+        ));
+      }
 
       // Debug print to log media files
       print("Media Files------------------");
       for (var file in mediaFiles) {
         print("File Path: ${file.path}");
       }
-        // Prepare files for API
-        // var mediaFilesData = mediaFiles.map((file) => file.path).toList();
+      // return;
+      // API Endpoint
+      String endpoint = '/posts';
 
-        // var formData = dio.FormData();
+      // Make API call
+      var response = await ApiService.filePostAuthenticatedResource(
+        endpoint,
+        formData,
+        onSendProgress: (int sent, int total) {
+          uploadProgress.value = sent / total;
+          update();
+        },
+      );
 
-        // // Add media files to FormData
-        // for (var file in mediaFiles) {
-        //   formData.files.add(MapEntry(
-        //     'media[]',
-        //     await dio.MultipartFile.fromFile(file.path,
-        //         filename: file.path.split('/').last),
-        //   ));
-        // }
-        // String endpoint = '';
-        // var response = await ApiService.filePostAuthenticatedResource(
-        //   endpoint,
-        //   formData,
-        //   onSendProgress: (int sent, int total) {
-        //     uploadProgress.value = sent / total;
-        //     update();
-        //   },
-        // );
-        // response.fold((failure) {
-        //   isLoading(false);
-
-        //   uploadProgress.value = 0.0;
-        //   update();
-        //   Modal.errorDialog(failure: failure);
-        // }, (success) {
-        //   isLoading(false);
-        //   uploadProgress.value = 0.0;
-        //   mediaFiles.clear();
-        //   Modal.success(message: 'Upload  File! Success 🎉');
-        // });
-      } catch (e) {
-        Get.back();
-        isLoading(false);
-        uploadProgress.value = 0.0;
-        update();
-        Modal.errorDialog(message: 'An error occurred. Please try again.${e}');
-      }
+      response.fold(
+        (failure) {
+          Get.back();
+          isLoading(false);
+          uploadProgress.value = 0.0;
+          update();
+          Modal.errorDialog(failure: failure);
+        },
+        (success) {
+             Get.back();
+          isLoading(false);
+          uploadProgress.value = 0.0;
+          mediaFiles.clear();
+          Modal.success(message: 'Post created successfully!');
+          Get.offNamedUntil('/posts', (route) => route.isFirst);
+        },
+      );
+    } catch (e) {
+      isLoading(false);
+      uploadProgress.value = 0.0;
+      update();
+      Modal.errorDialog(message: 'An error occurred. Please try again. ${e}');
+    } finally {
+      update();
     }
+  } else {
+    Modal.showToast(msg: 'Please complete the form.');
   }
+}
+
 
   Future<void> updatePost() async {}
   Future<void> deletePost() async {}
@@ -124,7 +155,98 @@ class PostController extends GetxController {
     }
   }
 
-  Future<void> pickFile() async {}
+  
+  
+
+  Future<void> pickFile() async {
+  const int maxFileSize = 50 * 1024 * 1024; // 50 MB in bytes
+  const allowedExtensions = ['jpg', 'jpeg', 'png', 'mp4', 'mov', 'avi', 'webm']; // Expanded video formats
+
+  if (mediaFiles.length >= 30) {
+    Modal.showToast(
+      msg: 'Limit Reached. You can only upload a maximum of 30 files.',
+      color: Palette.RED,
+      toastLength: Toast.LENGTH_LONG,
+    );
+    return;
+  }
+
+  // Show loading modal to prevent interaction during file picking
+  Modal.androidDialogNoContext();
+
+  try {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: allowedExtensions, // Allow common video formats
+      allowMultiple: true,
+    );
+
+    if (result != null) {
+      for (var file in result.files) {
+        // Check file size
+        if (file.size > maxFileSize) {
+          Modal.showToast(
+            msg: 'File "${file.name}" is too large. Maximum size is 50 MB.',
+            color: Palette.RED,
+            toastLength: Toast.LENGTH_LONG,
+          );
+          continue; // Skip this file and continue with others
+        }
+
+        // Check if file type is allowed
+        final fileExtension = file.extension?.toLowerCase();
+        if (fileExtension == null || !allowedExtensions.contains(fileExtension)) {
+          Modal.showToast(
+            msg: 'File "${file.name}" is not a valid format. Allowed formats are: ${allowedExtensions.join(", ")}.',
+            color: Palette.RED,
+            toastLength: Toast.LENGTH_LONG,
+          );
+          continue; // Skip invalid file types
+        }
+
+        // Additional check for video files
+        if (['mov', 'avi', 'webm'].contains(fileExtension) && !file.path!.endsWith(".mp4")) {
+          Modal.showToast(
+            msg: 'File "${file.name}" may not be viewable on all devices. Converting to mp4 is recommended.',
+            color: Palette.YELLOW,
+            toastLength: Toast.LENGTH_LONG,
+          );
+        }
+
+        // Limit to 6 files
+        if (mediaFiles.length < 6) {
+          mediaFiles.add(File(file.path!));
+        } else {
+          Modal.showToast(
+            msg: 'Limit Reached. You can only upload a maximum of 6 files.',
+            color: Palette.RED,
+            toastLength: Toast.LENGTH_LONG,
+          );
+          break;
+        }
+      }
+      update(); // Update UI after file addition
+    }
+  } on PlatformException catch (e) {
+    // Handle the 'already_active' error gracefully if it occurs
+    if (e.code == 'already_active') {
+      Modal.showToast(
+        msg: 'File picker is already active. Please wait.',
+        color: Palette.RED,
+        toastLength: Toast.LENGTH_SHORT,
+      );
+    } else {
+      Modal.showToast(
+        msg: 'Error picking file. Please try again.',
+        color: Palette.RED,
+        toastLength: Toast.LENGTH_SHORT,
+      );
+    }
+  } finally {
+    Get.back(); // Close loading modal
+  }
+}
+
   Future<void> playFile() async {}
 
   void fullScreenDisplay(List<File> files, File file) {
