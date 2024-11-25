@@ -53,6 +53,8 @@ final DateFormat readableDateFormat = DateFormat('EEEE, MMMM d, yyyy, h:mm a');
   Set<Circle> circles = {};
   Set<Marker> markers = {};
   RxBool isMapReady = false.obs;
+
+    var isPublish = true.obs; // Default to true
   
   @override
   void onInit() {
@@ -137,6 +139,7 @@ final DateFormat readableDateFormat = DateFormat('EEEE, MMMM d, yyyy, h:mm a');
       'description': selectedItem.value.description,
       'start_time': startTime,
       'end_time': endTime,
+      'is_publish': selectedItem.value.isPublish ?? false,
     });
 
     moveCamera(eventOldLocation); // Move the camera to the selected event's location
@@ -360,6 +363,7 @@ markers.clear();
         'radius': '${radius.value}',
         'map_location': selectedLocationDetails.value,
         'place_id': placeId.value,
+        'is_publish': eventData['is_publish'] ?? true,
         'start_time': (eventData['start_time'] as DateTime) .toIso8601String(), // Convert DateTime to String
         'end_time': (eventData['end_time'] as DateTime).toIso8601String(),
       };
@@ -379,10 +383,11 @@ markers.clear();
           WidgetsBinding.instance.addPostFrameCallback((_) {
             Get.back();
             clearData();
-            loadEvents();
+          
             Get.offNamedUntil('/events', (route) => route.isFirst);
             Modal.success(message: 'Event Created',);
               });
+                loadEvents();
        
       });
     } else {
@@ -534,6 +539,7 @@ void updateEvent() async {
       'radius': radius.value,
       'map_location': selectedLocationDetails.value,
       'place_id': placeId.value,
+      'is_publish': eventData['is_publish'] ?? true,
       'start_time': (eventData['start_time'] as DateTime).toIso8601String(),
       'end_time': (eventData['end_time'] as DateTime).toIso8601String(),
     };
@@ -558,10 +564,12 @@ void updateEvent() async {
          WidgetsBinding.instance.addPostFrameCallback((_) {
 
         Get.back();
-        loadEvents();
+      
         clearData(); // Optional: Clear data only if navigating away
+         
         Get.offNamedUntil('/events', (route) => route.isFirst);
         Modal.success(message: 'Event Updated');
+         loadEvents();
          });
       },
     );

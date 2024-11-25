@@ -29,6 +29,7 @@ import 'package:geolocation/features/playground/page1_middleware.dart';
 import 'package:geolocation/features/playground/page2.dart';
 import 'package:geolocation/features/playground/page2_middleware.dart';
 import 'package:geolocation/features/playground/page3.dart';
+import 'package:geolocation/features/post/post_page.dart';
 import 'package:geolocation/features/role/login_selection_page.dart';
 import 'package:geolocation/features/auth/controller/login_controller.dart';
 import 'package:geolocation/features/auth/pages/login_page.dart';
@@ -146,6 +147,7 @@ class _GeoLocationAppState extends State<GeoLocationApp>  with WidgetsBindingObs
         GetPage(name: '/events', page: () => EventPage(), middlewares: []),
 
         GetPage(name: '/notifications', page: () => NotificationPage(), middlewares: []),
+        GetPage(name: '/posts', page: () => PostPage(), middlewares: []),
         
 
 

@@ -440,7 +440,29 @@ class CreateEventPage extends StatelessWidget {
                 ]),
               ),
 
+            
               Gap(16),
+            Column(
+  mainAxisAlignment: MainAxisAlignment.start,
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    Text(
+      'Publish Event',
+      style: Get.textTheme.bodyMedium?.copyWith(color: Palette.LIGHT_TEXT),
+    ),
+   
+    Tooltip(
+      message: 'Enable this to publish the event immediately.',
+      child: FormBuilderSwitch(
+        name: 'is_publish',
+        title: const Text('Publish Event'),
+        initialValue: true, // Default to true
+        decoration: const InputDecoration(border: InputBorder.none),
+      ),
+    ),
+  ],
+),
+
 
               // Google Map for Location
               Text(

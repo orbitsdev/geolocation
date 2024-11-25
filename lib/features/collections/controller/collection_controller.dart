@@ -31,6 +31,8 @@ class CollectionController extends GetxController {
   var collectionItems = <CollectionItem>[].obs; // Dynamic item addition/removal
   var selectedItem = Collection().obs;
 
+  var isPublish = true.obs; // Default to true
+
   /// Fetch collections for a council
   Future<void> loadData() async {
     isPageLoading(true);
@@ -142,6 +144,7 @@ class CollectionController extends GetxController {
       'title': formData['title'],
       'type': formData['chart_type'],
       'description': formData['description'],
+       'is_publish': formData['is_publish'] ?? true, // Include is_publish with default true
       'items': collectionItems.map((item) => {'label': item.label, 'amount': item.amount}).toList(),
     };
 
@@ -164,6 +167,7 @@ class CollectionController extends GetxController {
         isLoading(false);
         update();
               loadData();
+                    clearForm();
         Get.offNamedUntil('/collections', (route) => route.isFirst);
         Modal.success(message: 'Collection created successfully');
             
@@ -195,6 +199,7 @@ class CollectionController extends GetxController {
     'title': formData['title'],
     'type': formData['chart_type'],
     'description': formData['description'],
+    'is_publish': formData['is_publish'],
     'items': collectionItems.map((item) {
       return {
         'id': item.id, // Optional, can be null for new items
@@ -224,6 +229,7 @@ class CollectionController extends GetxController {
       Get.back(); // Close the loading dialog
       isLoading(false);
       update();
+      clearForm();
       loadData();
       Get.offNamedUntil('/collections', (route) => route.isFirst);
       
@@ -281,15 +287,19 @@ class CollectionController extends GetxController {
   void fillForm() {
     if (selectedItem.value.id == null) return;
 
+    print('FILl----------------------');
+    print(selectedItem.value.isPublish);
     final formData = {
       'title': selectedItem.value.title ?? '',
       'chart_type': selectedItem.value.type ?? '',
       'description': selectedItem.value.description ?? '',
+      'is_publish': selectedItem.value.isPublish ?? false,
     };
+    
      WidgetsBinding.instance.addPostFrameCallback((_) {
       formKey.currentState?.patchValue(formData); // Populate the form with values
     collectionItems.value = selectedItem.value.items ?? [];
-    update();
+     isPublish.value = selectedItem.value.isPublish ?? true; // Populate publish state
       update(); // Ensure GetX reflects state
     });
     
@@ -342,9 +352,10 @@ class CollectionController extends GetxController {
 
    void clearForm() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-       selectedItem(Collection());
+    selectedItem(Collection());
     collectionItems.clear();
     formKey.currentState?.reset(); // Reset the form fields
+    update();
     });
    
   }

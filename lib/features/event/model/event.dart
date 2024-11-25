@@ -16,6 +16,7 @@ class Event {
   String? specifiedLocation;
   String? mapLocation;
   String? placeId;
+  bool? isPublish;
   String? startTime;
   String? endTime;
   bool? isActive;
@@ -39,6 +40,7 @@ class Event {
     this.specifiedLocation,
     this.mapLocation,
     this.placeId,
+     this.isPublish,
     this.startTime,
     this.endTime,
     this.isActive,
@@ -63,6 +65,7 @@ class Event {
     String? specifiedLocation,
     String? mapLocation,
     String? placeId,
+        bool? isPublish,
     String? startTime,
     String? endTime,
     bool? isActive,
@@ -86,6 +89,7 @@ class Event {
       specifiedLocation: specifiedLocation ?? this.specifiedLocation,
       mapLocation: mapLocation ?? this.mapLocation,
       placeId: placeId ?? this.placeId,
+           isPublish: isPublish ?? this.isPublish,
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,
       isActive: isActive ?? this.isActive,
@@ -112,6 +116,7 @@ class Event {
       'specified_location': specifiedLocation,
       'map_location': mapLocation,
       'place_id': placeId,
+         'is_publish': isPublish,
       'start_time': startTime,
       'end_time': endTime,
       'is_active': isActive,
@@ -138,6 +143,7 @@ class Event {
       specifiedLocation: map['specified_location'] != null ? map['specified_location'] as String : null,
       mapLocation: map['map_location'] != null ? map['map_location'] as String : null,
       placeId: map['place_id'] != null ? map['place_id'] as String : null,
+            isPublish: map['is_publish'] != null ? map['is_publish'] as bool : null,
       startTime: map['start_time'] != null ? map['start_time'] as String : null,
       endTime: map['end_time'] != null ? map['end_time'] as String : null,
       isActive: map['is_active'] != null ? map['is_active'] as bool : null,
@@ -158,6 +164,6 @@ class Event {
 
   @override
   String toString() {
-    return 'Event(id: $id, title: $title, description: $description, content: $content, latitude: $latitude, longitude: $longitude, radius: $radius, specifiedLocation: $specifiedLocation, mapLocation: $mapLocation, placeId: $placeId, startTime: $startTime, endTime: $endTime, isActive: $isActive, restrictEvent: $restrictEvent, maxCapacity: $maxCapacity, type: $type, createdAt: $createdAt, updatedAt: $updatedAt, council: $council, councilPosition: $councilPosition, total_attendance: $total_attendance)';
+    return 'Event(id: $id, title: $title, description: $description, content: $content, latitude: $latitude, longitude: $longitude, radius: $radius, specifiedLocation: $specifiedLocation, mapLocation: $mapLocation, placeId: $placeId, isPublish: $isPublish, startTime: $startTime, endTime: $endTime, isActive: $isActive, restrictEvent: $restrictEvent, maxCapacity: $maxCapacity, type: $type, createdAt: $createdAt, updatedAt: $updatedAt, council: $council, councilPosition: $councilPosition, total_attendance: $total_attendance)';
   }
 }

@@ -128,15 +128,18 @@ final CollectionController controller = Get.find<CollectionController>();
                     ],
                   ),
                   Gap(8),
-                  ...List.generate(
-                    controller.collectionItems.length,
-                    (index) => Column(
-                      children: [
-                        _buildCollectionItemField(controller, index),
-                        if (index < controller.collectionItems.length - 1) Gap(8), // Add spacing between items
-                      ],
-                    ),
-                  ),
+                 ...controller.collectionItems.isNotEmpty
+    ? List.generate(
+        controller.collectionItems.length,
+        (index) => Column(
+          children: [
+            _buildCollectionItemField(controller, index),
+            if (index < controller.collectionItems.length - 1) Gap(8),
+          ],
+        ),
+      )
+    : [Text('No collection items added yet.')],
+
 
                   Gap(16),
 
@@ -159,6 +162,29 @@ final CollectionController controller = Get.find<CollectionController>();
                       ),
                     ),
                   ),
+  Gap(16),
+            Column(
+  mainAxisAlignment: MainAxisAlignment.start,
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    Text(
+      'Publish Collection',
+      style: Get.textTheme.bodyMedium?.copyWith(color: Palette.LIGHT_TEXT),
+    ),
+   
+    Tooltip(
+      message: 'Enable this to publish the collection immediately.',
+      child: FormBuilderSwitch(
+        name: 'is_publish',
+        title: const Text('Publish Collection'),
+        initialValue: true, // Default to true
+        decoration: const InputDecoration(border: InputBorder.none),
+      ),
+    ),
+  ],
+),
+
+                  
                 ],
               ),
             );
@@ -188,7 +214,10 @@ final CollectionController controller = Get.find<CollectionController>();
             ),
           ),
           onChanged: (value) {
-            controller.collectionItems[index].label = value ?? '';
+            if(controller.collectionItems.isNotEmpty){
+              controller.collectionItems[index].label = value ?? '';
+
+            }
           },
           validator: FormBuilderValidators.required(),
         ),
@@ -213,7 +242,10 @@ final CollectionController controller = Get.find<CollectionController>();
             FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
           ],
           onChanged: (value) {
+            if(controller.collectionItems.isNotEmpty){
             controller.collectionItems[index].amount = double.tryParse(value ?? '0') ?? 0.0;
+
+            }
           },
           validator: FormBuilderValidators.compose([
             FormBuilderValidators.required(),
