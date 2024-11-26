@@ -10,6 +10,7 @@ import 'package:geolocation/core/globalwidget/browser_view_page.dart';
 import 'package:geolocation/core/globalwidget/images/local_file_image_full_screen_display.dart';
 import 'package:geolocation/core/modal/modal.dart';
 import 'package:geolocation/core/theme/palette.dart';
+import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:geolocation/features/file/model/media_file.dart';
 import 'package:geolocation/features/post/model/post.dart';
 import 'package:geolocation/features/video/file_viewer.dart';
@@ -38,8 +39,86 @@ class PostController extends GetxController {
   var selectedItem = Post().obs;
   var isPublish = true.obs;
 
-  Future<void> loadData() async {}
-  Future<void> loadDataOnScroll() async {}
+  Future<void> loadData() async {
+     isLoading(true);
+    page(1);
+    perPage(20);
+    lastTotalValue(0);
+    posts.clear();
+    update();
+    var councilId = AuthController.controller.user.value.defaultPosition?.councilId;
+    Map<String, dynamic> data = {
+      'page': page,
+      'per_page': perPage,
+      'councilId': councilId,
+    };
+
+    print(data);
+
+    var response = await ApiService.getAuthenticatedResource(
+        '/posts/council/${councilId}',
+        queryParameters: data);
+    response.fold((failed) {
+      isLoading(false);
+      update();
+      Modal.errorDialog(failure: failed);
+    }, (success) {
+      var data = success.data;
+      List<Post> newData = (data['data'] as List<dynamic>)
+          .map((task) => Post.fromMap(task))
+          .toList();
+      posts(newData);
+      page.value++;
+      lastTotalValue.value = data['pagination']['total'];
+      hasData.value = posts.length < lastTotalValue.value;
+      isLoading(false);
+      update();
+    });
+  }
+  Future<void> loadDataOnScroll() async {
+    if (isScrollLoading.value) return;
+
+    isScrollLoading(true);
+    update();
+    var councilId =
+        AuthController.controller.user.value.defaultPosition?.councilId;
+    Map<String, dynamic> data = {
+      'page': page,
+      'per_page': perPage,
+      'councilId': councilId,
+    };
+
+    var response = await ApiService.getAuthenticatedResource(
+          '/posts/council/${councilId}',
+        queryParameters: data);
+    response.fold((failed) {
+      isScrollLoading(false);
+      update();
+      Modal.errorDialog(failure: failed);
+    }, (success) {
+      isScrollLoading(false);
+      update();
+
+      var data = success.data;
+      if (lastTotalValue.value != data['pagination']['total']) {
+        loadData();
+        return;
+      }
+
+      if (posts.length == data['pagination']['total']) {
+        return;
+      }
+
+      List<Post> newData = (data['data'] as List<dynamic>)
+          .map((task) => Post.fromMap(task))
+          .toList();
+      posts.addAll(newData);
+      page.value++;
+      lastTotalValue.value = data['pagination']['total'];
+      hasData.value = posts.length < lastTotalValue.value;
+      update();
+    });
+  }
 
   Future<void> createPost() async {
   if (formKey.currentState?.saveAndValidate() ?? false) {

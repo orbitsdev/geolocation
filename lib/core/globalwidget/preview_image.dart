@@ -1,14 +1,18 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
+
 import 'package:geolocation/core/globalwidget/images/online_image.dart';
 
 class PreviewImage extends StatelessWidget {
 
   String url;
+  double? height;
    PreviewImage({
     Key? key,
     required this.url,
+    this.height,
   }) : super(key: key);
+  
 
   @override
   Widget build(BuildContext context){
@@ -16,7 +20,7 @@ class PreviewImage extends StatelessWidget {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(8)
                             ),
-                            height: 85,
+                            height: height ?? 125,
 
                              child: Stack(
                                children: [

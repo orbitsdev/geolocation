@@ -1,229 +1,117 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:geolocation/core/globalwidget/sliver_gap.dart';
 import 'package:geolocation/core/theme/palette.dart';
-import 'package:geolocation/features/post/create_post_page.dart';
+import 'package:geolocation/features/post/controller/post_controller.dart';
+import 'package:geolocation/features/post/model/post.dart';
+import 'package:geolocation/features/post/widget/post_widget.dart';
+import 'package:geolocation/features/post/widget/shimmer_post_widget.dart';
 import 'package:get/get.dart';
 
-class PostPage extends StatelessWidget {
-  const PostPage({Key? key}) : super(key: key);
+class PostPage extends StatefulWidget {
+   PostPage({Key? key}) : super(key: key);
+
+  @override
+  State<PostPage> createState() => _PostPageState();
+}
+
+class _PostPageState extends State<PostPage> {
+  final PostController controller = Get.find<PostController>();
+  final ScrollController newScrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (controller.posts.isEmpty) {
+        controller.loadData();
+      }
+
+      newScrollController.addListener(() async {
+        if (newScrollController.position.pixels >=
+            newScrollController.position.maxScrollExtent - 200) {
+          controller.loadDataOnScroll();
+        }
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.LIGHT_BACKGROUND,
-      body: CustomScrollView(
-        slivers: [
-          // Sliver App Bar for Create Post Button
-          SliverAppBar(
-            backgroundColor: Colors.white,
-            pinned: true,
-            // expandedHeight: 150.0,
-            flexibleSpace: FlexibleSpaceBar(
-              title: Text(
-                'Posts',
-                style: TextStyle(color: Colors.black),
-              ),
-              // background: Image.network(
-              //   'https://via.placeholder.com/600x200',
-              //   fit: BoxFit.cover,
-              // ),
+      body: RefreshIndicator(
+        triggerMode: RefreshIndicatorTriggerMode.anywhere,
+        onRefresh: () => controller.loadData(),
+        child: CustomScrollView(
+          controller: newScrollController,
+          shrinkWrap: true,
+          physics:  AlwaysScrollableScrollPhysics(),
+          slivers: [
+             SliverGap(16), // Add a gap at the top
+
+            // Display shimmer while loading or posts when loaded
+            GetBuilder<PostController>(
+              builder: (controller) {
+                if (controller.isLoading.value) {
+                  return SliverMasonryGrid.count(
+                    crossAxisCount: 1,
+                    mainAxisSpacing: 8,
+                    crossAxisSpacing: 8,
+                    childCount: 6, // Show 6 shimmer items
+                    itemBuilder: (context, index) {
+                      return  ShimmerPostWidget();
+                    },
+                  );
+                }
+
+                if (controller.posts.isEmpty) {
+                  return  SliverToBoxAdapter(
+                    child: Center(
+                      child: Text(
+                        'No posts available',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ),
+                  );
+                }
+
+                return SliverMasonryGrid.count(
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                  crossAxisCount: 1,
+                  childCount: controller.posts.length,
+                  itemBuilder: (context, index) {
+                    Post post = controller.posts[index];
+                    return PostWidget(post: post); // Display PostWidget
+                  },
+                );
+              },
             ),
-            actions: [
-              TextButton.icon(
-                onPressed: () {
-                  // Navigate to Create Post Page
-                  Get.to(() => CreatePostPage(), transition: Transition.cupertino);
-                },
-                icon: Icon(Icons.create, color: Palette.PRIMARY),
-                label: Text(
-                  'New Post',
-                  style: TextStyle(color: Palette.PRIMARY),
+
+            // Show scroll loading indicator
+            if (controller.isScrollLoading.value)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding:  EdgeInsets.all(8.0),
+                  child: Column(
+                    children: List.generate(
+                      3, // Number of shimmer items during scroll loading
+                      (index) =>  ShimmerPostWidget(),
+                    ),
+                  ),
                 ),
               ),
-            ],
-          ),
 
-          // Sliver List for Post Content
-          SliverPadding(
-            padding: EdgeInsets.all(16.0),
-            sliver: SliverList(
-              delegate: SliverChildListDelegate(
-                [
-                  // Example post
-                  _buildPost(
-                    context: context,
-                    authorName: 'Kareem Aljabari',
-                    authorImageUrl: 'https://i.pravatar.cc/150?img=1',
-                    postContent:
-                        'The always cheerful spirit of sunflowers inspires me to always be optimistic in facing...',
-                    postImageUrl: 'https://via.placeholder.com/600',
-                    postDate: '1h ago',
-                  ),
-                  _buildPost(
-                                        context: context,
-
-                    authorName: 'Jane Smith',
-                    authorImageUrl: 'https://i.pravatar.cc/150?img=5',
-                    postContent:
-                        'Loving the new features in our app!',
-                    postImageUrl: 'https://via.placeholder.com/600x300',
-                    postDate: '2h ago',
-                  ),
-                  _buildPost(
-                                        context: context,
-
-                    authorName: 'John Doe',
-                    authorImageUrl: 'https://i.pravatar.cc/150?img=12',
-                    postContent: 'Another great day to work on our projects!',
-                    postImageUrl: 'https://via.placeholder.com/600x300',
-                    postDate: '3h ago',
-                  ),
-                  // Add more posts as needed
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPost({
-    required BuildContext context,
-    required String authorName,
-    required String authorImageUrl,
-    required String postContent,
-    required String postImageUrl,
-    required String postDate,
-  }) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 16.0),
-      padding: EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 10,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Post Header with Menu
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  CircleAvatar(
-                    radius: 24,
-                    backgroundImage: NetworkImage(authorImageUrl),
-                  ),
-                  SizedBox(width: 16),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        authorName,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        postDate,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              IconButton(
-                icon: Icon(Icons.more_vert, color: Colors.grey[600]),
-                onPressed: () {
-                  _showPostMenu(context);
-                },
-              ),
-            ],
-          ),
-          SizedBox(height: 16),
-
-          // Post Content
-          Text(
-            postContent,
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[800],
-            ),
-          ),
-          SizedBox(height: 16),
-
-          // Post Image
-          if (postImageUrl.isNotEmpty)
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.network('https://picsum.photos/200/300'),
-            ),
-
-          SizedBox(height: 16),
-
-          // Like Button and Interactions
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.thumb_up_alt_outlined, color: Colors.grey[600]),
-                    onPressed: () {
-                      // Handle like action
-                    },
-                  ),
-                  Text(
-                    'Like',
-                    style: TextStyle(color: Colors.grey[600]),
-                  ),
-                ],
-              ),
-              // Additional buttons for comments or shares can be added here
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showPostMenu(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return Wrap(
-          children: [
-            ListTile(
-              leading: Icon(Icons.edit, ),
-              title: Text('Edit Post'),
-              onTap: () {
-                // Handle edit action
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.delete, ),
-              title: Text('Delete Post'),
-              onTap: () {
-                // Handle delete action
-                Navigator.pop(context);
-              },
-            ),
+            // Add bottom gap
+             SliverGap(100),
           ],
-        );
-      },
+        ),
+      ),
     );
   }
 }
