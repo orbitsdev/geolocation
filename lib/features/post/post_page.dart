@@ -49,9 +49,9 @@ class _PostPageState extends State<PostPage> {
           shrinkWrap: true,
           physics:  AlwaysScrollableScrollPhysics(),
           slivers: [
-             SliverGap(16), // Add a gap at the top
+             SliverGap(Get.size.height * 0.20), 
 
-            // Display shimmer while loading or posts when loaded
+
             GetBuilder<PostController>(
               builder: (controller) {
                 if (controller.isLoading.value) {

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
+import 'package:geolocation/core/globalwidget/images/online_image.dart';
 import 'package:geolocation/core/globalwidget/images/online_image_full_screen_display.dart';
 import 'package:geolocation/features/file/model/media_file.dart';
 import 'package:geolocation/features/post/model/post.dart';
@@ -16,7 +18,6 @@ class PostWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric( horizontal: 16.0),
       padding: const EdgeInsets.all(12.0),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -43,6 +44,7 @@ class PostWidget extends StatelessWidget {
           // Media Grid (Images/Videos)
           if (post.media != null && post.media!.isNotEmpty)
             _buildMediaGrid(post.media!),
+         
 
           const SizedBox(height: 12),
 
@@ -55,21 +57,33 @@ class PostWidget extends StatelessWidget {
   Widget _buildHeader() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Container(
+          height: 60,
+          width: 60,
+          
+          child: OnlineImage(imageUrl: '${post.councilPosition?.image}',borderRadius: BorderRadius.circular(40),),
+        ),
+        Gap(8),
         // Title and Timestamp
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              post.title ?? 'Untitled Post',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              post.createdAt ?? 'Just now',
-              style: const TextStyle(fontSize: 14, color: Colors.grey),
-            ),
-          ],
+        Flexible(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                post.title ?? 'Untitled Post',
+                style: Get.textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.bold
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                post.createdAt ?? 'Just now',
+                style: const TextStyle(fontSize: 14, color: Colors.grey),
+              ),
+            ],
+          ),
         ),
 
         // Menu Icon
