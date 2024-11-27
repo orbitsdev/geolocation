@@ -224,7 +224,16 @@ formValues.forEach((key, value) {
     }
   }
 
-  void fillForm() {}
+  void fillForm() {
+    if (selectedItem.value.id == null) return;
+
+    final formData = {
+      'title': selectedItem.value.title ?? '',
+      'content': selectedItem.value.content ?? '',
+      'description': selectedItem.value.description ?? '',
+      'is_publish': selectedItem.value.isPublish ?? false,
+    };
+  }
   void clearForm() {}
   void viewFile(File file) {
     if (file.path.endsWith(".mp4")) {
@@ -234,8 +243,14 @@ formValues.forEach((key, value) {
     }
   }
 
+
+ Future<void> updateCollection() async {
+  if (!formKey.currentState!.saveAndValidate()) {
+    
+    return;
+  }
   
-  
+ }
 
   Future<void> pickFile() async {
   const int maxFileSize = 50 * 1024 * 1024; // 50 MB in bytes
@@ -336,4 +351,37 @@ formValues.forEach((key, value) {
       Get.to(() => LocalFileImageFullScreenDisplay(imagePath: file.path));
     }
   }
+
+  Future<void> delete(int id) async {
+    Modal.confirmation(
+      titleText: "Confirm Delete",
+      contentText:
+          "Are you sure you want to delete this record? This action cannot be undone.",
+      onConfirm: () async {
+        final councilId = AuthController.controller.user.value.defaultPosition?.councilId;
+        Modal.loading(content: const Text('Deleting record...'));
+        var response = await ApiService.deleteAuthenticatedResource(
+          '/posts/${id}',
+        );
+
+        response.fold(
+          (failure) {
+            Get.back(); // Close the modal
+            Modal.errorDialog(failure: failure);
+          },
+          (success) {
+            Get.back(); // Close the modal
+            posts.removeWhere((t) => t.id == id);
+            update();
+            Modal.success(message: 'Post deleted successfully!');
+          },
+        );
+      },
+      onCancel: () {
+        Get.back();
+      },
+    );
+  }
+
+
 }

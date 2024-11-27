@@ -13,6 +13,7 @@ class Post {
   String? description;
   String? createdAt;
   String? updatedAt;
+  bool? isPublish
   List<MediaFile>? media; // List of associated media files
   Council? council;
   CouncilPosition? councilPosition;
@@ -25,6 +26,7 @@ class Post {
     this.description,
     this.createdAt,
     this.updatedAt,
+    this.isPublish,
     this.media,
     this.council,
     this.councilPosition,
@@ -39,6 +41,7 @@ class Post {
     String? description,
     String? createdAt,
     String? updatedAt,
+    bool? isPublish,
     List<MediaFile>? media,
     Council? council,
     CouncilPosition? councilPosition,
@@ -51,6 +54,7 @@ class Post {
       description: description ?? this.description,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      isPublish: isPublish ?? this.isPublish,
       media: media ?? this.media,
       council: council ?? this.council,
       councilPosition: councilPosition ?? this.councilPosition,
@@ -67,6 +71,7 @@ class Post {
       description: map['description'] != null ? map['description'] as String : null,
       createdAt: map['created_at'] != null ? map['created_at'] as String : null,
       updatedAt: map['updated_at'] != null ? map['updated_at'] as String : null,
+      isPublish: map['is_publish'] != null ? map['is_publish'] as bool : null,
       media: map['media'] != null
           ? List<MediaFile>.from(
               (map['media'] as List<dynamic>).map((x) => MediaFile.fromMap(x as Map<String, dynamic>)))
@@ -90,6 +95,7 @@ class Post {
       'description': description,
       'created_at': createdAt,
       'updated_at': updatedAt,
+      'is_publish': isPublish,
       'media': media?.map((x) => x.toMap()).toList(),
       'council': council?.toMap(),
       'council_position': councilPosition?.toMap(),
@@ -107,6 +113,6 @@ class Post {
   /// String representation of the `Post` instance.
   @override
   String toString() {
-    return 'Post(id: $id, title: $title, content: $content, description: $description, createdAt: $createdAt, updatedAt: $updatedAt, media: $media, council: $council, councilPosition: $councilPosition, relatedModel: $relatedModel)';
+    return 'Post(id: $id, title: $title, content: $content, description: $description, createdAt: $createdAt, updatedAt: $updatedAt,isPublish: $isPublish, media: $media, council: $council, councilPosition: $councilPosition, relatedModel: $relatedModel)';
   }
 }
