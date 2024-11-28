@@ -23,7 +23,7 @@ class TaskDetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:Colors.white,
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 1,
@@ -35,375 +35,372 @@ class TaskDetailsPage extends StatelessWidget {
           'Task Details',
           style: TextStyle(color: Color(0xff333333)),
         ),
-         actions: [
-      // Conditionally show "Manage Task" icon for authorized users
-      if (AuthController.controller.user.value.hasAccess()) // Replace with correct logic
-        GetBuilder<TaskController>(
-          builder: (controllert) {
-             return  TextButton(
-              
-              onPressed: () {
-                controllert.showApprovalModal(); // Trigger the approval modal
-              },
-              child: Text( AuthController.controller.user.value.hasAccess()?  'MANAGE': 'COMPLY'), // Tooltip for better accessibility
-            );
-            
-          }
-        ),
-    ],
-      ),
-      body: GetBuilder<TaskController>(
-        builder: (taskController) {
-          return RefreshIndicator(
-            triggerMode: RefreshIndicatorTriggerMode.anywhere,
-            onRefresh: ()=>taskController.refreshSelectedDetails(),
-            child: Column(
-              children: [
-                Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: CustomScrollView(
-                              physics: const AlwaysScrollableScrollPhysics(),
-                              
-                              slivers: [
-                              
-                         
-    
-    // Title
-    ToSliver(
-      child: SizedBox(height: 12),
-    ),
-    ToSliver(
-      child: Text(
-        '${taskController.selectedTask.value.title ?? ''}',
-        style: TextStyle(
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
-          color: Color(0xff333333),
-        ),
-      ),
-    ),
-    ToSliver(
-      child: SizedBox(height: 12),
-    ),
-    
-    // Status
-    ToSliver(
-      child: StatusRowWidget(
-        label: 'Status',
-        status: taskController.selectedTask.value.status ?? 'Unknown',
-      ),
-
-    ),
-    ToSliver(
-      child: SizedBox(height: 12),
-    ),
-    
-    // Due Date
-    ToSliver(
-      child: Row(
-        children: [
-          Icon(Icons.calendar_today, color: Color(0xff888888), size: 18),
-          SizedBox(width: 8),
-          Text(
-            'Due: ${taskController.selectedTask.value.dueDate ?? ''}',
-            style: TextStyle(
-              color: Color(0xff555555),
-              fontSize: 14,
-            ),
-          ),
+        actions: [
+          // Conditionally show "Manage Task" icon for authorized users
+          if (AuthController.controller.user.value
+              .hasAccess()) // Replace with correct logic
+            GetBuilder<TaskController>(builder: (controllert) {
+              return TextButton(
+                onPressed: () {
+                  controllert.showApprovalModal(); // Trigger the approval modal
+                },
+                child: Text(AuthController.controller.user.value.hasAccess()
+                    ? 'MANAGE'
+                    : 'COMPLY'), // Tooltip for better accessibility
+              );
+            }),
         ],
       ),
-    ),
-    
-    ToSliver(
-      child: SizedBox(height: 16),
-    ),
-    
-    // Task Details Header
-    ToSliver(
-      child: Text(
-        'Task Details',
-        style: TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          color: Color(0xff333333),
-        ),
-      ),
-    ),
-    ToSliver(
-      child: SizedBox(height: 8),
-    ),
-    
-    // Task Details Description
-    ToSliver(
-      child: Text(
-        '${taskController.selectedTask.value.taskDetails ?? ''}',
-        style: TextStyle(
-          color: Color(0xff555555),
-          fontSize: 14,
-        ),
-      ),
-    ),
-    
-    ToSliver(
-      child: SizedBox(height: 16),
-    ),
-
-    // Remarks if Need Revision
-    if (taskController.selectedTask.value.ifNeedRevisionOrRejected())
-      ToSliver(
-        child: RemarkWidget(
-          title: 'Remarks',
-          message: '${taskController.selectedTask.value.remarks}',
-          icon: Icons.warning_amber_rounded,
-
-        ),
-      ),
-        ToSliver(
-      child: SizedBox(height: 12),
-    ),
-    // Last Updated
-    if (taskController.selectedTask.value.statusChangedAt != null)
-      ToSliver(
-        child: Text(
-          'Last Updated: ${taskController.selectedTask.value.statusChangedAt}',
-          style: TextStyle(
-            color: Colors.grey,
-            fontSize: 12.0,
-          ),
-        ),
-      ),
-
-    SliverGap(8), // Extra spacing
-            
-                                Obx(() {
-                                      if (taskController.isLoading.value) {
-                                        return ToSliver(
-                                          child: Container(
-                                              margin: EdgeInsets.only(bottom: 12),
-                                              child: taskController
-                                                      .mediaFiles.isNotEmpty
-                                                  ? ProgressBarSubmit(
-                                                      progress:
-                                                          taskController
-                                                              .uploadProgress.value)
-                                                  : LinearProgressIndicator()),
-                                        );
-                                      } else {
-                                        return ToSliver(
-                                          child: SizedBox(
-                                              height:
-                                                  8),
-                                        ); // Placeholder when not loading
-                                      }
-                                    }),
-
-                              
-
- if(taskController.selectedTask.value.isTaskNotCompleteAndAssignedToCurrentOfficer())ToSliver(
-                                   child: SizedBox(
-                                                    child: GridView.builder(
-                                                      shrinkWrap:true, 
-                                                      physics: NeverScrollableScrollPhysics(), // Prevents separate scrolling
-                                                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                                        crossAxisCount: 4, // Number of items in a row
-                                                        crossAxisSpacing: 8,
-                                                        mainAxisSpacing: 8,
-                                                      ),
-                                                      itemCount: taskController .mediaFiles.length +1, // +1 for the add button
-                                                      itemBuilder: (context, index) {
-                                                        if (index == 0) {
-                                                          // Add button (always in the first position)
-                                                          return GestureDetector(
-                                                            onTap: () {
-                                                              taskController.pickFile();
-                                                            },
-                                                            child: Container(
-                                                              decoration: BoxDecoration(
-                                                                color: Palette
-                                                                    .PRIMARY_BG, // Placeholder color for add button
-                                                                borderRadius:
-                                                                    BorderRadius.circular(8),
-                                                              ),
-                                                              child: Center(
-                                                                child: Icon(
-                                                                  Icons.add,
-                                                                  color: Palette.grayTextLight,
-                                                                  size: 40,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          );
-                                                        } else {
-                                                          File file = taskController.mediaFiles[index - 1];
-                                                          return GestureDetector(
-                                                            onTap: () {
-                                                              taskController
-                                                                  .viewFile(file);
-                                                            },
-                                                            child: Stack(
-                                                              clipBehavior: Clip.none,
-                                                              children: [
-                                                                FilePreviewWidget(filePath: file.path),
-                                                                // "X" button to remove the file
-                                                                Positioned(
-                                                                  top: -10,
-                                                                  right: -10,
-                                                                  child: GestureDetector(
-                                                                    behavior: HitTestBehavior
-                                                                        .opaque, // Makes the entire area tappable
-                                                                    onTap: () =>
-                                                                        taskController
-                                                                            .removeFile(
-                                                                                index - 1), 
-                                                                    child: Container(
-                                                                      decoration: BoxDecoration(
-                                                                        shape: BoxShape.circle,
-                                                                        gradient:
-                                                                            LinearGradient(
-                                                                          colors: [
-                                                                            Colors.black
-                                                                                .withOpacity(
-                                                                                    0.7),
-                                                                            Colors.black
-                                                                                .withOpacity(
-                                                                                    0.4),
-                                                                          ],
-                                                                          begin:
-                                                                              Alignment.topLeft,
-                                                                          end: Alignment
-                                                                              .bottomRight,
-                                                                        ),
-                                                                      ),
-                                                                      padding: EdgeInsets.all(
-                                                                          4), // Larger touch area
-                                                                      child: Icon(
-                                                                        Icons.close,
-                                                                        color: Colors.white,
-                                                                        size: 16,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                )
-                                                              ],
-                                                            ),
-                                                          );
-                                                        }
-                                                      },
-                                                    ),
-                                                  ),
-                                 ),
-
-                       ToSliver(
-      child: SizedBox(height: 16),
-    ),
-                                  ToSliver(child: Text('Files')), 
-                                   ToSliver(
-      child: SizedBox(height: 16),
-    ),
-                                  SliverAlignedGrid.count(
-  itemCount: taskController.selectedTask.value.media?.length ?? 0,
-  crossAxisCount: 3,
-  mainAxisSpacing: 8,
-  crossAxisSpacing: 8,
-  itemBuilder: (context, index) {
-    final file = taskController.selectedTask.value.media![index];
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        GestureDetector(
-          onTap: () {
-            taskController.fullScreenDisplay(
-              taskController.selectedTask.value.media ?? [],
-              file,
-            );
-          },
-          child: MediaFileCard(file: file),
-        ),
-      if(taskController.selectedTask.value.isTaskNotCompleteAndAssignedToCurrentOfficer()) Positioned(
-  top: -12, // Adjust the position as needed
-  right: -12, // Adjust to make it more visible and larger
-  child: GestureDetector(
-    behavior: HitTestBehavior.opaque,
-    onTap: () => taskController.confirmDeleteMedia(index),
-    child: Container(
-      height: 28, // Increased size for better visibility
-      width: 28,  // Increased size for better visibility
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: LinearGradient(
-          colors: [
-            Colors.black.withOpacity(0.7),
-            Colors.black.withOpacity(0.5), // Adjust transparency for better contrast
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      child: Icon(
-        Icons.close,
-        color: Colors.white,
-        size: 20, // Increased icon size for better visibility
-      ),
-    ),
-  ),
-),
-
-      ],
-    );
-  },
-),
- 
-                                
-                                
-                                if(taskController.selectedTask.value.isTaskNotCompleteAndAssignedToCurrentOfficer())ToSliver(
-                                  child: SizedBox(height: 16),
-                                ),
-                                      
-                                
-                              ],
-                            ),
+      body: GetBuilder<TaskController>(builder: (taskController) {
+        return RefreshIndicator(
+          triggerMode: RefreshIndicatorTriggerMode.anywhere,
+          onRefresh: () => taskController.refreshSelectedDetails(),
+          child: Column(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: CustomScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    slivers: [
+                      // Title
+                      ToSliver(
+                        child: SizedBox(height: 12),
+                      ),
+                      ToSliver(
+                        child: Text(
+                          '${taskController.selectedTask.value.title ?? ''}',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xff333333),
                           ),
                         ),
-                          if(taskController.mediaFiles.isNotEmpty)Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2), // Shadow color
-                              spreadRadius: 2, // Spread radius
-                              blurRadius: 8, // Blur radius
-                              offset: Offset(0, 4), // Offset in the x and y direction
-                            ),
-                          ],
+                      ),
+                      ToSliver(
+                        child: SizedBox(height: 12),
+                      ),
+
+                      // Status
+                      ToSliver(
+                        child: StatusRowWidget(
+                          label: 'Status',
+                          status: taskController.selectedTask.value.status ??
+                              'Unknown',
                         ),
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
+                      ),
+                      ToSliver(
+                        child: SizedBox(height: 12),
+                      ),
+
+                      // Due Date
+                      ToSliver(
+                        child: Row(
                           children: [
-                            SizedBox(
-                              height: 50,
-                              width: Get.size.width,
-                              child: GradientElevatedButton(
-                                onPressed: () {
-                                  taskController.uploadFile();
-                                },
-                                style: GRADIENT_ELEVATED_BUTTON_STYLE,
-                                child: Text(
-                                  'Upload Files',
-                                  style: Get.textTheme.bodyLarge
-                                      ?.copyWith(color: Colors.white),
-                                ),
+                            Icon(Icons.calendar_today,
+                                color: Color(0xff888888), size: 18),
+                            SizedBox(width: 8),
+                            Text(
+                              'Due: ${taskController.selectedTask.value.dueDate ?? ''}',
+                              style: TextStyle(
+                                color: Color(0xff555555),
+                                fontSize: 14,
                               ),
                             ),
                           ],
                         ),
-                      )
-              ],
-            ),
-          );
-        }
-      ),
+                      ),
+
+                      ToSliver(
+                        child: SizedBox(height: 16),
+                      ),
+
+                      // Task Details Header
+                      ToSliver(
+                        child: Text(
+                          'Task Details',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xff333333),
+                          ),
+                        ),
+                      ),
+                      ToSliver(
+                        child: SizedBox(height: 8),
+                      ),
+
+                      // Task Details Description
+                      ToSliver(
+                        child: Text(
+                          '${taskController.selectedTask.value.taskDetails ?? ''}',
+                          style: TextStyle(
+                            color: Color(0xff555555),
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+
+                      ToSliver(
+                        child: SizedBox(height: 16),
+                      ),
+
+                      // Remarks if Need Revision
+                      if (taskController.selectedTask.value
+                          .ifNeedRevisionOrRejected())
+                        ToSliver(
+                          child: RemarkWidget(
+                            title: 'Remarks',
+                            message:
+                                '${taskController.selectedTask.value.remarks}',
+                            icon: Icons.warning_amber_rounded,
+                          ),
+                        ),
+                      ToSliver(
+                        child: SizedBox(height: 12),
+                      ),
+                      // Last Updated
+                      if (taskController.selectedTask.value.statusChangedAt !=
+                          null)
+                        ToSliver(
+                          child: Text(
+                            'Last Updated: ${taskController.selectedTask.value.statusChangedAt}',
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 12.0,
+                            ),
+                          ),
+                        ),
+
+                      SliverGap(8), // Extra spacing
+
+                      Obx(() {
+                        if (taskController.isLoading.value) {
+                          return ToSliver(
+                            child: Container(
+                                margin: EdgeInsets.only(bottom: 12),
+                                child: taskController.mediaFiles.isNotEmpty
+                                    ? ProgressBarSubmit(
+                                        progress:
+                                            taskController.uploadProgress.value)
+                                    : LinearProgressIndicator()),
+                          );
+                        } else {
+                          return ToSliver(
+                            child: SizedBox(height: 8),
+                          ); // Placeholder when not loading
+                        }
+                      }),
+
+                      if (taskController.selectedTask.value
+                          .isTaskNotCompleteAndAssignedToCurrentOfficer())
+                        ToSliver(
+                          child: SizedBox(
+                            child: GridView.builder(
+                              shrinkWrap: true,
+                              physics:
+                                  NeverScrollableScrollPhysics(), // Prevents separate scrolling
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 4, // Number of items in a row
+                                crossAxisSpacing: 8,
+                                mainAxisSpacing: 8,
+                              ),
+                              itemCount: taskController.mediaFiles.length +
+                                  1, // +1 for the add button
+                              itemBuilder: (context, index) {
+                                if (index == 0) {
+                                  // Add button (always in the first position)
+                                  return GestureDetector(
+                                    onTap: () {
+                                      taskController.pickFile();
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Palette
+                                            .PRIMARY_BG, // Placeholder color for add button
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Center(
+                                        child: Icon(
+                                          Icons.add,
+                                          color: Palette.grayTextLight,
+                                          size: 40,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  File file =
+                                      taskController.mediaFiles[index - 1];
+                                  return GestureDetector(
+                                    onTap: () {
+                                      taskController.viewFile(file);
+                                    },
+                                    child: Stack(
+                                      clipBehavior: Clip.none,
+                                      children: [
+                                        FilePreviewWidget(filePath: file.path),
+                                        // "X" button to remove the file
+                                        Positioned(
+                                          top: -10,
+                                          right: -10,
+                                          child: GestureDetector(
+                                            behavior: HitTestBehavior
+                                                .opaque, // Makes the entire area tappable
+                                            onTap: () => taskController
+                                                .removeFile(index - 1),
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                gradient: LinearGradient(
+                                                  colors: [
+                                                    Colors.black
+                                                        .withOpacity(0.7),
+                                                    Colors.black
+                                                        .withOpacity(0.4),
+                                                  ],
+                                                  begin: Alignment.topLeft,
+                                                  end: Alignment.bottomRight,
+                                                ),
+                                              ),
+                                              padding: EdgeInsets.all(
+                                                  4), // Larger touch area
+                                              child: Icon(
+                                                Icons.close,
+                                                color: Colors.white,
+                                                size: 16,
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  );
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+
+                      ToSliver(
+                        child: SizedBox(height: 16),
+                      ),
+                      ToSliver(child: Text('Files')),
+                      ToSliver(
+                        child: SizedBox(height: 16),
+                      ),
+                      SliverAlignedGrid.count(
+                        itemCount:
+                            taskController.selectedTask.value.media?.length ??
+                                0,
+                        crossAxisCount: 3,
+                        mainAxisSpacing: 8,
+                        crossAxisSpacing: 8,
+                        itemBuilder: (context, index) {
+                          final file =
+                              taskController.selectedTask.value.media![index];
+                          return Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  taskController.fullScreenDisplay(
+                                    taskController.selectedTask.value.media ??
+                                        [],
+                                    file,
+                                  );
+                                },
+                                child: MediaFileCard(file: file),
+                              ),
+                              if (taskController.selectedTask.value
+                                  .isTaskNotCompleteAndAssignedToCurrentOfficer())
+                                Positioned(
+                                  top: -12, // Adjust the position as needed
+                                  right:
+                                      -12, // Adjust to make it more visible and larger
+                                  child: GestureDetector(
+                                    behavior: HitTestBehavior.opaque,
+                                    onTap: () => taskController
+                                        .confirmDeleteMedia(index),
+                                    child: Container(
+                                      height:
+                                          28, // Increased size for better visibility
+                                      width:
+                                          28, // Increased size for better visibility
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            Colors.black.withOpacity(0.7),
+                                            Colors.black.withOpacity(
+                                                0.5), // Adjust transparency for better contrast
+                                          ],
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                        ),
+                                      ),
+                                      child: Icon(
+                                        Icons.close,
+                                        color: Colors.white,
+                                        size:
+                                            20, // Increased icon size for better visibility
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          );
+                        },
+                      ),
+
+                      if (taskController.selectedTask.value
+                          .isTaskNotCompleteAndAssignedToCurrentOfficer())
+                        ToSliver(
+                          child: SizedBox(height: 16),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+              if (taskController.mediaFiles.isNotEmpty)
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2), // Shadow color
+                        spreadRadius: 2, // Spread radius
+                        blurRadius: 8, // Blur radius
+                        offset: Offset(0, 4), // Offset in the x and y direction
+                      ),
+                    ],
+                  ),
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: 50,
+                        width: Get.size.width,
+                        child: GradientElevatedButton(
+                          onPressed: () {
+                            taskController.uploadFile();
+                          },
+                          style: GRADIENT_ELEVATED_BUTTON_STYLE,
+                          child: Text(
+                            'Upload Files',
+                            style: Get.textTheme.bodyLarge
+                                ?.copyWith(color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+            ],
+          ),
+        );
+      }),
     );
   }
 

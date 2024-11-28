@@ -354,6 +354,49 @@ Future<void> updatePost() async {
 
   Future<void> deletePost() async {}
   Future<void> getPost() async {}
+
+  void confirmDeleteMedia(int index) {
+    final mediaFile = selectedItem.value.media?[index];
+    if (mediaFile == null) return;
+
+    Modal.confirmation(
+      titleText: 'Delete File',
+      contentText: 'Are you sure you want to delete this file?',
+      onConfirm: () {
+        deleteMediaFromServer(mediaFile.id ?? 0);
+      },
+      onCancel: () {
+        Get.back();
+        // Optional cancel logic if needed
+      },
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      barrierDismissible: false,
+    );
+  }
+  Future<void> deleteMediaFromServer(int mediaId) async {
+    try {
+      Modal.loading();
+      final response = await ApiService.deleteAuthenticatedResource(
+        'posts/${selectedItem.value.id}/media/$mediaId',
+      );
+      response.fold(
+        (failure) {
+          Get.back();
+          Modal.errorDialog(failure: failure);
+        },
+        (success) {
+          Get.back();
+          selectedItem.value.media?.removeWhere((media) => media.id == mediaId);
+          update();
+          loadData();
+          Modal.success(message: 'File deleted successfully');
+        },
+      );
+    } catch (e) {
+      Modal.errorDialog(message: 'An unexpected error occurred');
+    }
+  }
   Future<void> removeFileFromDatabase() async {}
   void removeFileLocal(int index) {
     if (index >= 0 && index < mediaFiles.length) {
@@ -487,6 +530,27 @@ Future<void> updatePost() async {
 
   Future<void> playFile() async {}
 
+
+  void fullScreenDisplayOnline(List<MediaFile> media, MediaFile file) {
+    int initialIndex = media.indexOf(file);
+    if (file.type!.startsWith('video')) {
+      Get.to(() => FileViewer(
+            mediaFiles: media, // Pass the entire list of files
+            initialIndex:
+                initialIndex, // Set the initial index to the clicked file
+          ));
+    } else if (file.type!.startsWith('image')) {
+      Get.to(() => FileViewer(
+            mediaFiles: media, // Pass the entire list of files
+            initialIndex:
+                initialIndex, // Set the initial index to the clicked file
+          ));
+    } else {
+      Get.to(() => BrowserViewerPage(
+            file: file,
+          ));
+    }
+  }
   void fullScreenDisplay(List<File> files, File file) {
     int initialIndex = files.indexOf(file);
     if (file.path.endsWith('.mp4')) {
