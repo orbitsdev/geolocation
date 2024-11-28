@@ -7,7 +7,7 @@ import 'package:geolocation/features/home/dashboard/dashboard_page.dart';
 import 'package:geolocation/features/management/management_page.dart';
 import 'package:geolocation/features/map/sample_map.dart';
 import 'package:geolocation/features/profile/user_profile_page.dart';
-import 'package:geolocation/features/settings/settings_page.dart';
+import 'package:geolocation/features/settings/profile_page.dart';
 import 'package:get/get.dart';
 
 class AdminHomeMainPage extends StatefulWidget {
@@ -22,9 +22,9 @@ class _AdminHomeMainPageState extends State<AdminHomeMainPage> {
 
   List<Widget> _pages = [
     DashboardPage(),
-    MapSample(),
-    ChatboxPage(),
-    SettingsPage()
+    // MapSample(),
+    // ChatboxPage(),
+    ProfilePage()
     
   ];
 
@@ -58,18 +58,18 @@ class _AdminHomeMainPageState extends State<AdminHomeMainPage> {
             icon: FaIcon(FontAwesomeIcons.house, size: 22,),
             label: 'Home',
           ),
-          BottomNavigationBarItem(
-            activeIcon: FaIcon(FontAwesomeIcons.solidCompass,size: 22,),
+          // BottomNavigationBarItem(
+          //   activeIcon: FaIcon(FontAwesomeIcons.solidCompass,size: 22,),
 
-            icon: FaIcon(FontAwesomeIcons.compass,size: 22,),
-            label: 'Attendance',
-          ),
-          BottomNavigationBarItem(
-            activeIcon: FaIcon(FontAwesomeIcons.commentSms,size: 22,),
+          //   icon: FaIcon(FontAwesomeIcons.compass,size: 22,),
+          //   label: 'Attendance',
+          // ),
+          // BottomNavigationBarItem(
+          //   activeIcon: FaIcon(FontAwesomeIcons.commentSms,size: 22,),
 
-            icon: FaIcon(FontAwesomeIcons.commentSms,size: 22,),
-            label: 'message',
-          ),
+          //   icon: FaIcon(FontAwesomeIcons.commentSms,size: 22,),
+          //   label: 'message',
+          // ),
          
           BottomNavigationBarItem(
             activeIcon: FaIcon(FontAwesomeIcons.solidUser),

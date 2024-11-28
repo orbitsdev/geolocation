@@ -1,6 +1,8 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:geolocation/features/collections/model/collection.dart';
+import 'package:geolocation/features/post/widget/collection_chart_widget.dart';
 import 'package:get/get.dart';
 
 import 'package:geolocation/core/globalwidget/images/online_image.dart';
@@ -58,6 +60,20 @@ class PostWidget extends StatelessWidget {
          
 
           const SizedBox(height: 12),
+
+          if (post.relatedModel != null &&
+              post.relatedModel!.type == 'Collection' &&
+              post.relatedModel!.data is Collection) ...[
+            const Text(
+              'Collection Chart:',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            CollectionChartWidget(
+              collection: post.relatedModel!.data as Collection,
+            ),
+          ],
+        
 
           // Footer (removed Like button)
         ],

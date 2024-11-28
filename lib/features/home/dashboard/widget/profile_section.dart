@@ -9,6 +9,7 @@ import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:geolocation/features/notification/controller/notification_controller.dart';
 import 'package:geolocation/features/notification/notification_page.dart';
+import 'package:geolocation/features/settings/profile_page.dart';
 import 'package:get/get.dart';
 import 'package:heroicons/heroicons.dart';
 
@@ -51,15 +52,18 @@ class _ProfileSectionState extends State<ProfileSection> {
                           children: [
                             Row(
                               children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(40),
-                                  ),
-                                  height: 60,
-                                  width: 60,
-                                  child: OnlineImage(
-                                    imageUrl: '${authcontroller.user.value.image}',
-                                    borderRadius: BorderRadius.circular(60),
+                                RippleContainer(
+                                  onTap: ()=>Get.to(()=> ProfilePage()),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(40),
+                                    ),
+                                    height: 60,
+                                    width: 60,
+                                    child: OnlineImage(
+                                      imageUrl: '${authcontroller.user.value.image}',
+                                      borderRadius: BorderRadius.circular(60),
+                                    ),
                                   ),
                                 ),
                                 Gap(16),

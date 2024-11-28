@@ -324,4 +324,42 @@ class AuthController extends GetxController {
     // Redirect to the login page
     Get.offAllNamed('/login');
   }
+
+  Future<void> switchPosition(int positionId) async {
+  Modal.loading(); // Show loading modal
+  final result = await ApiService.putAuthenticatedResource(
+    '/council-positions/$positionId/switch',
+    {},
+  );
+  result.fold(
+    (failure) {
+      Get.back(); // Dismiss loading modal
+      Modal.errorDialog(
+        message: 'Failed to switch user position',
+        failure: failure,
+      );
+    },
+    (response) async {
+      // On success, update user and secure storage
+      final data = response.data['data'];
+
+      user.value = User.fromJson(data);
+
+      await SecureStorage().writeSecureData('user', jsonEncode(data));
+
+      Get.back(); // Dismiss loading modal
+      Modal.success(
+        message: 'Position switched successfully',
+        onDismiss: () {
+          // Redirect to the main page and reset navigation
+          Get.offAllNamed('/home-main');
+        },
+      );
+    },
+  );
+}
+
+
+
+
 }

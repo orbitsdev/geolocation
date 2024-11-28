@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:geolocation/core/globalwidget/ripple_container.dart';
 import 'package:geolocation/core/globalwidget/sliver_gap.dart';
 import 'package:geolocation/core/globalwidget/to_sliver.dart';
 import 'package:geolocation/core/modal/modal.dart';
 import 'package:geolocation/core/theme/palette.dart';
+import 'package:geolocation/features/collections/collection_details_page.dart';
 import 'package:geolocation/features/collections/controller/collection_controller.dart';
 import 'package:geolocation/features/collections/create_or_edit_collection_page.dart';
 import 'package:geolocation/features/collections/model/collection.dart';
@@ -95,17 +97,20 @@ class _CollectionPageState extends State<CollectionPage> {
                               itemBuilder: (context, index) {
                                 Collection collection =
                                     controller.collections[index];
-                                return CollectionCard(
-                                  collection: collection,
-                                  onEdit: () {
-                                    controller
-                                        .selectItemAndNavigateToUpdatePage(
-                                            collection);
-                                  },
-                                  onDelete: () async {
-                                   controller.deleteCollection(collection
-                                          .id!); 
-                                  },
+                                return RippleContainer(
+                                  onTap: ()=>  Get.to(()=> CollectionDetailsPage(collection: collection,)),
+                                  child: CollectionCard(
+                                    collection: collection,
+                                    onEdit: () {
+                                      controller
+                                          .selectItemAndNavigateToUpdatePage(
+                                              collection);
+                                    },
+                                    onDelete: () async {
+                                     controller.deleteCollection(collection
+                                            .id!); 
+                                    },
+                                  ),
                                 );
                               },
                             )
