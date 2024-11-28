@@ -3,6 +3,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:geolocation/core/globalwidget/sliver_gap.dart';
 import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/post/controller/post_controller.dart';
+import 'package:geolocation/features/post/create_or_edit_post_page.dart';
 import 'package:geolocation/features/post/model/post.dart';
 import 'package:geolocation/features/post/widget/post_widget.dart';
 import 'package:geolocation/features/post/widget/shimmer_post_widget.dart';
@@ -40,6 +41,7 @@ class _PostPageState extends State<PostPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+     
       backgroundColor: Palette.LIGHT_BACKGROUND,
       body: RefreshIndicator(
         triggerMode: RefreshIndicatorTriggerMode.anywhere,
@@ -49,7 +51,36 @@ class _PostPageState extends State<PostPage> {
           shrinkWrap: true,
           physics:  AlwaysScrollableScrollPhysics(),
           slivers: [
-             SliverGap(Get.size.height * 0.20), 
+
+            SliverAppBar(
+            backgroundColor: Colors.white,
+            pinned: true,
+            // expandedHeight: 150.0,
+            flexibleSpace: FlexibleSpaceBar(
+              title: Text(
+                'Posts',
+                style: TextStyle(color: Colors.black),
+              ),
+              // background: Image.network(
+              //   'https://via.placeholder.com/600x200',
+              //   fit: BoxFit.cover,
+              // ),
+            ),
+            actions: [
+              TextButton.icon(
+                onPressed: () {
+                  // Navigate to Create Post Page
+                  Get.to(() => CreateOrEditPostPage(), transition: Transition.cupertino);
+                },
+                icon: Icon(Icons.create, color: Palette.PRIMARY),
+                label: Text(
+                  'New Post',
+                  style: TextStyle(color: Palette.PRIMARY),
+                ),
+              ),
+            ],
+          ),
+             SliverGap(8), 
 
 
             GetBuilder<PostController>(
@@ -82,12 +113,20 @@ class _PostPageState extends State<PostPage> {
 
                 return SliverMasonryGrid.count(
                   crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
+                 mainAxisSpacing: 8,
                   crossAxisCount: 1,
                   childCount: controller.posts.length,
                   itemBuilder: (context, index) {
                     Post post = controller.posts[index];
-                    return PostWidget(post: post); // Display PostWidget
+                    return PostWidget(post: post,
+                     onEdit: () {
+                                    controller.selectItemAndNavigateToUpdatePage(
+                                            post);
+                                  },
+                                  onDelete: () async {
+                                   controller.delete(post.id!); 
+                                  },
+                    ); // Display PostWidget
                   },
                 );
               },

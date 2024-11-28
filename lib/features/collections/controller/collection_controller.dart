@@ -359,4 +359,7 @@ class CollectionController extends GetxController {
     });
    
   }
+
+
+  
 }

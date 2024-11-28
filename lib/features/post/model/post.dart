@@ -13,7 +13,7 @@ class Post {
   String? description;
   String? createdAt;
   String? updatedAt;
-  bool? isPublish
+  bool? isPublish;
   List<MediaFile>? media; // List of associated media files
   Council? council;
   CouncilPosition? councilPosition;

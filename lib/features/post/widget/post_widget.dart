@@ -1,19 +1,30 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:get/get.dart';
+
 import 'package:geolocation/core/globalwidget/images/online_image.dart';
 import 'package:geolocation/core/globalwidget/images/online_image_full_screen_display.dart';
+import 'package:geolocation/core/globalwidget/preview_image.dart';
+import 'package:geolocation/core/globalwidget/preview_video.dart';
 import 'package:geolocation/features/file/model/media_file.dart';
 import 'package:geolocation/features/post/model/post.dart';
 import 'package:geolocation/features/video/online_video_player.dart';
 import 'package:geolocation/features/video/video_player_widget.dart';
-import 'package:geolocation/core/globalwidget/preview_image.dart';
-import 'package:geolocation/core/globalwidget/preview_video.dart';
-import 'package:get/get.dart';
 
 class PostWidget extends StatelessWidget {
   final Post post;
 
-  const PostWidget({Key? key, required this.post}) : super(key: key);
+    final VoidCallback onEdit;
+  final VoidCallback onDelete;
+  const PostWidget({
+    Key? key,
+    required this.post,
+    required this.onEdit,
+    required this.onDelete,
+  }) : super(key: key);
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -87,12 +98,39 @@ class PostWidget extends StatelessWidget {
         ),
 
         // Menu Icon
-        IconButton(
-          icon: const Icon(Icons.more_vert),
-          onPressed: () {
-            // Add menu actions (edit/delete) if needed
-          },
-        ),
+        // IconButton(
+        //   icon: const Icon(Icons.more_vert),
+        //   onPressed: () {
+        //     // Add menu actions (edit/delete) if needed
+        //   },
+        // ),
+
+         PopupMenuButton<String>(
+                icon: const Icon(Icons.more_vert),
+                onSelected: (value) {
+                  if (value == 'edit') {
+                    onEdit();
+                  } else if (value == 'delete') {
+                    onDelete();
+                  }
+                },
+                itemBuilder: (context) => [
+                  const PopupMenuItem(
+                    value: 'edit',
+                    child: ListTile(
+                      leading: Icon(Icons.edit),
+                      title: Text('Edit'),
+                    ),
+                  ),
+                  const PopupMenuItem(
+                    value: 'delete',
+                    child: ListTile(
+                      leading: Icon(Icons.delete),
+                      title: Text('Delete'),
+                    ),
+                  ),
+                ],
+              ),
       ],
     );
   }

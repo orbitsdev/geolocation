@@ -12,7 +12,7 @@ class ShimmerPostWidget extends StatelessWidget {
       padding:  EdgeInsets.all(12.0),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        // borderRadius: BorderRadius.circular(12),
        
       ),
       child: Column(

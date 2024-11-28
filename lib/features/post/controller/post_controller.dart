@@ -12,6 +12,7 @@ import 'package:geolocation/core/modal/modal.dart';
 import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:geolocation/features/file/model/media_file.dart';
+import 'package:geolocation/features/post/create_or_edit_post_page.dart';
 import 'package:geolocation/features/post/model/post.dart';
 import 'package:geolocation/features/video/file_viewer.dart';
 import 'package:geolocation/features/video/local_video_player.dart';
@@ -38,6 +39,35 @@ class PostController extends GetxController {
   var posts = <Post>[].obs;
   var selectedItem = Post().obs;
   var isPublish = true.obs;
+
+
+
+
+
+  void selectItemAndNavigateToUpdatePage(Post item)  async {
+    
+    selectedItem(item);
+  update(); 
+
+  print('VALUE WHEN SELECT');
+  print(selectedItem.value); // Debug print to check the selected item
+  print('VALUE WHEN SELECT-----------------');
+
+  await Get.to(() => CreateOrEditPostPage(), arguments: {
+    'post': item,
+    'isEditMode': true, // Set this flag to indicate edit mode
+  }, transition: Transition.cupertino);
+  // Get.to(() => CreateOrEditPostPage(isEditMode: true), arguments: collection);
+}
+
+  void setSelectedItemAndFillForm(Post item){
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+    selectedItem(item);
+    update();
+    fillForm();
+
+    });
+  }
 
   Future<void> loadData() async {
      isLoading(true);
@@ -170,6 +200,12 @@ formValues.forEach((key, value) {
       }
       // return;
       // API Endpoint
+
+
+      
+    formData.fields.forEach((field) {
+  print('Field: ${field.key} = ${field.value}');
+});
       String endpoint = '/posts';
 
       // Make API call
@@ -194,9 +230,18 @@ formValues.forEach((key, value) {
              Get.back();
           isLoading(false);
           uploadProgress.value = 0.0;
-          mediaFiles.clear();
+          
           Modal.success(message: 'Post created successfully!');
           Get.offNamedUntil('/posts', (route) => route.isFirst);
+
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+               isLoading(false);
+                uploadProgress.value = 0.0;
+                  clearForm();
+                   Get.offNamedUntil('/posts', (route) => route.isFirst);
+                    Modal.success(message: 'Post updated successfully!');
+            });
+            
         },
       );
     } catch (e) {
@@ -211,9 +256,102 @@ formValues.forEach((key, value) {
     Modal.showToast(msg: 'Please complete the form.');
   }
 }
+Future<void> updatePost() async {
+  if (formKey.currentState?.saveAndValidate() ?? false) {
+    // Show loading modal
+    Modal.loading();
+    isLoading(true);
+    update();
+
+    try {
+      // Extract form values
+      var formValues = formKey.currentState!.value;
+
+      // Prepare FormData for the API request
+      var formData = dio.FormData();
+
+      // Add form fields
+      formValues.forEach((key, value) {
+        if (key == 'is_publish' && value is bool) {
+          // Convert boolean to 1/0
+          formData.fields.add(MapEntry(key, value ? '1' : '0'));
+        } else {
+          formData.fields.add(MapEntry(key, value.toString()));
+        }
+      });
+
+      // Add media files
+      for (var file in mediaFiles) {
+        formData.files.add(MapEntry(
+          'media[]',
+          await dio.MultipartFile.fromFile(
+            file.path,
+            filename: file.path.split('/').last,
+          ),
+        ));
+      }
+
+      // Debug log to ensure data is being sent correctly
+      print("FormData being sent:");
+      formData.fields.forEach((field) {
+        print('${field.key}: ${field.value}');
+      });
+
+      // API endpoint for updating the post
+      String endpoint = '/posts/${selectedItem.value.id}';
+
+      // Call the API
+      var response = await ApiService.filePutAuthenticatedResource(
+        endpoint,
+        formData,
+        onSendProgress: (int sent, int total) {
+          uploadProgress.value = sent / total;
+          update();
+        },
+      );
+
+      // Handle the API response
+      response.fold(
+        (failure) {
+          // On failure, close the loading modal and show error
+          Get.back(); // Close the modal
+          isLoading(false);
+          uploadProgress.value = 0.0;
+          update();
+          Modal.errorDialog(failure: failure);
+        },
+        (success) {
+          // On success, clear form and return to the post list
+          Get.back(); // Close the modal
+          isLoading(false);
+          uploadProgress.value = 0.0;
+          mediaFiles.clear();
+          clearForm();
+          update();
+          Get.offNamedUntil('/posts', (route) => route.isFirst);
+          Modal.success(message: 'Post updated successfully!');
+        },
+      );
+    } catch (e) {
+      // Handle any unexpected errors
+      isLoading(false);
+      uploadProgress.value = 0.0;
+      update();
+      Modal.errorDialog(message: 'An error occurred. Please try again. $e');
+    } finally {
+      // Always update state at the end
+      update();
+    }
+  } else {
+    // If validation fails, show a toast
+    Modal.showToast(msg: 'Please complete the form.');
+  }
+}
 
 
-  Future<void> updatePost() async {}
+
+
+
   Future<void> deletePost() async {}
   Future<void> getPost() async {}
   Future<void> removeFileFromDatabase() async {}
@@ -225,16 +363,29 @@ formValues.forEach((key, value) {
   }
 
   void fillForm() {
-    if (selectedItem.value.id == null) return;
+   
+     print('---------------VALUE IN FILE FORM BEFORE FILL---------------');
+  print(selectedItem.value);
+  print('---------------');
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+     
 
     final formData = {
       'title': selectedItem.value.title ?? '',
       'content': selectedItem.value.content ?? '',
       'description': selectedItem.value.description ?? '',
-      'is_publish': selectedItem.value.isPublish ?? false,
+       'is_publish': selectedItem.value.isPublish ?? true,
     };
+      formKey.currentState?.patchValue(formData); // Populate the form with 
+      update(); 
+    });
   }
-  void clearForm() {}
+  void clearForm() {
+    mediaFiles.clear();
+    formKey.currentState?.reset();
+     update();
+     // Reset the form fields
+  }
   void viewFile(File file) {
     if (file.path.endsWith(".mp4")) {
       Get.to(() => LocalVideoPlayer(filePath: file.path));
@@ -244,13 +395,6 @@ formValues.forEach((key, value) {
   }
 
 
- Future<void> updateCollection() async {
-  if (!formKey.currentState!.saveAndValidate()) {
-    
-    return;
-  }
-  
- }
 
   Future<void> pickFile() async {
   const int maxFileSize = 50 * 1024 * 1024; // 50 MB in bytes
