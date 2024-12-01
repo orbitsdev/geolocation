@@ -22,7 +22,7 @@ class User {
   final String? role;
   final String? image;
   final List<CouncilPosition>? councilPositions;
-  final CouncilPosition? defaultPosition;
+    final CouncilPosition? defaultPosition;
 
   User({
     this.id,

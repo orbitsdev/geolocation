@@ -10,6 +10,7 @@ import 'package:geolocation/core/globalwidget/images/local_lottie_image.dart';
 import 'package:geolocation/core/globalwidget/logout_loading.dart';
 import 'package:geolocation/core/modal/modal.dart';
 import 'package:geolocation/core/services/firebase_service.dart';
+import 'package:geolocation/features/auth/model/council_position.dart';
 import 'package:geolocation/features/auth/model/user.dart';
 import 'package:get/get.dart';
 import 'package:geolocation/core/localdata/secure_storage.dart';
@@ -32,6 +33,9 @@ class AuthController extends GetxController {
   var user = User().obs;
   var token = ''.obs;
   var isTokenLoaded = false.obs;
+
+int? selectedPositionId; 
+
 
   Future<void> loadTokenAndUser({bool showModal = true}) async {
     try {
@@ -325,12 +329,36 @@ class AuthController extends GetxController {
     Get.offAllNamed('/login');
   }
 
-  Future<void> switchPosition(int positionId) async {
+  
+
+  void setSelectedPosition(CouncilPosition position) {
+    selectedPositionId = position.id;
+    update(); // Notify listeners
+  }
+
+  // Confirm and switch the position
+  Future<void> confirmAndSwitchPosition() async {
+    if (selectedPositionId == null) return;
+
+    Modal.confirmation(
+      titleText: 'Switch Position',
+      contentText: 'Are you sure you want to switch to this position?',
+      onConfirm: () async {
+        await switchPosition(selectedPositionId as int);
+        selectedPositionId = null; // Reset after switching
+        update(); // Update UI
+      },
+    );
+  }
+
+ Future<void> switchPosition(int positionId) async {
   Modal.loading(); // Show loading modal
+
   final result = await ApiService.putAuthenticatedResource(
     '/council-positions/$positionId/switch',
     {},
   );
+
   result.fold(
     (failure) {
       Get.back(); // Dismiss loading modal
@@ -340,24 +368,34 @@ class AuthController extends GetxController {
       );
     },
     (response) async {
-      // On success, update user and secure storage
-      final data = response.data['data'];
+      try {
+        // Handle success
+        final data = response.data['data']; // Make sure `response.data` contains the expected structure
+        user.value = User.fromJson(data);
 
-      user.value = User.fromJson(data);
+        await SecureStorage().writeSecureData('user', jsonEncode(data));
 
-      await SecureStorage().writeSecureData('user', jsonEncode(data));
-
-      Get.back(); // Dismiss loading modal
-      Modal.success(
-        message: 'Position switched successfully',
-        onDismiss: () {
-          // Redirect to the main page and reset navigation
-          Get.offAllNamed('/home-main');
-        },
-      );
+        Get.back(); // Dismiss loading modal
+        Modal.success(
+          message: 'Position switched successfully',
+          onDismiss: () {
+            Get.offAllNamed('/home-main'); // Navigate to the main page
+          },
+        );
+      } catch (e) {
+        // Log and handle parsing errors
+        print('Error parsing user data: $e');
+        Get.back(); // Dismiss loading modal
+        Modal.errorDialog(message: 'Failed to parse response data.');
+      }
     },
   );
 }
+
+
+
+  
+
 
 
 

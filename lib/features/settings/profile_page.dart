@@ -11,6 +11,7 @@ class ProfilePage extends GetView<AuthController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        
         title: const Text('Profile', style: TextStyle(color: Colors.white)),
         backgroundColor: Palette.PRIMARY,
         elevation: 0,
@@ -76,52 +77,7 @@ class ProfilePage extends GetView<AuthController> {
               const SizedBox(height: 16),
 
               // Council Positions Section
-              _buildSectionHeader('COUNCIL POSITIONS'),
-              Obx(
-                () {
-                  final positions = controller.user.value?.councilPositions ?? [];
-                  if (positions.isEmpty) {
-                    return const Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: Text(
-                        'No council positions found.',
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    );
-                  }
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: positions.length,
-                    itemBuilder: (context, index) {
-                      final position = positions[index];
-                      return ListTile(
-                        leading: Icon(
-                          position.isLogin == true
-                              ? Icons.check_circle
-                              : Icons.circle,
-                          color: position.isLogin == true
-                              ? Palette.PRIMARY
-                              : Colors.grey,
-                        ),
-                        title: Text(
-                          position.position ?? 'Unknown Position',
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                        subtitle: Text(
-                          '${position.councilName}',
-                          style: const TextStyle(color: Colors.grey),
-                        ),
-                        onTap: () {
-                          // Switch position
-                          controller.switchPosition(position.id!);
-                        },
-                      );
-                    },
-                  );
-                },
-              ),
-              const SizedBox(height: 16),
+              
 
               // Logout Section
               _buildSettingsItem(
