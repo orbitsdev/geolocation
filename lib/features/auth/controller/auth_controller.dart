@@ -10,11 +10,14 @@ import 'package:geolocation/core/globalwidget/images/local_lottie_image.dart';
 import 'package:geolocation/core/globalwidget/logout_loading.dart';
 import 'package:geolocation/core/modal/modal.dart';
 import 'package:geolocation/core/services/firebase_service.dart';
+import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/auth/model/council_position.dart';
 import 'package:geolocation/features/auth/model/user.dart';
 import 'package:get/get.dart';
 import 'package:geolocation/core/localdata/secure_storage.dart';
-import 'package:geolocation/core/api/dio/failure.dart'; // Import your Failure model
+import 'package:geolocation/core/api/dio/failure.dart';
+import 'package:image_picker/image_picker.dart'; // Import your Failure model
+import 'package:dio/dio.dart' as dio;
 
 class AuthController extends GetxController {
   static AuthController controller = Get.find();
@@ -35,6 +38,131 @@ class AuthController extends GetxController {
   var isTokenLoaded = false.obs;
 
 int? selectedPositionId; 
+
+
+  var uploadProgress = 0.0.obs;
+  final formKey = GlobalKey<FormBuilderState>();
+
+    final ImagePicker _picker = ImagePicker();
+
+
+  XFile? selectedImage;
+  // Pick an image for the profile
+  void showImagePickerOptions() {
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(16.0),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(16),
+            topRight: Radius.circular(16),
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading:  Icon(Icons.camera_alt, color: Palette.PRIMARY),
+              title: const Text('Take a Photo'),
+              onTap: () async {
+                Get.back();
+                selectedImage = await _picker.pickImage(source: ImageSource.camera);
+                if (selectedImage != null) update();
+              },
+            ),
+            ListTile(
+              leading:  Icon(Icons.photo_library, color: Palette.PRIMARY),
+              title: const Text('Choose from Gallery'),
+              onTap: () async {
+                Get.back();
+                selectedImage = await _picker.pickImage(source: ImageSource.gallery);
+                if (selectedImage != null) update();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+ Future<void> updateProfile() async {
+  if (formKey.currentState?.saveAndValidate() ?? false) {
+    // Show loading modal
+    Modal.loading();
+
+    try {
+      // Extract form values
+      var formValues = formKey.currentState!.value;
+
+      // Prepare FormData for the API request
+      var formData = dio.FormData();
+
+      // Add form fields
+      formValues.forEach((key, value) {
+        if (value != null) {
+          formData.fields.add(MapEntry(key, value.toString()));
+        }
+      });
+
+      // Add the avatar file if selected
+      if (selectedImage != null) {
+        formData.files.add(MapEntry(
+          'avatar',
+          await dio.MultipartFile.fromFile(
+            selectedImage!.path,
+            filename: selectedImage!.path.split('/').last,
+          ),
+        ));
+      }
+
+      // Debug log to ensure data is being sent correctly
+      print("FormData being sent:");
+      formData.fields.forEach((field) {
+        print('${field.key}: ${field.value}');
+      });
+
+      // Call the API
+      var response = await ApiService.filePostAuthenticatedResource(
+        'user/profile-update',
+        formData,
+        onSendProgress: (int sent, int total) {
+          uploadProgress.value = sent / total;
+          update();
+        },
+      );
+
+      // Handle the API response
+      Get.back(); // Close the loading modal
+
+      response.fold(
+        (failure) {
+          uploadProgress.value = 0.0; // Reset progress on failure
+          Modal.errorDialog(message: 'Failed to update profile', failure: failure);
+        },
+        (success) async {
+
+          print('-------------------- SUCCE DATA');
+          print(success.data);
+          // uploadProgress.value = 0.0; // Reset progress on success
+          // user.value = User.fromJson(success.data['data']); // Update user data locally
+          // await SecureStorage().writeSecureData('user', jsonEncode(user.value.toJson()));
+          // update(); // Notify UI of changes
+          Modal.success(message: 'Profile updated successfully');
+        },
+      );
+    } catch (e) {
+      // Handle any unexpected errors
+      uploadProgress.value = 0.0;
+      update();
+      Modal.errorDialog(message: 'An error occurred. Please try again. $e');
+    }
+  } else {
+    Modal.showToast(msg: 'Please complete the form.');
+  }
+}
+
+
 
 
   Future<void> loadTokenAndUser({bool showModal = true}) async {

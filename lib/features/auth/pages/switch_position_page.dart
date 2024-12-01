@@ -9,7 +9,11 @@ class SwitchPositionPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Palette.FBG,
       appBar: AppBar(
+        leading: IconButton(onPressed: (){
+          Get.back();
+        }, icon: Icon(Icons.arrow_back,color: Colors.white,)),
         title: Text(
           'Switch Position',
           style: Get.textTheme.titleLarge!.copyWith(color: Colors.white),
@@ -21,7 +25,7 @@ class SwitchPositionPage extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+        children: [
             Text(
               'Choose Your Position',
               style: Get.textTheme.titleLarge,
@@ -59,7 +63,7 @@ class SwitchPositionPage extends StatelessWidget {
                                 ? Palette.PRIMARY.withOpacity(0.1)
                                 : isSelected
                                     ? Palette.PRIMARY
-                                    : Colors.grey[200],
+                                    : Colors.white,
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                           child: Stack(

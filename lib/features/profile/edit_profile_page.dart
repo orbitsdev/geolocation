@@ -1,86 +1,61 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:geolocation/core/constant/style.dart';
+import 'package:geolocation/core/globalwidget/images/online_image.dart';
 import 'package:geolocation/core/theme/palette.dart';
-import 'package:geolocation/features/profile/controller/profile_controller.dart';
+import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
 
 class EditProfilePage extends StatelessWidget {
-  final ProfileController controller = Get.find<ProfileController>();
-  final ImagePicker _picker = ImagePicker();
-
-  final _formKey = GlobalKey<FormBuilderState>();
-
-  Future<void> _changeProfilePicture(BuildContext context) async {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: Icon(Icons.camera_alt),
-              title: Text('Take a Photo'),
-              onTap: () async {
-                Navigator.pop(context);
-                final pickedFile = await _picker.pickImage(source: ImageSource.camera);
-                if (pickedFile != null) {
-                  controller.userProfile.update((val) {
-                    val?.profileImageUrl = pickedFile.path;
-                  });
-                }
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.photo_library),
-              title: Text('Upload from Gallery'),
-              onTap: () async {
-                Navigator.pop(context);
-                final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-                if (pickedFile != null) {
-                  controller.userProfile.update((val) {
-                    val?.profileImageUrl = pickedFile.path;
-                  });
-                }
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+  final AuthController controller = Get.find<AuthController>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Profile', style: TextStyle(color: Palette.PRIMARY)),
-        backgroundColor: Colors.transparent,
+        leading: IconButton(
+          onPressed: () {
+            Get.back();
+          },
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+        ),
+        title: const Text(
+          'Edit Profile',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Palette.PRIMARY,
         elevation: 0,
-        iconTheme: IconThemeData(color: Palette.PRIMARY),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
-        child: GetBuilder<ProfileController>(
+        padding: const EdgeInsets.all(16.0),
+        child: GetBuilder<AuthController>(
           builder: (controller) {
             return FormBuilder(
               key: controller.formKey,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   GestureDetector(
-                    onTap: () => _changeProfilePicture(context),
+                    onTap: () => controller.showImagePickerOptions(),
                     child: Stack(
+                      alignment: Alignment.center,
                       children: [
-                        Obx(() {
-                          return CircleAvatar(
-                            radius: 50,
-                            backgroundImage: NetworkImage(controller.userProfile.value.profileImageUrl),
-                            backgroundColor: Palette.LIGHT_BACKGROUND,
-                          );
-                        }),
+                        ClipOval(
+                          child: Container(
+                            width: 90,
+                            height: 90,
+                            child: controller.selectedImage != null
+                                ? Image.file(
+                                    File(controller.selectedImage!.path),
+                                    fit: BoxFit.cover,
+                                  )
+                                : OnlineImage(
+                                    borderRadius: BorderRadius.circular(90),
+                                    imageUrl: controller.user.value.image ?? '',
+                                  ),
+                          ),
+                        ),
                         Positioned(
                           bottom: 0,
                           right: 0,
@@ -89,72 +64,83 @@ class EditProfilePage extends StatelessWidget {
                               color: Palette.PRIMARY,
                               shape: BoxShape.circle,
                             ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Icon(Icons.edit, color: Colors.white, size: 20),
+                            child: const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Icon(
+                                Icons.edit,
+                                color: Colors.white,
+                                size: 20,
+                              ),
                             ),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  SizedBox(height: 24),
-            
-                  // Full Name
-                  _buildTextField('Full Name', 'full_name', controller.userProfile.value.fullName),
-                  SizedBox(height: 16),
-            
-                  // Email
-                  _buildTextField('Email', 'email', controller.userProfile.value.email),
-                  SizedBox(height: 16),
-            
-                  // Council Position
-                  _buildTextField('Council Position', 'council_position', controller.userProfile.value.councilPosition),
-                  SizedBox(height: 16),
-            
-                  // Year
-                  _buildTextField('Year', 'year', controller.userProfile.value.year),
-                  SizedBox(height: 32),
-             
-                 
+                  const SizedBox(height: 24),
+                  _buildTextField(
+                    'First Name',
+                    'first_name',
+                    controller.user.value.firstName ?? '',
+                  ),
+                  const SizedBox(height: 16),
+                  _buildTextField(
+                    'Last Name',
+                    'last_name',
+                    controller.user.value.lastName ?? '',
+                  ),
+                  const SizedBox(height: 16),
+                  GetBuilder<AuthController>(
+                    builder: (controller) {
+                      if (controller.uploadProgress.value > 0 &&
+                          controller.uploadProgress.value < 1) {
+                        return LinearProgressIndicator(
+                          value: controller.uploadProgress.value,
+                          color: Palette.PRIMARY,
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    },
+                  ),
                 ],
               ),
             );
-          }
+          },
         ),
       ),
-      bottomSheet:  GetBuilder<ProfileController>(
-         builder: (controller) {
-           return Container(
-              height: Get.size.height * 0.11,
-            padding: EdgeInsets.all(16),
-             decoration:   BoxDecoration(color: Colors.white, boxShadow: [
-              BoxShadow(
-            color:  Color(0x000000).withOpacity(0.03),
-            offset: Offset(0, -4),
-            blurRadius: 3,
-            spreadRadius: 0,
-           )
-             ]),
-              
-                 child:  Container(
-                    width: Get.size.width,
-                        constraints: const BoxConstraints(minWidth: 150),
-                        height: Get.size.height,
-                        child: ElevatedButton(
-                            style:ELEVATED_BUTTON_STYLE,
-                            onPressed: (){
-                                controller.updateProfile();
-                            },
-                            child: Text(
-                              'Save',
-                              style: Get.textTheme.bodyLarge!.copyWith(
-                                  color: Colors.white, fontWeight: FontWeight.normal),
-                            )),
-                      ),
-               );
-         }
-       ),
+      bottomSheet: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 5,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: SizedBox(
+          width: double.infinity,
+          height: 50,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Palette.PRIMARY,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            onPressed: () => controller.updateProfile(),
+            child: const Text(
+              'Save Changes',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -166,19 +152,13 @@ class EditProfilePage extends StatelessWidget {
         labelText: label,
         filled: true,
         fillColor: Palette.LIGHT_BACKGROUND,
-        contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         border: OutlineInputBorder(
           borderSide: BorderSide.none,
           borderRadius: BorderRadius.circular(12),
         ),
       ),
-      style: TextStyle(
-        fontSize: 16,
-        color: Palette.DARK_PRIMARY,
-      ),
-      validator: FormBuilderValidators.compose([
-        FormBuilderValidators.required(),
-      ]),
+      validator: FormBuilderValidators.compose([FormBuilderValidators.required()]),
     );
   }
 }
