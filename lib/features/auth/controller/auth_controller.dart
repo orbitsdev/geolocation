@@ -86,7 +86,8 @@ int? selectedPositionId;
     );
   }
 
- Future<void> updateProfile() async {
+
+Future<void> updateProfile() async {
   if (formKey.currentState?.saveAndValidate() ?? false) {
     // Show loading modal
     Modal.loading();
@@ -107,13 +108,18 @@ int? selectedPositionId;
 
       // Add the avatar file if selected
       if (selectedImage != null) {
+        print("Selected Image Path: ${selectedImage!.path}"); // Print selected image path
+        print("Selected Image Filename: ${selectedImage!.path.split('/').last}"); // Print image filename
+
         formData.files.add(MapEntry(
-          'avatar',
+          'profile_image',
           await dio.MultipartFile.fromFile(
             selectedImage!.path,
             filename: selectedImage!.path.split('/').last,
           ),
         ));
+      } else {
+        print("No image selected."); // Print if no image is selected
       }
 
       // Debug log to ensure data is being sent correctly
@@ -122,7 +128,6 @@ int? selectedPositionId;
         print('${field.key}: ${field.value}');
       });
 
-      // Call the API
       var response = await ApiService.filePostAuthenticatedResource(
         'user/profile-update',
         formData,
@@ -141,14 +146,24 @@ int? selectedPositionId;
           Modal.errorDialog(message: 'Failed to update profile', failure: failure);
         },
         (success) async {
-
-          print('-------------------- SUCCE DATA');
+          print('-------------------- SUCCESS DATA');
           print(success.data);
-          // uploadProgress.value = 0.0; // Reset progress on success
-          // user.value = User.fromJson(success.data['data']); // Update user data locally
-          // await SecureStorage().writeSecureData('user', jsonEncode(user.value.toJson()));
-          // update(); // Notify UI of changes
-          Modal.success(message: 'Profile updated successfully');
+          uploadProgress.value = 0.0; // Reset progress on success
+          user.value = User.fromJson(success.data['data']); // Update user data locally
+          await SecureStorage().writeSecureData('user', jsonEncode(user.value.toJson()));
+
+          // Clear selected image
+          selectedImage = null;
+
+          update(); // Notify UI of changes
+          
+          // Show success modal and navigate back
+          Modal.success(
+            message: 'Profile updated successfully',
+            onDismiss: () {
+              Get.back(); // Navigate back to the previous screen
+            },
+          );
         },
       );
     } catch (e) {

@@ -801,7 +801,8 @@ class TaskController extends GetxController {
 
       Modal.androidDialogNoContext();
 
-      var response = await ApiService.putAuthenticatedResource('tasks/$id', data);
+      var response =
+          await ApiService.putAuthenticatedResource('tasks/$id', data);
 
       response.fold(
         (failure) {

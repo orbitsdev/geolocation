@@ -91,17 +91,19 @@ class EditProfilePage extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   GetBuilder<AuthController>(
-                    builder: (controller) {
-                      if (controller.uploadProgress.value > 0 &&
-                          controller.uploadProgress.value < 1) {
-                        return LinearProgressIndicator(
-                          value: controller.uploadProgress.value,
-                          color: Palette.PRIMARY,
-                        );
-                      }
-                      return const SizedBox.shrink();
-                    },
-                  ),
+  builder: (controller) {
+    if (controller.selectedImage != null && 
+        controller.uploadProgress.value > 0 && 
+        controller.uploadProgress.value < 1) {
+      return LinearProgressIndicator(
+        value: controller.uploadProgress.value,
+        color: Palette.PRIMARY,
+      );
+    }
+    return const SizedBox.shrink(); // Return empty widget if no image or no progress
+  },
+),
+
                 ],
               ),
             );

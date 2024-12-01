@@ -19,7 +19,9 @@ class ProfilePage extends StatelessWidget {
         
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () {},
+          onPressed: () {
+            Get.back();
+          },
         ),
         title: const Text("Profile"),
         centerTitle: true,
