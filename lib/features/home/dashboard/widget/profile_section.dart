@@ -24,7 +24,9 @@ class _ProfileSectionState extends State<ProfileSection> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      NotificationController.controller.loadNotifications();
+      if (Get.isRegistered<NotificationController>()) {
+        NotificationController.controller.loadNotifications();
+      }
     });
   }
 
@@ -39,6 +41,7 @@ class _ProfileSectionState extends State<ProfileSection> {
         return ToSliver(
           child: Container(
             padding: const EdgeInsets.all(16),
+            width: double.infinity, // Constrain the width to prevent unbounded errors
             decoration: const BoxDecoration(
               color: Colors.white,
             ),
@@ -47,9 +50,10 @@ class _ProfileSectionState extends State<ProfileSection> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Row(
+                  mainAxisSize: MainAxisSize.min, // Prevent infinite width issues
                   children: [
                     RippleContainer(
-                      onTap: () => Get.to(() => ProfilePage()),
+                      onTap: () => Get.to(() => const ProfilePage()),
                       child: Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(40),
@@ -64,6 +68,7 @@ class _ProfileSectionState extends State<ProfileSection> {
                     ),
                     const Gap(16),
                     Flexible(
+                      fit: FlexFit.loose, // Avoid forcing infinite width
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -92,14 +97,15 @@ class _ProfileSectionState extends State<ProfileSection> {
                 GetBuilder<NotificationController>(
                   builder: (notificationController) {
                     final unreadCount = notificationController.notifications
-                        .where((notification) => notification.read_at == null)
-                        .length;
+                            ?.where((notification) => notification.read_at == null)
+                            .length ??
+                        0;
 
                     return NotificationBadgeGlobal(
                       value: unreadCount,
                       action: () {
                         Get.to(
-                          () => NotificationPage(),
+                          () =>  NotificationPage(),
                           transition: Transition.cupertino,
                         );
                       },

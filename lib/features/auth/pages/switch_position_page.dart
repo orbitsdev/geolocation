@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocation/core/theme/palette.dart';
 import 'package:get/get.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
+import 'package:lottie/lottie.dart';
 
 class SwitchPositionPage extends StatelessWidget {
   final AuthController authController = Get.find<AuthController>();
@@ -11,9 +12,12 @@ class SwitchPositionPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Palette.FBG,
       appBar: AppBar(
-        leading: IconButton(onPressed: (){
-          Get.back();
-        }, icon: Icon(Icons.arrow_back,color: Colors.white,)),
+        leading: IconButton(
+          onPressed: () {
+            Get.back();
+          },
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+        ),
         title: Text(
           'Switch Position',
           style: Get.textTheme.titleLarge!.copyWith(color: Colors.white),
@@ -25,7 +29,7 @@ class SwitchPositionPage extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+          children: [
             Text(
               'Choose Your Position',
               style: Get.textTheme.titleLarge,
@@ -42,6 +46,38 @@ class SwitchPositionPage extends StatelessWidget {
                   final user = controller.user.value;
                   final positions = user.councilPositions ?? [];
                   final selectedPositionId = controller.selectedPositionId;
+
+                  if (positions.isEmpty) {
+                    // Show empty state when no positions are available
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Lottie.asset(
+                            'assets/lotties/empty2.json',
+                            width: 200,
+                            height: 200,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'No Positions Available',
+                            style: Get.textTheme.bodyLarge?.copyWith(
+                              color: Colors.grey,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'It seems like you don’t have any more positions assigned.',
+                            style: Get.textTheme.bodyMedium?.copyWith(
+                              color: Colors.grey,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    );
+                  }
 
                   return ListView.builder(
                     itemCount: positions.length,

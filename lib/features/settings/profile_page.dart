@@ -50,11 +50,23 @@ class ProfilePage extends StatelessWidget {
                   // Council Details Section
                   if (defaultPosition != null) _buildCouncilDetailsCard(defaultPosition),
 
-                  const Gap(20),
-                  Divider(color: Colors.grey.shade300, thickness: 1),
+                  const Gap(10),
+             
 
                   // Action Buttons Section
-                  _buildActionButtons(controller),
+                  if((controller.user.value.councilPositions ??[]).isNotEmpty)_buildActionButtons(controller),
+                   const Gap(10),
+    
+
+        // Edit Profile and Log Out Buttons
+       
+        _buildListTile(
+          icon: Icons.logout,
+          title: "Log Out",
+          onTap: () {
+            controller.logout();
+          },
+        ),
                 ],
               );
             },
@@ -67,32 +79,61 @@ class ProfilePage extends StatelessWidget {
   // User Details Section
   Widget _buildUserDetails(User user) {
     return Center(
-      child: Column(
-        children: [
-          Container(
-            height: 100,
-            width: 100,
-           
-            child: OnlineImage(imageUrl: '${user.image}'),
-          ),
-          const Gap(10),
-          Text(
-            "${user.fullName}",
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+  child: Column(
+    children: [
+      SizedBox(
+        height: 100,
+        width: 100,
+        child: Stack(
+          children: [
+            // User Image
+            ClipOval(
+              child: OnlineImage(imageUrl: '${user.image}'),
             ),
-          ),
-          Text(
-            "${user.email}",
-            style: const TextStyle(
-              fontSize: 16,
-              color: Colors.grey,
+            // Edit Icon
+            Positioned(
+              bottom: 0,
+              right: 0,
+              child: GestureDetector(
+                onTap: () {
+            Get.to(()=>  EditProfilePage());
+          },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Palette.PRIMARY, // Background color for the icon
+                    shape: BoxShape.circle,
+                  ),
+                  padding: const EdgeInsets.all(4),
+                  child: const Icon(
+                    Icons.edit,
+                    size: 20,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    );
+      const Gap(10),
+      Text(
+        "${user.fullName}",
+        style: const TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      Text(
+        "${user.email}",
+        style: const TextStyle(
+          fontSize: 16,
+          color: Colors.grey,
+        ),
+      ),
+    ],
+  ),
+);
+
   }
 
   // Council Details Card Section
@@ -131,6 +172,8 @@ class ProfilePage extends StatelessWidget {
   Widget _buildActionButtons(AuthController controller) {
     return Column(
       children: [
+
+            Divider(color: Colors.grey.shade300, thickness: 1),
         // Switch Position Button
         TextButton.icon(
           onPressed: () {
@@ -156,24 +199,7 @@ class ProfilePage extends StatelessWidget {
             ),
           ),
         ),
-        const Gap(10),
-        Divider(color: Colors.grey.shade300, thickness: 1),
-
-        // Edit Profile and Log Out Buttons
-        _buildListTile(
-          icon: Icons.edit,
-          title: "Edit Profile",
-          onTap: () {
-            Get.to(()=>  EditProfilePage());
-          },
-        ),
-        _buildListTile(
-          icon: Icons.logout,
-          title: "Log Out",
-          onTap: () {
-            controller.logout();
-          },
-        ),
+            Divider(color: Colors.grey.shade300, thickness: 1),
       ],
     );
   }

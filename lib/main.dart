@@ -19,11 +19,13 @@ import 'package:geolocation/features/event/event_page.dart';
 import 'package:geolocation/features/globalpage/forbidden_page.dart';
 import 'package:geolocation/features/home/admin_home_main_page.dart';
 import 'package:geolocation/features/home/middleware/full_access_middleware.dart';
+import 'package:geolocation/features/home/middleware/role_middleware.dart';
 import 'package:geolocation/features/map/sample_map.dart';
 import 'package:geolocation/features/council_positions/pages/council_member_position_list_page.dart';
 import 'package:geolocation/features/notification/notification_page.dart';
 import 'package:geolocation/features/playground/login_page_test.dart';
 import 'package:geolocation/features/playground/modal_test_page.dart';
+import 'package:geolocation/features/playground/officer_home_page.dart';
 import 'package:geolocation/features/playground/page1.dart';
 import 'package:geolocation/features/playground/page1_middleware.dart';
 import 'package:geolocation/features/playground/page2.dart';
@@ -136,7 +138,9 @@ class _GeoLocationAppState extends State<GeoLocationApp>  with WidgetsBindingObs
         GetPage(name: '/login', page: () => LoginPage(), middlewares:[GuestMiddleware()]),
         GetPage(name: '/sign-up', page: () => SignupPage(),middlewares:[GuestMiddleware()]),
         GetPage(name: '/login-selection', page: () => LoginSelectionPage(), middlewares: []),
-        GetPage(name: '/home-main', page: () => AdminHomeMainPage(), middlewares: [AuthMiddleware(), FullAccessMiddleware()]),
+        
+        GetPage(name: '/home-main', page: () => AdminHomeMainPage(), middlewares: [AuthMiddleware(), RoleMiddleware()]),
+        GetPage(name: '/home-officer', page: () => OfficerHomePage(), middlewares: [AuthMiddleware()]),
 
         GetPage(name: '/councils', page: () => CouncilListPage(), middlewares: []),
         GetPage(name: '/members', page: () => CouncilMemberPositionListPage(), middlewares: []),

@@ -408,6 +408,7 @@ Future<void> updateProfile() async {
 
             // Update the user and save it to SecureStorage
             user(updatedUser);
+            print(user.toJson());
 
             await SecureStorage().writeSecureData(
               'user',

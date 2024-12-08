@@ -10,6 +10,8 @@ import 'package:get/get.dart';
 class ForbiddenPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final AuthController authController = Get.find<AuthController>();
+
     return Scaffold(
       backgroundColor: Palette.LIGH_BACKGROUND_GREEN2,
       body: SafeArea(
@@ -28,11 +30,10 @@ class ForbiddenPage extends StatelessWidget {
                       if (defaultPosition != null) {
                         return Column(
                           children: [
-                            
+                            // Profile Image
                             Center(
                               child: Column(
                                 children: [
-                                  // Profile Image
                                   Container(
                                     height: 70,
                                     width: 70,
@@ -50,17 +51,18 @@ class ForbiddenPage extends StatelessWidget {
                                     style: Get.textTheme.bodyLarge,
                                   ),
                                   const SizedBox(height: 4),
-                                Text(
-  '${defaultPosition.position ?? 'N/A'} - ${defaultPosition.councilName ?? 'N/A'}',
-  style: Get.textTheme.bodyMedium!.copyWith(
-    fontWeight: FontWeight.w500,
-  ),
-),
-
+                                  Text(
+                                    '${defaultPosition.position ?? 'N/A'} - ${defaultPosition.councilName ?? 'N/A'}',
+                                    style: Get.textTheme.bodyMedium!.copyWith(
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
                                   const SizedBox(height: 4),
                                   // Access Rights
                                   Text(
-                                    '${defaultPosition.grantAccess == true ? "Granted" : "Restricted"}',
+                                    defaultPosition.grantAccess == true
+                                        ? "Granted"
+                                        : "Restricted",
                                     style: Get.textTheme.bodySmall!.copyWith(
                                       color: defaultPosition.grantAccess == true
                                           ? Colors.green
@@ -74,10 +76,13 @@ class ForbiddenPage extends StatelessWidget {
                           ],
                         );
                       } else {
-                        return Text(
-                          'No default position found. Please switch to a valid position.',
-                          textAlign: TextAlign.center,
-                          style: Get.textTheme.bodyMedium,
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 24),
+                          child: Text(
+                            'No default position found. Please switch to a valid position.',
+                            textAlign: TextAlign.center,
+                            style: Get.textTheme.bodyMedium,
+                          ),
                         );
                       }
                     },
@@ -99,34 +104,46 @@ class ForbiddenPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 24),
                   // "Switch Account" Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Get.to(() => SwitchPositionPage());
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Palette.ORANGE, // Button color
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: Text(
-                        'Switch Account',
-                        style: Get.textTheme.bodyLarge!.copyWith(
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
+                  GetBuilder<AuthController>(
+                    builder: (authController) {
+                      final hasPositions = (authController.user.value.councilPositions ?? []).isNotEmpty;
+
+                      if (hasPositions) {
+                        return Column(
+                          children: [
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: () => Get.to(() => SwitchPositionPage()),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Palette.ORANGE, // Button color
+                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                child: Text(
+                                  'Switch Account',
+                                  style: Get.textTheme.bodyLarge!.copyWith(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Or',
+                              style: Get.textTheme.bodySmall,
+                            ),
+                            const SizedBox(height: 8),
+                          ],
+                        );
+                      } else {
+                        return const SizedBox.shrink();
+                      }
+                    },
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Or',
-                    style: Get.textTheme.bodySmall,
-                  ),
-                  const SizedBox(height: 8),
                   // Logout Button
                   SizedBox(
                     width: double.infinity,

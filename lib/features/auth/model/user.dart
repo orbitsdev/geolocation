@@ -8,7 +8,7 @@ import 'package:geolocation/features/auth/model/council_position.dart';
 
 class Role  {
     static String ADMIN = 'admin';
-    static String User = 'user';
+    static String USER = 'user';
 }
 
 class User {
@@ -163,11 +163,18 @@ class User {
   }
   
   bool isAdmin(){
-    return this.role == Role.ADMIN;
+    return role == Role.ADMIN;
   }
 
   bool hasAccess() {
   return defaultPosition?.grantAccess == true;
 }
+
+bool hasAnyRole(List<String> roles) {
+    if (role == null || roles.isEmpty) {
+      return false;
+    }
+    return roles.contains(role);
+  }
 
 }

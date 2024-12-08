@@ -21,7 +21,7 @@ class LoginPage extends GetView<AuthController> {
       body: SafeArea(
         child: GestureDetector(
           onTap: () {
-               FocusScope.of(context).unfocus();
+              //  FocusScope.of(context).unfocus();
            
           },
           child: SingleChildScrollView(
