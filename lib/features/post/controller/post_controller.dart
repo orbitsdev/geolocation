@@ -38,9 +38,11 @@ class PostController extends GetxController {
   var hasData = false.obs;
   var posts = <Post>[].obs;
   var selectedItem = Post().obs;
-  var isPublish = true.obs;
+  var isPublish = true.obs; // Observable for reactive state
 
-
+void togglePublish(bool value) {
+    isPublish.value = value;
+  }
 
 
 
@@ -149,66 +151,150 @@ class PostController extends GetxController {
       update();
     });
   }
+  
 
-  Future<void> createPost() async {
+Future<void> createPost() async {
   if (formKey.currentState?.saveAndValidate() ?? false) {
     isLoading(true);
     update();
 
     try {
       Modal.loading();
-      // Gather form data
-      var formValues = formKey.currentState!.value;
 
-      // Debug print to log form data
-      print("Form Data:------------");
-      formValues.forEach((key, value) {
-        print("$key: $value");
+      // Get form values
+      var formData = formKey.currentState!.value;
+
+      // Create a clean map to pass data
+      var requestData = {
+        'title': formData['title'],
+        'content': formData['content'],
+        'description': formData['description'],
+        'is_publish': formData['is_publish'] == true ? 1 : 0,
+      };
+
+      // Debug print the request data
+      print("Request Data:");
+      print(requestData);
+      print("--------------------");
+     
+
+      // Prepare FormData
+      var fileData = dio.FormData();
+      requestData.forEach((key, value) {
+        fileData.fields.add(MapEntry(key, value.toString())); // Convert values to strings
       });
 
-      // Prepare FormData for API request
-      var formData = dio.FormData();
-
-      // Add form fields to FormData
-      // Add form fields to FormData
-formValues.forEach((key, value) {
-  // Ensure boolean for `is_publish` field
-  if (key == 'is_publish' && value is bool) {
-    formData.fields.add(MapEntry(key, value ? '1' : '0')); // Send as 1 or 0 for boolean
-  } else {
-    formData.fields.add(MapEntry(key, value.toString()));
-  }
-});
-
-      // is_publish
-
       // Add media files to FormData
-      for (var file in mediaFiles) {
-        formData.files.add(MapEntry(
-          'media[]',
-          await dio.MultipartFile.fromFile(
-            file.path,
-            filename: file.path.split('/').last,
-          ),
-        ));
+      if (mediaFiles.isNotEmpty) {
+        for (var file in mediaFiles) {
+          fileData.files.add(MapEntry(
+            'media[]',
+            await dio.MultipartFile.fromFile(
+              file.path,
+              filename: file.path.split('/').last,
+            ),
+          ));
+        }
       }
 
-      // Debug print to log media files
-      print("Media Files------------------");
-      for (var file in mediaFiles) {
-        print("File Path: ${file.path}");
-      }
-      // return;
-      // API Endpoint
+      // Debug print the FormData
+      print("FormData after adding fields:");
+      fileData.fields.forEach((field) {
+        print("Key: ${field.key}, Value: ${field.value}");
+      });
 
-
-      
-    formData.fields.forEach((field) {
-  print('Field: ${field.key} = ${field.value}');
-});
+      // API endpoint for creating the post
       String endpoint = '/posts';
 
-      // Make API call
+      // Make the API call
+      var response = await ApiService.filePostAuthenticatedResource(
+        endpoint,
+        fileData,
+        onSendProgress: (int sent, int total) {
+          uploadProgress.value = sent / total;
+          update();
+        },
+      );
+
+      // Handle the response
+      response.fold(
+        (failure) {
+          Get.back(); // Close the modal
+          isLoading(false);
+          Modal.errorDialog(failure: failure);
+        },
+        (success) {
+          Get.back(); // Close the modal
+          isLoading(false);
+          clearForm(); // Clear the form and reset data
+          loadData();
+          Modal.success(message: 'Post created successfully!');
+          Get.offNamedUntil('/posts', (route) => route.isFirst); // Navigate to the posts page
+        },
+      );
+    } catch (e) {
+      isLoading(false);
+      Modal.errorDialog(message: 'An error occurred: $e');
+    } finally {
+      update(); // Ensure UI updates
+    }
+  } else {
+    Modal.showToast(msg: 'Please complete the form.');
+  }
+}
+
+Future<void> updatePost() async {
+  if (formKey.currentState?.saveAndValidate() ?? false) {
+    isLoading(true);
+    update();
+
+    try {
+      Modal.loading();
+
+      // Get form values
+      var formValues = formKey.currentState!.value;
+
+      // Create a clean map to pass data
+      var requestData = {
+        'title': formValues['title'],
+        'content': formValues['content'],
+        'description': formValues['description'],
+        'is_publish': formValues['is_publish'] == true ? 1 : 0, // Ensure it's sent as 1/0
+      };
+
+      // Debug print the request data
+      print("Request Data:---------------------");
+      print(requestData);
+
+      // Prepare FormData
+      var formData = dio.FormData();
+      requestData.forEach((key, value) {
+        formData.fields.add(MapEntry(key, value.toString())); // Convert values to strings
+      });
+
+      // Add media files to FormData
+      if (mediaFiles.isNotEmpty) {
+        for (var file in mediaFiles) {
+          formData.files.add(MapEntry(
+            'media[]',
+            await dio.MultipartFile.fromFile(
+              file.path,
+              filename: file.path.split('/').last,
+            ),
+          ));
+        }
+      }
+
+      // Debug print the FormData
+      print("FormData after adding fields:");
+      formData.fields.forEach((field) {
+        print("Key: ${field.key}, Value: ${field.value}");
+      });
+
+      // API endpoint for updating the post
+      String endpoint = 'posts/update/${selectedItem.value.id}';
+
+      // Make the API call
       var response = await ApiService.filePostAuthenticatedResource(
         endpoint,
         formData,
@@ -218,135 +304,239 @@ formValues.forEach((key, value) {
         },
       );
 
+      // Handle the response
       response.fold(
         (failure) {
-          Get.back();
+          Get.back(); // Close the modal
           isLoading(false);
-          uploadProgress.value = 0.0;
-          update();
           Modal.errorDialog(failure: failure);
         },
         (success) {
-             Get.back();
-          isLoading(false);
-          uploadProgress.value = 0.0;
-          
-          Modal.success(message: 'Post created successfully!');
-          Get.offNamedUntil('/posts', (route) => route.isFirst);
-
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-               isLoading(false);
-                uploadProgress.value = 0.0;
-                  clearForm();
-                   Get.offNamedUntil('/posts', (route) => route.isFirst);
-                    Modal.success(message: 'Post updated successfully!');
-            });
-            
-        },
-      );
-    } catch (e) {
-      isLoading(false);
-      uploadProgress.value = 0.0;
-      update();
-      Modal.errorDialog(message: 'An error occurred. Please try again. ${e}');
-    } finally {
-      update();
-    }
-  } else {
-    Modal.showToast(msg: 'Please complete the form.');
-  }
-}
-Future<void> updatePost() async {
-  if (formKey.currentState?.saveAndValidate() ?? false) {
-    // Show loading modal
-    Modal.loading();
-    isLoading(true);
-    update();
-
-    try {
-      // Extract form values
-      var formValues = formKey.currentState!.value;
-
-      // Prepare FormData for the API request
-      var formData = dio.FormData();
-
-      // Add form fields
-      formValues.forEach((key, value) {
-        if (key == 'is_publish' && value is bool) {
-          // Convert boolean to 1/0
-          formData.fields.add(MapEntry(key, value ? '1' : '0'));
-        } else {
-          formData.fields.add(MapEntry(key, value.toString()));
-        }
-      });
-
-      // Add media files
-      for (var file in mediaFiles) {
-        formData.files.add(MapEntry(
-          'media[]',
-          await dio.MultipartFile.fromFile(
-            file.path,
-            filename: file.path.split('/').last,
-          ),
-        ));
-      }
-
-      // Debug log to ensure data is being sent correctly
-      print("FormData being sent:");
-      formData.fields.forEach((field) {
-        print('${field.key}: ${field.value}');
-      });
-
-      // API endpoint for updating the post
-      String endpoint = '/posts/${selectedItem.value.id}';
-
-      // Call the API
-      var response = await ApiService.filePutAuthenticatedResource(
-        endpoint,
-        formData,
-        onSendProgress: (int sent, int total) {
-          uploadProgress.value = sent / total;
-          update();
-        },
-      );
-
-      // Handle the API response
-      response.fold(
-        (failure) {
-          // On failure, close the loading modal and show error
           Get.back(); // Close the modal
           isLoading(false);
-          uploadProgress.value = 0.0;
-          update();
-          Modal.errorDialog(failure: failure);
-        },
-        (success) {
-          // On success, clear form and return to the post list
-          Get.back(); // Close the modal
-          isLoading(false);
-          uploadProgress.value = 0.0;
-          mediaFiles.clear();
-          clearForm();
-          update();
-          Get.offNamedUntil('/posts', (route) => route.isFirst);
+          clearForm(); // Clear the form and reset data
+          loadData(); // Refresh the list of posts
           Modal.success(message: 'Post updated successfully!');
+          Get.offNamedUntil('/posts', (route) => route.isFirst); // Navigate to the posts page
         },
       );
     } catch (e) {
-      // Handle any unexpected errors
       isLoading(false);
-      uploadProgress.value = 0.0;
-      update();
-      Modal.errorDialog(message: 'An error occurred. Please try again. $e');
+      Modal.errorDialog(message: 'An error occurred: $e');
     } finally {
-      // Always update state at the end
-      update();
+      update(); // Ensure UI updates
     }
   } else {
-    // If validation fails, show a toast
     Modal.showToast(msg: 'Please complete the form.');
   }
 }
+
+
+
+//   Future<void> createPost() async {
+//   if (formKey.currentState?.saveAndValidate() ?? false) {
+//     isLoading(true);
+//     update();
+
+//     try {
+//       Modal.loading();
+//       // Gather form data
+//       var formValues = formKey.currentState!.value;
+
+//       // Debug print to log form data
+//       print("Form Data:------------");
+//       formValues.forEach((key, value) {
+//         print("$key: $value");
+//       });
+
+//       // Prepare FormData for API request
+//       var formData = dio.FormData();
+
+//       // Add form fields to FormData
+//       // Add form fields to FormData
+//  formValues.forEach((key, value) {
+//   if (key == 'is_publish') {
+//     formData.fields.add(MapEntry(key, value.toString())); // Converts boolean to string
+//   } else {
+//     formData.fields.add(MapEntry(key, value.toString()));
+//   }
+// });
+
+
+//       // is_publish
+
+//       // Add media files to FormData
+//       for (var file in mediaFiles) {
+//         formData.files.add(MapEntry(
+//           'media[]',
+//           await dio.MultipartFile.fromFile(
+//             file.path,
+//             filename: file.path.split('/').last,
+//           ),
+//         ));
+//       }
+
+//       // Debug print to log media files
+//       print("Media Files------------------");
+//       for (var file in mediaFiles) {
+//         print("File Path: ${file.path}");
+//       }
+//       // return;
+//       // API Endpoint
+
+
+      
+//     formData.fields.forEach((field) {
+//   print('Field: ${field.key} = ${field.value}');
+// });
+//       String endpoint = '/posts';
+
+//       // Make API call
+//       var response = await ApiService.filePostAuthenticatedResource(
+//         endpoint,
+//         formData,
+//         onSendProgress: (int sent, int total) {
+//           uploadProgress.value = sent / total;
+//           update();
+//         },
+//       );
+
+//       response.fold(
+//         (failure) {
+//           Get.back();
+//           isLoading(false);
+//           uploadProgress.value = 0.0;
+//           update();
+//           Modal.errorDialog(failure: failure);
+//         },
+//         (success) {
+//              Get.back();
+//           isLoading(false);
+//           uploadProgress.value = 0.0;
+          
+//           Modal.success(message: 'Post created successfully!');
+//           Get.offNamedUntil('/posts', (route) => route.isFirst);
+
+//             WidgetsBinding.instance.addPostFrameCallback((_) {
+//                isLoading(false);
+//                 uploadProgress.value = 0.0;
+//                   clearForm();
+//                    Get.offNamedUntil('/posts', (route) => route.isFirst);
+//                     Modal.success(message: 'Post updated successfully!');
+//             });
+            
+//         },
+//       );
+//     } catch (e) {
+//       isLoading(false);
+//       uploadProgress.value = 0.0;
+//       update();
+//       Modal.errorDialog(message: 'An error occurred. Please try again. ${e}');
+//     } finally {
+//       update();
+//     }
+//   } else {
+//     Modal.showToast(msg: 'Please complete the form.');
+//   }
+// }
+
+
+// Future<void> updatePost() async {
+
+  
+//   if (formKey.currentState?.saveAndValidate() ?? false) {
+    
+  
+//     isLoading(true);
+//     update();
+
+//     try {
+//       Modal.loading();
+//       var formValues = formKey.currentState!.value;
+
+
+//        print("Form Data:------------");
+//       formValues.forEach((key, value) {
+//         print("$key: $value");
+//       });
+
+     
+//       var formData = dio.FormData();
+//  formValues.forEach((key, value) {
+//   if (key == 'is_publish') {
+//     formData.fields.add(MapEntry(key, value.toString())); // Converts boolean to string
+//   } else {
+//     formData.fields.add(MapEntry(key, value.toString()));
+//   }
+// });
+
+     
+//       for (var file in mediaFiles) {
+//         formData.files.add(MapEntry(
+//           'media[]',
+//           await dio.MultipartFile.fromFile(
+//             file.path,
+//             filename: file.path.split('/').last,
+//           ),
+//         ));
+//       }
+
+//       // Debug log to ensure data is being sent correctly
+//       print("FormData being sent:");
+//       formData.fields.forEach((field) {
+//         print('${field.key}: ${field.value}');
+//       });
+
+//       // API endpoint for updating the post
+//       String endpoint = '/posts/${selectedItem.value.id}';
+
+//       // Call the API
+//       var response = await ApiService.filePutAuthenticatedResource(
+//         endpoint,
+//         formData,
+//         onSendProgress: (int sent, int total) {
+//           uploadProgress.value = sent / total;
+//           update();
+//         },
+//       );
+
+//       // Handle the API response
+//       response.fold(
+//         (failure) {
+//           // On failure, close the loading modal and show error
+//           Get.back(); // Close the modal
+//           isLoading(false);
+//           uploadProgress.value = 0.0;
+//           update();
+//           Modal.errorDialog(failure: failure);
+//         },
+//         (success) {
+//           // On success, clear form and return to the post list
+//           Get.back(); // Close the modal
+//           isLoading(false);
+//           uploadProgress.value = 0.0;
+//           mediaFiles.clear();
+//           clearForm();
+//           update();
+//           Get.offNamedUntil('/posts', (route) => route.isFirst);
+//           Modal.success(message: 'Post updated successfully!');
+//         },
+//       );
+//     } catch (e) {
+//       // Handle any unexpected errors
+//       isLoading(false);
+//       uploadProgress.value = 0.0;
+//       update();
+//       Modal.errorDialog(message: 'An error occurred. Please try again. $e');
+//     } finally {
+//       // Always update state at the end
+//       update();
+//     }
+//   } else {
+//     // If validation fails, show a toast
+//     Modal.showToast(msg: 'Please complete the form.');
+//   }
+// }
 
 
 
@@ -404,28 +594,31 @@ Future<void> updatePost() async {
       update();
     }
   }
-
-  void fillForm() {
-   
-     print('---------------VALUE IN FILE FORM BEFORE FILL---------------');
-  print(selectedItem.value);
+void fillForm() {
+  print('---------------VALUE IN FILE FORM BEFORE FILL---------------');
+  print(selectedItem.value); // Debug log to ensure the selected item is loaded
   print('---------------');
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-     
-
+  
+  WidgetsBinding.instance.addPostFrameCallback((_) {
     final formData = {
-      'title': selectedItem.value.title ?? '',
-      'content': selectedItem.value.content ?? '',
-      'description': selectedItem.value.description ?? '',
-       'is_publish': selectedItem.value.isPublish ?? true,
+      'title': selectedItem.value.title ?? '',         // Set the title field
+      'content': selectedItem.value.content ?? '',     // Set the content field
+      'description': selectedItem.value.description ?? '', // Set description
+      'is_publish': (selectedItem.value.isPublish ?? false) ? true : false, 
     };
-      formKey.currentState?.patchValue(formData); // Populate the form with 
-      update(); 
-    });
-  }
+
+     formKey.currentState?.patchValue(formData);        // Pre-fill the form
+    isPublish((selectedItem.value.isPublish ?? false) ? true : false); // Update toggle state
+    update();                                         // Refresh UI
+  print('---------------VALUE REQUEDR DATAL---------------');
+  print(formData);
+  });
+}
+
   void clearForm() {
     mediaFiles.clear();
     formKey.currentState?.reset();
+    isPublish(false);
      update();
      // Reset the form fields
   }

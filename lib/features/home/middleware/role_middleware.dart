@@ -12,7 +12,7 @@ class RoleMiddleware extends GetMiddleware {
 
 
 
-    // Redirect admin users to '/home-main'
+ 
     if (user.hasAnyRole([Role.ADMIN])) {
       return route == '/home-main' ? null : const RouteSettings(name: '/home-main');
     }
@@ -25,7 +25,7 @@ class RoleMiddleware extends GetMiddleware {
       return route == '/home-officer' ? null : const RouteSettings(name: '/home-officer');
     }
 
-    // Default to '/forbidden' for users with no access or valid default position
+    
     return route == '/forbidden' ? null : const RouteSettings(name: '/forbidden');
   
   }
