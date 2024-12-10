@@ -120,8 +120,7 @@ class _PostPageState extends State<PostPage> {
                     Post post = controller.posts[index];
                     return PostWidget(post: post,
                      onEdit: () {
-                                    controller.selectItemAndNavigateToUpdatePage(
-                                            post);
+                                    controller.selectItemAndNavigateToUpdatePage(post);
                                   },
                                   onDelete: () async {
                                    controller.delete(post.id!); 

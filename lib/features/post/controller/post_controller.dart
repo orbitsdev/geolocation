@@ -44,33 +44,27 @@ void togglePublish(bool value) {
     isPublish.value = value;
   }
 
+ 
 
-
-  void selectItemAndNavigateToUpdatePage(Post item)  async {
+  void initializeFormForEdit(Post item) {
+    selectedItem(item);
     
-    selectedItem(item);
-  update(); 
+    // Parse the human-readable date
+   
 
-  print('VALUE WHEN SELECT');
-  print(selectedItem.value); // Debug print to check the selected item
-  print('VALUE WHEN SELECT-----------------');
-
-  await Get.to(() => CreateOrEditPostPage(), arguments: {
-    'post': item,
-    'isEditMode': true, // Set this flag to indicate edit mode
-  }, transition: Transition.cupertino);
-  // Get.to(() => CreateOrEditPostPage(isEditMode: true), arguments: collection);
-}
-
-  void setSelectedItemAndFillForm(Post item){
     WidgetsBinding.instance.addPostFrameCallback((_) {
-    selectedItem(item);
-    update();
-    fillForm();
-
+      formKey.currentState?.patchValue({
+        'title': item.title,
+        'content': item.content,
+        'description': item.description,
+         'is_publish': item.isPublish ?? false, // Set initial value for picker
+      });
+      update(); // Ensure GetX reflects state
     });
   }
 
+
+ 
   Future<void> loadData() async {
      isLoading(true);
     page(1);
@@ -243,7 +237,7 @@ Future<void> createPost() async {
   }
 }
 
-Future<void> updatePost() async {
+Future<void> updatePost(int id) async {
   if (formKey.currentState?.saveAndValidate() ?? false) {
     isLoading(true);
     update();
@@ -292,7 +286,7 @@ Future<void> updatePost() async {
       });
 
       // API endpoint for updating the post
-      String endpoint = 'posts/update/${selectedItem.value.id}';
+      String endpoint = 'posts/update/${id}';
 
       // Make the API call
       var response = await ApiService.filePostAuthenticatedResource(
@@ -314,10 +308,9 @@ Future<void> updatePost() async {
         (success) {
           Get.back(); // Close the modal
           isLoading(false);
-          clearForm(); // Clear the form and reset data
-          loadData(); // Refresh the list of posts
-          Modal.success(message: 'Post updated successfully!');
+          
           Get.offNamedUntil('/posts', (route) => route.isFirst); // Navigate to the posts page
+          Modal.success(message: 'Post updated successfully!');
         },
       );
     } catch (e) {
@@ -594,41 +587,6 @@ Future<void> updatePost() async {
       update();
     }
   }
-void fillForm() {
-  print('---------------VALUE IN FILE FORM BEFORE FILL---------------');
-  print(selectedItem.value); // Debug log to ensure the selected item is loaded
-  print('---------------');
-  
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    final formData = {
-      'title': selectedItem.value.title ?? '',         // Set the title field
-      'content': selectedItem.value.content ?? '',     // Set the content field
-      'description': selectedItem.value.description ?? '', // Set description
-      'is_publish': (selectedItem.value.isPublish ?? false) ? true : false, 
-    };
-
-     formKey.currentState?.patchValue(formData);        // Pre-fill the form
-    isPublish((selectedItem.value.isPublish ?? false) ? true : false); // Update toggle state
-    update();                                         // Refresh UI
-  print('---------------VALUE REQUEDR DATAL---------------');
-  print(formData);
-  });
-}
-
-  void clearForm() {
-    mediaFiles.clear();
-    formKey.currentState?.reset();
-    isPublish(false);
-     update();
-     // Reset the form fields
-  }
-  void viewFile(File file) {
-    if (file.path.endsWith(".mp4")) {
-      Get.to(() => LocalVideoPlayer(filePath: file.path));
-    } else {
-      Get.to(() => LocalFileImageFullScreenDisplay(imagePath: file.path));
-    }
-  }
 
 
 
@@ -784,5 +742,60 @@ void fillForm() {
     );
   }
 
+   void viewFile(File file) {
+    if (file.path.endsWith(".mp4")) {
+      Get.to(() => LocalVideoPlayer(filePath: file.path));
+    } else {
+      Get.to(() => LocalFileImageFullScreenDisplay(imagePath: file.path));
+    }
+  }
+
+void setSelectedItemAndFillForm(Post item) {
+  print('setSelectedItemAndFillForm CALLED');
+ 
+  selectedItem.value = item; 
+  fillForm(); // Populate the form with new values
+}
+
+void fillForm() {
+  if (selectedItem.value.id == null) return;
+
+  final formData = {
+    'title': selectedItem.value.title ?? '',
+    'content': selectedItem.value.content ?? '',
+    'description': selectedItem.value.description ?? '',
+    'is_publish': selectedItem.value.isPublish ?? false,
+  };
+
+  print('---- Filling Form ----');
+  print('Selected Item: ${selectedItem.value.toJson()}');
+  print('Form Data: $formData');
+  print('----------------------');
+
+  // Reset the form and apply values
+  formKey.currentState?.reset();
+  formKey.currentState?.patchValue(formData); // Patch the form
+  isPublish.value = selectedItem.value.isPublish ?? false; // Update toggle
+  update(); // Trigger UI rebuild
+  print('dasdasdasdasd');
+}
+
+
+
+void clearForm() {
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    selectedItem.value = Post(); // Reset the selected item
+    mediaFiles.clear(); // Clear media files
+    // formKey.currentState?.reset(); // Reset the form fields
+    isPublish.value = false; // Reset the publish state
+    update(); // Update UI
+  });
+}
+
+void selectItemAndNavigateToUpdatePage(Post item) async {
+  // selectedItem(item);
+  // update();
+  Get.to(() => CreateOrEditPostPage(isEditMode: true, post: item), arguments: item, transition: Transition.cupertino); // Navigate with arguments
+}
 
 }

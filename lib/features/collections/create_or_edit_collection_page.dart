@@ -23,7 +23,7 @@ final CollectionController controller = Get.find<CollectionController>();
       final Collection? selectedCollection = Get.arguments;
       if (selectedCollection != null) {
         controller.setSelectedItemAndFilForm(selectedCollection);
-      }
+    }
     } else {
       controller.clearForm(); // Clear form for new collections
     }

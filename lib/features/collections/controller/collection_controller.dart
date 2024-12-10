@@ -333,12 +333,12 @@ class CollectionController extends GetxController {
       },
     );
   }
-
-  void selectItemAndNavigateToUpdatePage(Collection collection) {
-  // Navigate to the CreateOrEditCollectionPage with arguments
-  Get.to(() => CreateOrEditCollectionPage(isEditMode: true), arguments: collection);
+void selectItemAndNavigateToUpdatePage(Collection collection) {
+  Get.to(
+    () => CreateOrEditCollectionPage(isEditMode: true),
+    arguments: collection, // Pass the collection as an argument
+  );
 }
-
 
   void setSelectedItemAndFilForm(Collection item){
     WidgetsBinding.instance.addPostFrameCallback((_) {

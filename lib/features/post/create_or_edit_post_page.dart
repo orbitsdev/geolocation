@@ -1,8 +1,14 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:gap/gap.dart';
+import 'package:get/get.dart';
+import 'package:sliver_tools/sliver_tools.dart';
+
 import 'package:geolocation/core/globalwidget/file_preview.dart';
 import 'package:geolocation/core/globalwidget/preview_file_card.dart';
 import 'package:geolocation/core/globalwidget/progress_bar_submit.dart';
@@ -11,45 +17,41 @@ import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/file/model/media_file.dart';
 import 'package:geolocation/features/post/controller/post_controller.dart';
 import 'package:geolocation/features/post/model/post.dart';
-import 'package:get/get.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:gap/gap.dart';
-import 'package:sliver_tools/sliver_tools.dart';
 
 class CreateOrEditPostPage extends StatelessWidget {
-  final bool isEditMode;
-  const CreateOrEditPostPage({Key? key, this.isEditMode = false})
-      : super(key: key);
+ final bool? isEditMode;
+  final Post? post;
+  const CreateOrEditPostPage({
+    Key? key,
+    this.isEditMode,
+    this.post,
+  }) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    final PostController controller = PostController.controller;
+    var taskController = Get.find<PostController>();
 
-    final arguments = Get.arguments;
-    final isEditMode = arguments?['isEditMode'] ?? false;
-    final post = arguments?['post'];
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (isEditMode == true && post != null) {
-        controller.selectedItem.value = post;
-        controller.fillForm();
-        // controller.update();
-      }
-    });
+    // Initialize form values only once if in edit mode
+    if (isEditMode == true && post != null) {
+      taskController.initializeFormForEdit(post!);
+    }
+
+
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(isEditMode ? 'Edit Post' : 'Create Post'),
+        title: Text(isEditMode == true ? 'Edit Post' : 'Create Post'),
         actions: [
           GetBuilder<PostController>(
             builder: (controller) {
               return TextButton(
                 onPressed: () {
-                  isEditMode
-                      ? controller.updatePost()
+                  isEditMode == true
+                      ? controller.updatePost(post?.id as int)
                       : controller.createPost();
                 },
                 child: Text(
-                  isEditMode ? 'Update' : 'Post',
+                  isEditMode == true ? 'Update' : 'Post',
                   style: TextStyle(color: Palette.PRIMARY),
                 ),
               );
@@ -59,22 +61,23 @@ class CreateOrEditPostPage extends StatelessWidget {
       ),
       body: CustomScrollView(slivers: [
         ToSliver(
-          child: GetBuilder<PostController>(builder: (poscontroller) {
+          child: GetBuilder<PostController>(
+  builder: (postcontroller) {
             return FormBuilder(
-              key: poscontroller.formKey,
+              key: postcontroller.formKey,
               child: Padding(
                 padding: EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Obx(() {
-                      if (poscontroller.isLoading.value) {
+                      if (postcontroller.isLoading.value) {
                         return Container(
                             margin: EdgeInsets.only(bottom: 12),
-                            child: poscontroller.mediaFiles.isNotEmpty
+                            child: postcontroller.mediaFiles.isNotEmpty
                                 ? ProgressBarSubmit(
                                     progress:
-                                        poscontroller.uploadProgress.value)
+                                        postcontroller.uploadProgress.value)
                                 : LinearProgressIndicator());
                       } else {
                         return SizedBox(
@@ -200,12 +203,12 @@ class CreateOrEditPostPage extends StatelessWidget {
                         crossAxisSpacing: 8,
                         mainAxisSpacing: 8,
                       ),
-                      itemCount: poscontroller.mediaFiles.length + 1,
+                      itemCount: postcontroller.mediaFiles.length + 1,
                       itemBuilder: (context, index) {
                         if (index == 0) {
                           // Add button
                           return GestureDetector(
-                            onTap: () => poscontroller.pickFile(),
+                            onTap: () => postcontroller.pickFile(),
                             child: Container(
                               decoration: BoxDecoration(
                                 color: Palette.LIGHT_BACKGROUND,
@@ -223,10 +226,10 @@ class CreateOrEditPostPage extends StatelessWidget {
                           );
                         } else {
                           // Display media files
-                          File file = poscontroller.mediaFiles[index - 1];
+                          File file = postcontroller.mediaFiles[index - 1];
                           return GestureDetector(
                             onTap: () {
-                              poscontroller.viewFile(file);
+                              postcontroller.viewFile(file);
                             },
                             child: Stack(
                               clipBehavior: Clip.none,
@@ -239,7 +242,7 @@ class CreateOrEditPostPage extends StatelessWidget {
                                   child: GestureDetector(
                                     behavior: HitTestBehavior
                                         .opaque, // Makes the entire area tappable
-                                    onTap: () => poscontroller
+                                    onTap: () => postcontroller
                                         .removeFileLocal(index - 1),
                                     child: Container(
                                       decoration: BoxDecoration(
@@ -327,13 +330,7 @@ class CreateOrEditPostPage extends StatelessWidget {
                     behavior: HitTestBehavior.opaque,
                     onTap: () async {
 
-                      MediaFile mediaFile = postcontroller.posts[index]
-
-                    final shouldDelete =
-                          await postcontroller.confirmDeleteMedia(index);
-                           (shouldDelete) {
-                        postcontroller.selectedItem.value.media?.removeAt(index);
-                      }
+                        postcontroller.confirmDeleteMedia(index);
                     },
                     child: Container(
                       height: 28, // Increased size for better visibility

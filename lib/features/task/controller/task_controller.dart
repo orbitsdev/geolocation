@@ -813,8 +813,8 @@ class TaskController extends GetxController {
         (success) {
           print(success.data);
           Get.back(); // Close loading modal
-          Modal.success(message: 'Task updated successfully');
           Get.offNamedUntil('/tasks', (route) => route.isFirst);
+          Modal.success(message: 'Task updated successfully');
         },
       );
     }
