@@ -175,185 +175,85 @@
 //   }
 // }
 
-
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:gap/gap.dart';
 import 'package:geolocation/core/globalwidget/images/online_image.dart';
+import 'package:geolocation/core/globalwidget/notification_global.dart';
 import 'package:geolocation/core/globalwidget/to_sliver.dart';
 import 'package:geolocation/core/theme/palette.dart';
-import 'package:geolocation/features/home/all_tab.dart';
-import 'package:geolocation/features/home/attendance_tab.dart';
-import 'package:geolocation/features/home/collections_tab.dart';
-import 'package:geolocation/features/home/dashboard/widget/profile_section.dart';
-import 'package:geolocation/features/home/files_tab.dart';
-import 'package:geolocation/features/home/posts_tab.dart';
+import 'package:geolocation/features/auth/controller/auth_controller.dart';
+import 'package:get/get_state_manager/src/simple/get_state.dart';
+import 'package:googleapis_auth/auth_io.dart';
 
-import 'package:get/get.dart';
-class OfficerHomePage extends StatefulWidget {
-  const OfficerHomePage({ Key? key }) : super(key: key);
+class OfficerHomePage extends StatelessWidget {
+const OfficerHomePage({ Key? key }) : super(key: key);
 
   @override
-  _OfficerHomePageState createState() => _OfficerHomePageState();
-}
-
-
-class _OfficerHomePageState extends State<OfficerHomePage>
-    with SingleTickerProviderStateMixin {
-  final ScrollController scrollController = ScrollController();
-  late TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 5, vsync: this);
-
-    // Add a listener to detect tab index changes
-    _tabController.addListener(() {
-      // Ensure the listener reacts only when the tab has finished changing
-      if (_tabController.index != _tabController.previousIndex) {
-        print('Tab changed to index: ${_tabController.index}');
-      }
-    });
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      scrollController.addListener(() {
-        if (scrollController.position.pixels ==
-            scrollController.position.maxScrollExtent) {
-          print('End of Scroll');
-        }
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context){
     return Scaffold(
-      backgroundColor: Colors.white,
+     
       body: SafeArea(
         child: CustomScrollView(
-          controller: scrollController,
-          slivers: [
-            ProfileSection(),
-            SliverGap(24),
-            SliverPadding(
-              padding: EdgeInsets.symmetric(
-                horizontal: 16,
-              ),
-              sliver: ToSliver(
-                child: Container(
-                  height: 60,
-                  child: Column(
-                    children: [
-                      Container(
-                        height: 60, // Explicit height
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: 10,
-                          itemBuilder: (context, index) {
-                            return Stack(
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                      border: Border.all(
-                                          width: 4, color: Palette.PRIMARY),
-                                      borderRadius: BorderRadius.circular(60)),
-                                  margin: EdgeInsets.only(right: 16),
-                                  height: 60,
-                                  width: 60,
-                                  child: OnlineImage(
-                                    imageUrl: 'https://picsum.photos/200/300',
-                                    borderRadius: BorderRadius.circular(50),
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            SliverGap(24),
-            SliverPadding(
-              padding: const EdgeInsets.only(left: 16),
-              sliver: ToSliver(
-                child: TabBar(
-                    padding: EdgeInsets.all(0),
-                    tabAlignment: TabAlignment.start,
-                    dividerColor: Colors.transparent,
-                    isScrollable: true,
-                    controller: _tabController,
-                    labelColor: Colors.white,
-                    unselectedLabelColor: Palette.LIGHT_PRIMARY,
-                    indicatorSize: TabBarIndicatorSize.tab,
-                    indicator: BoxDecoration(
-                      borderRadius: BorderRadius.circular(4),
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Palette.PRIMARY,
-                          Palette.DARK_PRIMARY,
-                        ],
-                      ),
-                    ),
-                    tabs: [
-                      Tab(
-                        child: Text(
-                          "All".toUpperCase(),
-                        ),
-                      ),
-                      Tab(
-                        child: Text(
-                          "ATTENDANCE".toUpperCase(),
-                        ),
-                      ),
-                      Tab(
-                        child: Text(
-                          "POST".toUpperCase(),
-                        ),
-                      ),
-                      Tab(
-                        child: Text(
-                          "COLLECTIONS".toUpperCase(),
-                        ),
-                      ),
-                      Tab(
-                        child: Text(
-                          "FILES".toUpperCase(),
-                        ),
-                      ),
-                    ]),
-              ),
-            ),
-            SliverFillRemaining(
-              child: Container(
-                height: 300,
-                child: TabBarView(
-                  controller: _tabController,
+        slivers: [
+          ToSliver(
+            child:Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
                   children: [
-                    AllTab(),
-                    AttendanceTab(),
-                    PostsTab(),
-                    CollectionsTab(),
-                    FilesTab(),
+                   
+                   
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Halo, Fulan',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Text(
+                          'Selamat Pagi!',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                    Spacer(),
+                  NotificationGlobal(
+  value: 3, // Badge value
+  action: () {
+    print('Notification Icon Clicked!');
+  },
+  badgeColor: Palette.GREEN3, // Optional: Custom badge color
+  textColor: Colors.white,  // Optional: Custom text color
+)
+,
+                     SizedBox(width: 16),
+                     GetBuilder<AuthController>(
+                       builder: (controller) {
+                         return Container(
+                          height: 45,
+                          width: 45,
+                          child: OnlineImage(imageUrl: controller.user.value.image ??'',borderRadius: BorderRadius.circular(45),),
+                         );
+                       }
+                     )
                   ],
                 ),
-              ),
-            )
-          ],
+              ],
+            ),
+          ),
+            
+          )
+        ],
         ),
-      ),
+      ) ,
     );
   }
-
 }
