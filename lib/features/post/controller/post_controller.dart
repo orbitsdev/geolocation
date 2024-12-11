@@ -66,6 +66,7 @@ void togglePublish(bool value) {
 
  
   Future<void> loadData() async {
+    print('load post caled');
      isLoading(true);
     page(1);
     perPage(20);
@@ -89,6 +90,7 @@ void togglePublish(bool value) {
       update();
       Modal.errorDialog(failure: failed);
     }, (success) {
+      print(success.data);
       var data = success.data;
       List<Post> newData = (data['data'] as List<dynamic>)
           .map((task) => Post.fromMap(task))

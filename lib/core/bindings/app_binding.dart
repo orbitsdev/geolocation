@@ -9,6 +9,7 @@ import 'package:geolocation/features/file/controller/files_controller.dart';
 import 'package:geolocation/features/map/controller/sample_map_controller.dart';
 import 'package:geolocation/features/council_positions/controller/council_position_controller.dart';
 import 'package:geolocation/features/notification/controller/notification_controller.dart';
+import 'package:geolocation/features/officers/controller/officer_controller.dart';
 import 'package:geolocation/features/post/controller/post_controller.dart';
 import 'package:geolocation/features/profile/controller/profile_controller.dart';
 import 'package:geolocation/features/auth/controller/login_controller.dart';
@@ -36,6 +37,8 @@ class AppBinding  extends Bindings{
     Get.put(AttendanceController(), permanent: true);
     Get.put(SampleMapController(), permanent: true);
     Get.put(SearchOfficerController(), permanent: true);
+    Get.put(OfficerController(), permanent: true);
+
   }
 
 }

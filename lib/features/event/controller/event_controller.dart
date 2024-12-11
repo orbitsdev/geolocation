@@ -397,6 +397,7 @@ markers.clear();
 
 
   Future<void> loadEvents() async {
+    print('event load');
     isLoading(true);
     page(1);
     perPage(20);

@@ -570,6 +570,7 @@ class TaskController extends GetxController {
   }
 
   Future<void> loadTask() async {
+    print('task load ---------');
     isLoading(true);
     page(1);
     perPage(20);

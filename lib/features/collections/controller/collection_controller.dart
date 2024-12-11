@@ -35,6 +35,8 @@ class CollectionController extends GetxController {
 
   /// Fetch collections for a council
   Future<void> loadData() async {
+        print(' post stage');
+
     isPageLoading(true);
     update();
 
