@@ -47,35 +47,33 @@ class _OfficerHomePageState extends State<OfficerHomePage> with SingleTickerProv
   @override
   void initState() {
     super.initState();
-    tabController = TabController(length: tabs.length, vsync: this);
+    tabController = TabController(length: tabs.length, vsync: this,initialIndex: 0);
     
-  //   tabController.addListener(() {
-  //   if (!tabController.indexIsChanging) {
-  //     switch (tabController.index) {
-  //       case 0:
-  //         postController.loadData();
-  //         break;
-  //       case 1:
-  //         print('Load Posts');
-  //         // Call your function for posts
-  //         break;
-  //       case 2:
-  //         print('Load Attendance');
-  //         // Call your function for attendance
-  //         break;
-  //       case 3:
-  //         print('Load Tasks');
-  //         // Call your function for tasks
-  //         break;
-  //       case 4:
-  //         print('Load Files');
-  //         // Call your function for files
-  //         break;
-  //       default:
-  //         break;
-  //     }
-  //   }
-  // });
+    tabController.addListener(() {
+    switch (tabController.index) {
+        case 0:
+          postController.loadData();
+          break;
+        case 1:
+          print('Load Posts');
+          // Call your function for posts
+          break;
+        case 2:
+          print('Load Attendance');
+          // Call your function for attendance
+          break;
+        case 3:
+          print('Load Tasks');
+          // Call your function for tasks
+          break;
+        case 4:
+          print('Load Files');
+          // Call your function for files
+          break;
+        default:
+          break;
+      }
+  });
 
 
 
@@ -83,7 +81,8 @@ class _OfficerHomePageState extends State<OfficerHomePage> with SingleTickerProv
   Future<void> refreshCurrentTab() async {
   switch (tabController.index) {
     case 0:
-      await postController.loadData();
+      print('DA');
+      // await postController.loadData();
       break;
     case 1:
       print('Refresh Posts');

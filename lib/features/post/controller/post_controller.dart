@@ -90,6 +90,7 @@ void togglePublish(bool value) {
       update();
       Modal.errorDialog(failure: failed);
     }, (success) {
+      print('-----------------------------------------------');
       print(success.data);
       var data = success.data;
       List<Post> newData = (data['data'] as List<dynamic>)

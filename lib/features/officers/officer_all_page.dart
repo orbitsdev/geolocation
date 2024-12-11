@@ -6,6 +6,8 @@ import 'package:geolocation/features/officers/controller/officer_controller.dart
 import 'package:geolocation/features/post/controller/post_controller.dart';
 import 'package:geolocation/features/post/widget/post_card.dart';
 import 'package:get/get.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
+import 'package:sliver_tools/sliver_tools.dart';
 
 import '../post/model/post.dart';
 
@@ -17,24 +19,26 @@ const OfficerAllPage({ Key? key }) : super(key: key);
 }
 
 class _OfficerAllPageState extends State<OfficerAllPage> {
-  var  officerController = Get.find<OfficerController>();
+  var  officerController = Get.put(OfficerController());
 
   @override
   void initState() {
     super.initState();
+  WidgetsBinding.instance.addPostFrameCallback((_) async{
 
-    officerController.loadAllPageData();
+    // await officerController.loadAllPageData();
+  });
+  
     print('all page called');
   }
 
   @override
   Widget build(BuildContext context){
-    return GetBuilder<PostController>(
-      builder: (postController) {
-        return CustomScrollView(
+    return CustomScrollView(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                  slivers: [
+
                  ToSliver(
   child: Container(
     padding: EdgeInsets.symmetric(vertical: 16, horizontal: 8.0,),
@@ -62,27 +66,34 @@ class _OfficerAllPageState extends State<OfficerAllPage> {
     ),
   ),
 ),
+GetBuilder<PostController>(
+  builder: (postcontroller) {
+    return MultiSliver(children: [
+    
+      if(postcontroller.isLoading.value == true)ToSliver(child: LinearProgressIndicator()),
+            SliverAlignedGrid.count(
+              
+                                  crossAxisSpacing: 8,
+                                  mainAxisSpacing: 8,
+                                  itemCount: postcontroller.posts.length,
+                                  crossAxisCount: 1,
+                                  itemBuilder: (context, index) {
+                                    Post post = postcontroller.posts[index];
+                                    return PostCard(
+                                      onEdit: (){},
+                                      onDelete: (){
+                                    
+                                      },
+                                    post: post,
+                                    );
+                                  })
+    ]);
+  }
+),
 
-        SliverAlignedGrid.count(
-                              crossAxisSpacing: 8,
-                              mainAxisSpacing: 8,
-                              itemCount: postController.posts.length,
-                              crossAxisCount: 1,
-                              itemBuilder: (context, index) {
-                                Post post = postController.posts[index];
-                                return PostCard(
-                                  onEdit: (){},
-                                  onDelete: (){
-                                
-                                  },
-                                post: post,
-                                );
-                              })
                   
         
                  ],
                 );
-      }
-    );
   }
 }

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:geolocation/core/globalwidget/images/online_image.dart';
 import 'package:geolocation/core/globalwidget/notification_global.dart';
+import 'package:geolocation/core/globalwidget/ripple_container.dart';
 import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
+import 'package:geolocation/features/settings/profile_page.dart';
 import 'package:get/get.dart';
 
 class OfficerProfileSection extends StatelessWidget {
@@ -52,12 +54,15 @@ class OfficerProfileSection extends StatelessWidget {
                         textColor: Colors.white,
                       ),
                       const SizedBox(width: 8),
-                      Container(
-                        height: 45,
-                        width: 45,
-                        child: OnlineImage(
-                          imageUrl: controller.user.value.image ?? '',
-                          borderRadius: BorderRadius.circular(45),
+                      RippleContainer(
+                        onTap: ()=> Get.to(()=> ProfilePage(), transition: Transition.cupertino),
+                        child: Container(
+                          height: 45,
+                          width: 45,
+                          child: OnlineImage(
+                            imageUrl: controller.user.value.image ?? '',
+                            borderRadius: BorderRadius.circular(45),
+                          ),
                         ),
                       ),
                     ],
