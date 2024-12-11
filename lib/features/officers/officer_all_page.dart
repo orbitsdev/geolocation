@@ -26,7 +26,7 @@ class _OfficerAllPageState extends State<OfficerAllPage> {
     super.initState();
   WidgetsBinding.instance.addPostFrameCallback((_) async{
 
-    // await officerController.loadAllPageData();
+     await officerController.loadAllPageData();
   });
   
     print('all page called');
@@ -36,7 +36,7 @@ class _OfficerAllPageState extends State<OfficerAllPage> {
   Widget build(BuildContext context){
     return CustomScrollView(
                 shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
+                physics: const AlwaysScrollableScrollPhysics(),
                  slivers: [
 
                  ToSliver(

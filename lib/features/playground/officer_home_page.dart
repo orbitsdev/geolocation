@@ -52,7 +52,7 @@ class _OfficerHomePageState extends State<OfficerHomePage> with SingleTickerProv
     tabController.addListener(() {
     switch (tabController.index) {
         case 0:
-          postController.loadData();
+          // postController.loadData();
           break;
         case 1:
           print('Load Posts');
@@ -113,7 +113,7 @@ class _OfficerHomePageState extends State<OfficerHomePage> with SingleTickerProv
         triggerMode: RefreshIndicatorTriggerMode.anywhere,
         onRefresh:refreshCurrentTab,
         child: CustomScrollView(
-          physics: const  AlwaysScrollableScrollPhysics(),
+          physics: const  NeverScrollableScrollPhysics(),
           slivers: [
             // Profile Section
             OfficerProfileSection(),
