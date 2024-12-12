@@ -40,7 +40,7 @@ class _MemberTaskPageState extends State<MemberTaskPage> {
 
           if (scrollController.position.pixels >=
               scrollController.position.maxScrollExtent - threshold) {
-            taskController.loadTaskOnScroll(context);
+            taskController.loadTaskOnScroll();
           }
         }
       });

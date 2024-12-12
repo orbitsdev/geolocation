@@ -613,7 +613,7 @@ class TaskController extends GetxController {
     });
   }
 
-  void loadTaskOnScroll(BuildContext context) async {
+  void loadTaskOnScroll() async {
     if (isScrollLoading.value) return;
 
     isScrollLoading(true);

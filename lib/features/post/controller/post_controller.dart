@@ -66,7 +66,8 @@ void togglePublish(bool value) {
 
  
   Future<void> loadData() async {
-    print('load post caled');
+    if (isScrollLoading.value) return;
+
      isLoading(true);
     page(1);
     perPage(20);

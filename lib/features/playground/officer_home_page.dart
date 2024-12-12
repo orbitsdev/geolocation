@@ -31,17 +31,17 @@ class _OfficerHomePageState extends State<OfficerHomePage> with SingleTickerProv
   final List<Widget> pages = [
     OfficerAllPage(),
     OfficerPostPage(),
-    AttendancePage(),
     OfficerTaskPage(),
     OfficerFilesPage(),
+    AttendancePage(),
   ];
 
   final List<Tab> tabs = const [
     Tab(text: 'All'),
     Tab(text: 'Posts'),
-    Tab(text: 'Attendance'),
     Tab(text: 'Tasks'),
     Tab(text: 'Files'),
+    Tab(text: 'Attendance'),
   ];
 
   @override
