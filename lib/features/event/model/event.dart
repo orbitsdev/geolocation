@@ -19,6 +19,10 @@ class Event {
   bool? isPublish;
   String? startTime;
   String? endTime;
+  String? dateOnly;
+  String? startTimeOnly;
+  String? endTimeOnly;
+  String? date;
   bool? isActive;
   bool? restrictEvent;
   int? maxCapacity;
@@ -43,6 +47,9 @@ class Event {
      this.isPublish,
     this.startTime,
     this.endTime,
+    this.dateOnly,
+    this.startTimeOnly,
+    this.endTimeOnly,
     this.isActive,
     this.restrictEvent,
     this.maxCapacity,
@@ -68,6 +75,9 @@ class Event {
         bool? isPublish,
     String? startTime,
     String? endTime,
+   String? dateOnly,
+  String? startTimeOnly,
+  String? endTimeOnly,
     bool? isActive,
     bool? restrictEvent,
     int? maxCapacity,
@@ -92,6 +102,9 @@ class Event {
            isPublish: isPublish ?? this.isPublish,
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,
+      dateOnly: dateOnly ?? this.dateOnly,
+      startTimeOnly: startTimeOnly ?? this.startTimeOnly,
+      endTimeOnly: endTimeOnly ?? this.endTimeOnly,
       isActive: isActive ?? this.isActive,
       restrictEvent: restrictEvent ?? this.restrictEvent,
       maxCapacity: maxCapacity ?? this.maxCapacity,
@@ -119,6 +132,9 @@ class Event {
          'is_publish': isPublish,
       'start_time': startTime,
       'end_time': endTime,
+      'date': dateOnly,
+      'start_time_only': startTimeOnly,
+      'end_time_only': endTimeOnly,
       'is_active': isActive,
       'restrict_event': restrictEvent,
       'max_capacity': maxCapacity,
@@ -146,6 +162,9 @@ class Event {
             isPublish: map['is_publish'] != null ? map['is_publish'] as bool : null,
       startTime: map['start_time'] != null ? map['start_time'] as String : null,
       endTime: map['end_time'] != null ? map['end_time'] as String : null,
+      dateOnly: map['date'] != null ? map['date'] as String : null,
+      startTimeOnly: map['start_time_only'] != null ? map['start_time_only'] as String : null,
+      endTimeOnly: map['end_time_only'] != null ? map['end_time_only'] as String : null,
       isActive: map['is_active'] != null ? map['is_active'] as bool : null,
       restrictEvent: map['restrict_event'] != null ? map['restrict_event'] as bool : null,
       maxCapacity: map['max_capacity'] != null ? map['max_capacity'] as int : null,

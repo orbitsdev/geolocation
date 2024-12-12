@@ -21,12 +21,13 @@ class EventCard2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      // margin: EdgeInsets.all(16),
+      width: Get.size.width ,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
+        // borderRadius: BorderRadius.circular(16),
         color: Palette.GREEN3,
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-      margin: const EdgeInsets.only(bottom: 24),
+             padding: const EdgeInsets.all(16),
       child: Stack(
         children: [
           // Background SVG Image
@@ -47,50 +48,54 @@ class EventCard2 extends StatelessWidget {
             children: [
               // Event Date Section
               Row(
+                
                 children: [
-                Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      '${event.startTime}- ${event.endTime}}',
-                      style: Get.textTheme.bodyMedium?.copyWith(
-                        color: Palette.GREEN3,
-                        fontWeight: FontWeight.bold,
+                Flexible(
+                  child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                       
+                        '${event.dateOnly} | ${event.startTimeOnly} - ${event.endTimeOnly}',
+                        style: Get.textTheme.bodyMedium?.copyWith(
+                          color: Palette.GREEN3,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                  ),
-                  const Spacer(),
+                ),
                 ],
               ),
               const Gap(16),
               // Event Description Section
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Event Description
                     Text(
+                      // 'EVENT NAME',
                       event.title ?? 'Unknown Event',
                       style: Get.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: Palette.DARK_PRIMARY,
                       ),
                     ),
-                    const Gap(8),
+                     const Gap(8),
                     // Coordinates Section with Background
                     Container(
-                      padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16,),
+                      padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 8,),
                       decoration: BoxDecoration(
                         color: Palette.GREEN1,
-                        borderRadius: BorderRadius.circular(10),
+                        // borderRadius: BorderRadius.circular(10),
                       ),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
@@ -101,7 +106,8 @@ class EventCard2 extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  '${event.description}',
+                                  // 'DESCRIPTIN',
+                                   '${event.description}',
                                   style: Get.textTheme.bodyMedium!.copyWith(
                                     fontWeight: FontWeight.bold,
                                     color: Palette.GREEN3,
@@ -128,36 +134,11 @@ class EventCard2 extends StatelessWidget {
                               ],
                             ),
                           ),
-                          RippleContainer(
-                            onTap: onView,
-                            child: Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(40),
-                                color: Palette.GREEN3,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              child: const Center(
-                                child: HeroIcon(
-                                  HeroIcons.mapPin,
-                                  color: Colors.white,
-                                  size: 28,
-                                ),
-                              ),
-                            ),
-                          ),
+                          
                         ],
                       ),
                     ),
-                    const Gap(8),
-                    Divider(),
+                  
                     // Event Schedules Section
                     
                   ],
