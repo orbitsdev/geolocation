@@ -25,11 +25,22 @@ class OfficerAllPage extends StatefulWidget {
 class _OfficerAllPageState extends State<OfficerAllPage> {
   var officerController = Get.put(OfficerController());
 
+  final ScrollController newScrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
+   
+   
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await officerController.loadAllPageData();
+
+        newScrollController.addListener(() async {
+        if (newScrollController.position.pixels >=
+            newScrollController.position.maxScrollExtent - 200) {
+             PostController.controller.loadDataOnScroll();
+        }
+      });
     });
 
     print('all page called');
@@ -41,12 +52,14 @@ class _OfficerAllPageState extends State<OfficerAllPage> {
       triggerMode: RefreshIndicatorTriggerMode.anywhere,
       onRefresh: () => officerController.loadAllPageData(),
       child: CustomScrollView(
+        controller: newScrollController,
         shrinkWrap: true,
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
 
            GetBuilder<EventController>(builder: (eventcontroller) {
             return MultiSliver(children: [
+               ToSliver(child: Text('Latest Events')),
                if (eventcontroller.isLoading.value == true)
                 ToSliver(child: LinearProgressIndicator()),
                 ToSliver(
@@ -128,9 +141,16 @@ class _OfficerAllPageState extends State<OfficerAllPage> {
                       onDelete: () {},
                       post: post,
                     );
-                  })
+                  }),
+
+                   if (postcontroller.isScrollLoading.value)
+                    ToSliver(
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
             ]);
           }),
+
+
         ],
       ),
     );

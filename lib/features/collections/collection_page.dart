@@ -132,6 +132,8 @@ class _CollectionPageState extends State<CollectionPage> {
                       child: Center(child: CircularProgressIndicator()),
                     ),
 
+                    
+
                   SliverGap(Get.size.height * 0.10)
                 ],
               );

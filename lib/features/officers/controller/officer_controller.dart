@@ -10,11 +10,12 @@ class OfficerController extends GetxController  {
 
   // all page
   Future<void> loadAllPageData()  async {
+    print('caleed');
      await Future.wait([
         PostController.controller.loadData(),
         EventController.controller.loadEvents(),
-        CollectionController.controller.loadData(),
-        TaskController.controller.loadTask(),
+        // CollectionController.controller.loadData(),
+        // TaskController.controller.loadTask(),
       ]);
   } 
 

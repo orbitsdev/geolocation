@@ -26,7 +26,7 @@ class _OfficerHomePageState extends State<OfficerHomePage> with SingleTickerProv
 
   var postController = Get.find<PostController>();
   late TabController tabController;
-  
+    final ScrollController newScrollController = ScrollController();
 
   final List<Widget> pages = [
     OfficerAllPage(),
@@ -75,6 +75,14 @@ class _OfficerHomePageState extends State<OfficerHomePage> with SingleTickerProv
       }
   });
 
+  //  newScrollController.addListener(() async {
+  //       if (newScrollController.position.pixels >=
+  //           newScrollController.position.maxScrollExtent - 200) {
+  //             print('caleed------------------ON');
+  //         // PostController.controller.loadDataOnScroll();
+  //       }
+  //     });
+
 
 
   }
@@ -113,6 +121,7 @@ class _OfficerHomePageState extends State<OfficerHomePage> with SingleTickerProv
         triggerMode: RefreshIndicatorTriggerMode.anywhere,
         onRefresh:refreshCurrentTab,
         child: CustomScrollView(
+          controller: newScrollController,
           physics: const  NeverScrollableScrollPhysics(),
           slivers: [
             // Profile Section
