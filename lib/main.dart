@@ -18,11 +18,13 @@ import 'package:geolocation/features/councils/pages/council_list_page.dart';
 import 'package:geolocation/features/event/event_page.dart';
 import 'package:geolocation/features/globalpage/forbidden_page.dart';
 import 'package:geolocation/features/home/admin_home_main_page.dart';
+import 'package:geolocation/features/home/all_tab.dart';
 import 'package:geolocation/features/home/middleware/full_access_middleware.dart';
 import 'package:geolocation/features/home/middleware/role_middleware.dart';
 import 'package:geolocation/features/map/sample_map.dart';
 import 'package:geolocation/features/council_positions/pages/council_member_position_list_page.dart';
 import 'package:geolocation/features/notification/notification_page.dart';
+import 'package:geolocation/features/officers/alltasks/task_main.dart';
 import 'package:geolocation/features/playground/login_page_test.dart';
 import 'package:geolocation/features/playground/modal_test_page.dart';
 import 'package:geolocation/features/playground/officer_home_page.dart';
@@ -158,6 +160,7 @@ class _GeoLocationAppState extends State<GeoLocationApp>  with WidgetsBindingObs
         GetPage(name: '/settings', page: () => ProfilePage(), middlewares: []),
         GetPage(name: '/councils', page: () => CouncilListPage(), middlewares: []),
         GetPage(name: '/forbidden', page: () => ForbiddenPage(), middlewares: []),
+        GetPage(name: '/officers-task-main', page: () => TaskMain(), middlewares: []),
       ],
     );
   }

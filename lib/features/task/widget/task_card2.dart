@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
+import 'package:geolocation/core/globalwidget/images/online_image.dart';
+import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:geolocation/features/task/model/task.dart';
 class TaskCard2 extends StatelessWidget {
   final Task task;
@@ -18,6 +21,34 @@ class TaskCard2 extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+
+            if (task.assignedCouncilPosition != null && (task.assignedCouncilPosition?.id != AuthController.controller.user.value.defaultPosition?.id))
+              Row(
+                children: [
+                  Container(
+                    height: 34,
+                    width: 34,
+                    
+                    child: OnlineImage(imageUrl: task.assignedCouncilPosition?.image ??'', borderRadius: BorderRadius.circular(34),),
+                  ),
+
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      task.assignedCouncilPosition?.fullName ??
+                          'Unassigned Position',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+            const SizedBox(height: 12),
             // Header Row
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -74,23 +105,39 @@ class TaskCard2 extends StatelessWidget {
         ),
       ],
     ),
-    // Container(
-    //   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-    //   decoration: BoxDecoration(
-    //     color: task.isLock == true ? Colors.redAccent : Colors.green,
-    //     borderRadius: BorderRadius.circular(8),
-    //   ),
-    //   child: Text(
-    //     task.isLock == true ? 'Locked' : 'Unlocked',
-    //     style: const TextStyle(
-    //       color: Colors.white,
-    //       fontSize: 12,
-    //       fontWeight: FontWeight.bold,
-    //     ),
-    //   ),
-    // ),
+   
   ],
 ),
+Gap(8),
+if (task.approvedByCouncilPosition != null)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.green.shade400, Colors.green.shade600],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(Icons.check_circle, color: Colors.white, size: 20),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        'Approved by: ${task.approvedByCouncilPosition?.fullName ?? 'N/A'} ',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
 
           ],
         ),

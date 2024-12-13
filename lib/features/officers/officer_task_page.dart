@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:gap/gap.dart';
 import 'package:geolocation/core/globalwidget/ripple_container.dart';
 import 'package:geolocation/core/globalwidget/to_sliver.dart';
 import 'package:geolocation/features/task/controller/task_controller.dart';
@@ -46,8 +47,44 @@ void initState() {
         shrinkWrap: true,
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
-
-
+SliverGap(8),
+           ToSliver(
+             child: Padding(
+               padding: const EdgeInsets.symmetric(horizontal: 16),
+               child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                 
+                                  Text('Latest Task',
+                                      style: Get.textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold)),
+                                ]),
+                            GestureDetector(
+                              onTap: (){
+                                // MyOrderScreen(), transition: Transition.cupertino)
+                              },
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'View all Tasks',
+                                    style: Get.textTheme.bodyMedium!.copyWith(),
+                                  ),
+                                //   Gap(4),
+                                //  Icon(Icons.arrow_forward_ios,size: 12,)
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+             ),
+           ),
+  SliverGap(8),
           GetBuilder<TaskController>(builder: (taskcontroller) {
             return MultiSliver(children: [
               if (taskcontroller.isLoading.value == true)

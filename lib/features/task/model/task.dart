@@ -7,13 +7,14 @@ import 'package:geolocation/features/file/model/media_file.dart';
 
 class Task {
 
-    static String STATUS_TODO = 'To Do';
-    static String STATUS_IN_PROGRESS = 'In Progress';
-    static String STATUS_COMPLETED = 'Completed';
-    static String STATUS_APPROVE = 'Completed';
-    static String STATUS_NEED_REVISION = 'Needs Revision';
-    static String STATUS_REJECTED = 'Rejected';
-    static String STATUS_RESUBMIT = 'Resubmit';
+    static const String ALL = 'All';
+    static const String STATUS_TODO = 'To Do';
+    static const String STATUS_IN_PROGRESS = 'In Progress';
+    static const String STATUS_COMPLETED = 'Completed';
+    static const String STATUS_APPROVE = 'Completed';
+    static const String STATUS_NEED_REVISION = 'Needs Revision';
+    static const String STATUS_REJECTED = 'Rejected';
+    static const String STATUS_RESUBMIT = 'Resubmit';
     
 
 

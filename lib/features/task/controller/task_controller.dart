@@ -28,6 +28,11 @@ import 'dart:io';
 class TaskController extends GetxController {
   static TaskController controller = Get.find<TaskController>();
 
+
+  ///------------------------------------------------------------
+  /// ALL
+  ///-----------------------------------------
+
   var isLoading = false.obs;
   var isScrollLoading = false.obs;
   var page = 1.obs;
@@ -37,7 +42,6 @@ class TaskController extends GetxController {
   var tasks = <Task>[].obs;
 
   var isRemoving = false.obs;
-
   final taskFormKey = GlobalKey<FormBuilderState>();
   var selectedOfficer = CouncilPosition().obs;
   var selectedTask = Task().obs;
@@ -46,6 +50,57 @@ class TaskController extends GetxController {
 
   var mediaFiles = <File>[].obs;
   var uploadProgress = 0.0.obs;
+
+
+
+
+  ///------------------------------------------------------------
+  /// TODO
+  ///-----------------------------------------
+  var todoIsLoading = false.obs;
+  var todoIsScrollLoading = false.obs;
+  var todoPage = 1.obs;
+  var todoPerPage = 20.obs;
+  var todoLastTotalValue = 0.obs;
+  var todoHasData = false.obs;
+  var todoTasks = <Task>[].obs;
+
+
+
+  ///------------------------------------------------------------
+  /// REJEC
+  ///-----------------------------------------
+  var rejectIsLoading = false.obs;
+  var rejectIsScrollLoading = false.obs;
+  var rejectPage = 1.obs;
+  var rejectPerPage = 20.obs;
+  var rejectLastTotalValue = 0.obs;
+  var rejectHasData = false.obs;
+  var rejectTasks = <Task>[].obs;
+
+
+  ///------------------------------------------------------------
+  /// RESUBMIT
+  ///-----------------------------------------
+  var resubmitIsLoading = false.obs;
+  var resubmitIsScrollLoading = false.obs;
+  var resubmitPage = 1.obs;
+  var resubmitPerPage = 20.obs;
+  var resubmitLastTotalValue = 0.obs;
+  var resubmitHasData = false.obs;
+  var resubmitTasks = <Task>[].obs;
+
+  ///------------------------------------------------------------
+  /// RESUBMIT
+  ///-----------------------------------------
+  var completedIsLoading = false.obs;
+  var completedIsScrollLoading = false.obs;
+  var completedPage = 1.obs;
+  var completedPerPage = 20.obs;
+  var completedLastTotalValue = 0.obs;
+  var completedHasData = false.obs;
+  var completedTasks = <Task>[].obs;
+
 
   void showApprovalModal() {
     Get.bottomSheet(
@@ -241,7 +296,7 @@ class TaskController extends GetxController {
           print('---------------------');
           print(data);
 
-          return;
+        
           Modal.loading();
           var response = await ApiService.putAuthenticatedResource(
               '/tasks/${selectedTask.value.id}/status', data);
@@ -571,11 +626,11 @@ class TaskController extends GetxController {
     update();
     Get.to(
       () => TaskDetailsPage(),
+      transition: Transition.cupertino
     );
   }
 
   Future<void> loadTask() async {
-    print('task load ---------');
     isLoading(true);
     page(1);
     perPage(20);
@@ -593,7 +648,7 @@ class TaskController extends GetxController {
 
 
     var response = await ApiService.getAuthenticatedResource('tasks',
-        queryParameters: data);
+        data: data);
     response.fold((failed) {
       isLoading(false);
       update();
@@ -632,7 +687,7 @@ class TaskController extends GetxController {
     };
 
     var response = await ApiService.getAuthenticatedResource('tasks',
-        queryParameters: data);
+        data: data);
     response.fold((failed) {
       isScrollLoading(false);
       update();
@@ -661,8 +716,8 @@ class TaskController extends GetxController {
       update();
     });
   }
+
   Future<void> loadByOfficerTask() async {
-    print('task load ---------');
     isLoading(true);
     page(1);
     perPage(20);
@@ -935,5 +990,400 @@ class TaskController extends GetxController {
         Modal.success(message: 'Task deleted successfully!');
       },
     );
+  }
+
+
+  
+  Future<void> reload(String status) async {
+    switch (status) {
+      case Task.ALL:
+        loadByOfficerTask();
+      case Task.STATUS_TODO:
+        loadToDoTask();
+      case Task.STATUS_IN_PROGRESS:
+       
+        break;
+      case Task.STATUS_COMPLETED:
+       
+      case Task.STATUS_APPROVE:
+ 
+      case Task.STATUS_NEED_REVISION:
+     
+      case Task.STATUS_REJECTED:
+      
+      case Task.STATUS_RESUBMIT:
+       
+
+      default:
+      //loadToShipOrders(context);
+    }
+  }
+
+
+  
+  Future<void> loadToDoTask() async {
+    todoIsLoading(true);
+    todoPage(1);
+    todoPerPage(20);
+    todoLastTotalValue(0);
+    todoTasks.clear();
+    update();
+    
+    var officerId =  AuthController.controller.user.value.defaultPosition?.id;
+    Map<String, dynamic> data = {
+      'page': todoPage,
+      'per_page': todoPerPage,
+      'status': Task.STATUS_TODO,
+     
+    };
+
+   
+
+  
+
+    var response = await ApiService.getAuthenticatedResource('tasks/council-tasks/${officerId}', queryParameters: data);
+    response.fold((failed) {
+      todoIsLoading(false);
+      update();
+      Modal.errorDialog(failure: failed);
+    }, (success) {
+      var data = success.data;  
+
+     
+      print(data);
+
+      
+      List<Task> newData = (data['data'] as List<dynamic>)
+          .map((task) => Task.fromMap(task))
+          .toList();
+      todoTasks(newData);
+      todoPage.value++;
+      todoLastTotalValue.value = data['pagination']['total'];
+      todoHasData.value = todoTasks.length < lastTotalValue.value;
+      todoIsLoading(false);
+      update();
+      todoTasks.forEach((e){
+        print('___________');
+        print(e.toJson());
+        print('__________________');
+      });
+    });
+  }
+
+  void loadToDoTaskOnScroll() async {
+    if (todoIsScrollLoading.value) return;
+
+    todoIsScrollLoading(true);
+    update();
+
+   
+    var officerId =  AuthController.controller.user.value.defaultPosition?.id;
+    Map<String, dynamic> data = {
+       'page': todoPage,
+      'per_page': todoPerPage,
+      'status': Task.STATUS_TODO,
+     
+    };
+    
+   
+    var response = await ApiService.getAuthenticatedResource('tasks/council-tasks/${officerId}',
+        queryParameters: data);
+    response.fold((failed) {
+      todoIsScrollLoading(false);
+      update();
+      Modal.errorDialog(failure: failed);
+    }, (success) {
+      todoIsScrollLoading(false);
+      update();
+
+      var data = success.data;
+      if (todoLastTotalValue.value != data['pagination']['total']) {
+        loadTask();
+        return;
+      }
+
+      if (todoTasks.length == data['pagination']['total']) {
+        return;
+      }
+
+      List<Task> newData = (data['data'] as List<dynamic>)
+          .map((task) => Task.fromMap(task))
+          .toList();
+      todoTasks.addAll(newData);
+      page.value++;
+      todoLastTotalValue.value = data['pagination']['total'];
+      hasData.value = todoTasks.length < todoLastTotalValue.value;
+      update();
+    });
+  }
+
+  
+  Future<void> loadRejectTask() async {
+    rejectIsLoading(true);
+    rejectPage(1);
+    rejectPerPage(20);
+    rejectLastTotalValue(0);
+    rejectTasks.clear();
+    update();
+    
+    var officerId =  AuthController.controller.user.value.defaultPosition?.id;
+    Map<String, dynamic> data = {
+      'page': rejectPage,
+      'per_page': rejectPerPage,
+      'status': Task.STATUS_REJECTED,
+     
+    };
+
+  
+    var response = await ApiService.getAuthenticatedResource('tasks/council-tasks/${officerId}', queryParameters: data);
+    response.fold((failed) {
+      rejectIsLoading(false);
+      update();
+      Modal.errorDialog(failure: failed);
+    }, (success) {
+      var data = success.data;  
+
+     
+      print(data);
+
+      
+      List<Task> newData = (data['data'] as List<dynamic>)
+          .map((task) => Task.fromMap(task))
+          .toList();
+      rejectTasks(newData);
+      rejectPage.value++;
+      rejectLastTotalValue.value = data['pagination']['total'];
+      rejectHasData.value = rejectTasks.length < lastTotalValue.value;
+      rejectIsLoading(false);
+      update();
+      
+    });
+  }
+
+  void loadRejectTaskOnScroll() async {
+    if (rejectIsScrollLoading.value) return;
+
+    rejectIsScrollLoading(true);
+    update();
+
+   
+    var officerId =  AuthController.controller.user.value.defaultPosition?.id;
+    Map<String, dynamic> data = {
+       'page': rejectPage,
+      'per_page': rejectPerPage,
+      'status': Task.STATUS_REJECTED,
+     
+    };
+    
+   
+    var response = await ApiService.getAuthenticatedResource('tasks/council-tasks/${officerId}',
+        queryParameters: data);
+    response.fold((failed) {
+      rejectIsScrollLoading(false);
+      update();
+      Modal.errorDialog(failure: failed);
+    }, (success) {
+      rejectIsScrollLoading(false);
+      update();
+
+      var data = success.data;
+      if (rejectLastTotalValue.value != data['pagination']['total']) {
+        loadTask();
+        return;
+      }
+
+      if (rejectTasks.length == data['pagination']['total']) {
+        return;
+      }
+
+      List<Task> newData = (data['data'] as List<dynamic>)
+          .map((task) => Task.fromMap(task))
+          .toList();
+      rejectTasks.addAll(newData);
+      page.value++;
+      rejectLastTotalValue.value = data['pagination']['total'];
+      hasData.value = rejectTasks.length < rejectLastTotalValue.value;
+      update();
+    });
+  }
+  
+  Future<void> loadResubmitTask() async {
+    resubmitIsLoading(true);
+    resubmitPage(1);
+    resubmitPerPage(20);
+    resubmitLastTotalValue(0);
+    resubmitTasks.clear();
+    update();
+    
+    var officerId =  AuthController.controller.user.value.defaultPosition?.id;
+    Map<String, dynamic> data = {
+      'page': resubmitPage,
+      'per_page': resubmitPerPage,
+      'status': Task.STATUS_RESUBMIT,
+     
+    };
+
+  
+  
+    var response = await ApiService.getAuthenticatedResource('tasks/council-tasks/${officerId}', queryParameters: data);
+    response.fold((failed) {
+      resubmitIsLoading(false);
+      update();
+      Modal.errorDialog(failure: failed);
+    }, (success) {
+      var data = success.data;  
+
+     
+      print(data);
+
+      
+      List<Task> newData = (data['data'] as List<dynamic>)
+          .map((task) => Task.fromMap(task))
+          .toList();
+      resubmitTasks(newData);
+      resubmitPage.value++;
+      resubmitLastTotalValue.value = data['pagination']['total'];
+      resubmitHasData.value = resubmitTasks.length < lastTotalValue.value;
+      resubmitIsLoading(false);
+      update();
+      
+    });
+  }
+
+  void loadResubmitTaskOnScroll() async {
+    if (resubmitIsScrollLoading.value) return;
+
+    resubmitIsScrollLoading(true);
+    update();
+
+   
+    var officerId =  AuthController.controller.user.value.defaultPosition?.id;
+    Map<String, dynamic> data = {
+       'page': rejectPage,
+      'per_page': rejectPerPage,
+      'status': Task.STATUS_REJECTED,
+     
+    };
+    
+   
+    var response = await ApiService.getAuthenticatedResource('tasks/council-tasks/${officerId}',
+        queryParameters: data);
+    response.fold((failed) {
+      resubmitIsScrollLoading(false);
+      update();
+      Modal.errorDialog(failure: failed);
+    }, (success) {
+      resubmitIsScrollLoading(false);
+      update();
+
+      var data = success.data;
+      if (resubmitLastTotalValue.value != data['pagination']['total']) {
+        loadTask();
+        return;
+      }
+
+      if (resubmitTasks.length == data['pagination']['total']) {
+        return;
+      }
+
+      List<Task> newData = (data['data'] as List<dynamic>)
+          .map((task) => Task.fromMap(task))
+          .toList();
+      resubmitTasks.addAll(newData);
+      page.value++;
+      resubmitLastTotalValue.value = data['pagination']['total'];
+      hasData.value = resubmitTasks.length < resubmitLastTotalValue.value;
+      update();
+    });
+  }
+  
+  Future<void> loadCompletedTask() async {
+    completedIsLoading(true);
+    completedPage(1);
+    completedPerPage(20);
+    completedLastTotalValue(0);
+    completedTasks.clear();
+    update();
+    
+    var officerId =  AuthController.controller.user.value.defaultPosition?.id;
+    Map<String, dynamic> data = {
+      'page': completedPage,
+      'per_page': completedPerPage,
+      'status': Task.STATUS_COMPLETED,
+     
+    };
+
+  
+  
+    var response = await ApiService.getAuthenticatedResource('tasks/council-tasks/${officerId}', queryParameters: data);
+    response.fold((failed) {
+      completedIsLoading(false);
+      update();
+      Modal.errorDialog(failure: failed);
+    }, (success) {
+      var data = success.data;  
+
+     
+      print(data);
+
+      
+      List<Task> newData = (data['data'] as List<dynamic>)
+          .map((task) => Task.fromMap(task))
+          .toList();
+      completedTasks(newData);
+      completedPage.value++;
+      completedLastTotalValue.value = data['pagination']['total'];
+      completedHasData.value = completedTasks.length < lastTotalValue.value;
+      completedIsLoading(false);
+      update();
+      
+    });
+  }
+
+  void loadCompletedTaskOnScroll() async {
+    if (completedIsScrollLoading.value) return;
+
+    completedIsScrollLoading(true);
+    update();
+
+   
+    var officerId =  AuthController.controller.user.value.defaultPosition?.id;
+    Map<String, dynamic> data = {
+       'page': rejectPage,
+      'per_page': rejectPerPage,
+      'status': Task.STATUS_REJECTED,
+     
+    };
+    
+   
+    var response = await ApiService.getAuthenticatedResource('tasks/council-tasks/${officerId}',
+        queryParameters: data);
+    response.fold((failed) {
+      completedIsScrollLoading(false);
+      update();
+      Modal.errorDialog(failure: failed);
+    }, (success) {
+      completedIsScrollLoading(false);
+      update();
+
+      var data = success.data;
+      if (completedLastTotalValue.value != data['pagination']['total']) {
+        loadTask();
+        return;
+      }
+
+      if (completedTasks.length == data['pagination']['total']) {
+        return;
+      }
+
+      List<Task> newData = (data['data'] as List<dynamic>)
+          .map((task) => Task.fromMap(task))
+          .toList();
+      completedTasks.addAll(newData);
+      page.value++;
+      completedLastTotalValue.value = data['pagination']['total'];
+      hasData.value = completedTasks.length < completedLastTotalValue.value;
+      update();
+    });
   }
 }
