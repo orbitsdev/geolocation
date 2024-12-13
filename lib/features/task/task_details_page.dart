@@ -36,14 +36,19 @@ class TaskDetailsPage extends StatelessWidget {
           style: TextStyle(color: Color(0xff333333)),
         ),
         actions: [
-         
-     GetBuilder<TaskController>(
+ GetBuilder<TaskController>(
   builder: (controller) {
     final user = AuthController.controller.user.value;
     final task = TaskController.controller.selectedTask.value;
 
-    // Check if the user can manage the task:
-    final canManage = (user.defaultPosition?.grantAccess == true||(user.defaultPosition?.id == task.assignedCouncilPosition?.userId && task.status != Task.STATUS_COMPLETED) );
+    // Admin logic: Admin can always see "MANAGE"
+    final isAdmin = user.defaultPosition?.grantAccess == true;
+
+    // Officer logic: Officers can see "MANAGE" if they are assigned to the task
+    final isOfficerAssigned = user.defaultPosition?.id == task.assignedCouncilPosition?.id;
+
+    // Determine if the "MANAGE" button should be visible
+    final canManage = isAdmin || (isOfficerAssigned && task.status != Task.STATUS_COMPLETED);
 
     if (canManage) {
       return TextButton(
@@ -61,6 +66,11 @@ class TaskDetailsPage extends StatelessWidget {
 
 
 
+
+
+
+
+
         ],
       ),
       body: GetBuilder<TaskController>(builder: (taskController) {
@@ -69,12 +79,57 @@ class TaskDetailsPage extends StatelessWidget {
           onRefresh: () => taskController.refreshSelectedDetails(),
           child: Column(
             children: [
+             if (taskController.selectedTask.value.approvedByCouncilPosition?.id != null)
+  Container(
+    decoration: BoxDecoration(
+      gradient: LinearGradient(
+        colors: [Palette.PRIMARY, Palette.GREEN2],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+     
+    ),
+    child: Padding(
+      padding: EdgeInsets.all(12),
+      child: Row(
+        children: [
+          Icon(Icons.check_circle, color: Colors.white, size: 24), // Approve icon
+          SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Approved by:',
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  taskController.selectedTask.value.approvedByCouncilPosition?.fullName ?? '',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ),
+  ),
+
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: CustomScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
                     slivers: [
+                       
                       // Title
                       ToSliver(
                         child: SizedBox(height: 12),
@@ -126,6 +181,8 @@ class TaskDetailsPage extends StatelessWidget {
                       ToSliver(
                         child: SizedBox(height: 16),
                       ),
+
+                     
 
                       // Task Details Header
                       ToSliver(

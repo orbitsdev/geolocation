@@ -10,8 +10,11 @@ class Task {
     static String STATUS_TODO = 'To Do';
     static String STATUS_IN_PROGRESS = 'In Progress';
     static String STATUS_COMPLETED = 'Completed';
+    static String STATUS_APPROVE = 'Completed';
     static String STATUS_NEED_REVISION = 'Needs Revision';
     static String STATUS_REJECTED = 'Rejected';
+    static String STATUS_RESUBMIT = 'Resubmit';
+    
 
 
   

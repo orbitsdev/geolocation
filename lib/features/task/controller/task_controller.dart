@@ -66,10 +66,16 @@ class TaskController extends GetxController {
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 12),
-                    if (selectedTask.value.status != Task.STATUS_COMPLETED)
+                    if (selectedTask.value.status == Task.STATUS_COMPLETED && selectedTask.value.approvedByCouncilPosition == null)
                       ListTile(
                         leading: Icon(Icons.check, color: Colors.green),
                         title: Text('Approve Task'),
+                        onTap: () => updateTaskStatus(Task.STATUS_COMPLETED),
+                      ),
+                    if (selectedTask.value.status != Task.STATUS_COMPLETED)
+                      ListTile(
+                        leading: Icon(Icons.check, color: Colors.green),
+                        title: Text('Mark as completed'),
                         onTap: () => updateTaskStatus(Task.STATUS_COMPLETED),
                       ),
                     if (selectedTask.value.status != Task.STATUS_NEED_REVISION)
@@ -96,16 +102,7 @@ class TaskController extends GetxController {
                         title: Text('Mark as Done'),
                         onTap: () => updateTaskStatus(Task.STATUS_COMPLETED),
                       ),
-                                            if (selectedTask.value.status != Task.STATUS_IN_PROGRESS && selectedTask.value.isTaskNotCompleteAndAssignedToCurrentOfficer())
-                   
-                      ListTile(
-                        leading: Icon(Icons.refresh, color: Colors.orange),
-                        title: Text('Resubmit Task'),
-                        onTap: () {
-                          Get.back(); // Close the modal
-                          showRemarksModal('Resubmission');
-                        },
-                      ),
+                                          
                   ],
                 )
               : Column(
@@ -123,13 +120,14 @@ class TaskController extends GetxController {
                         title: Text('Mark as Done'),
                         onTap: () => updateTaskStatus(Task.STATUS_COMPLETED),
                       ),
-                    if (selectedTask.value.status != Task.STATUS_IN_PROGRESS)
+                     if (selectedTask.value.status != Task.STATUS_TODO  && selectedTask.value.isTaskNotCompleteAndAssignedToCurrentOfficer())
+                   
                       ListTile(
                         leading: Icon(Icons.refresh, color: Colors.orange),
                         title: Text('Resubmit Task'),
                         onTap: () {
                           Get.back(); // Close the modal
-                          showRemarksModal('Resubmission');
+                          showRemarksModal(Task.STATUS_RESUBMIT);
                         },
                       ),
                   ],
@@ -239,6 +237,11 @@ class TaskController extends GetxController {
             'remarks': remarks,
             'is_admin_action': isAdmin,
           };
+
+          print('---------------------');
+          print(data);
+
+          return;
           Modal.loading();
           var response = await ApiService.putAuthenticatedResource(
               '/tasks/${selectedTask.value.id}/status', data);
@@ -284,6 +287,9 @@ class TaskController extends GetxController {
     // Define the action text based on the status
     if (status == Task.STATUS_COMPLETED) {
       actionText = "approve this task as completed";
+    } else if (status == Task.STATUS_APPROVE) {
+      actionText = "approve this task as completed";
+
     } else if (status == Task.STATUS_NEED_REVISION) {
       actionText = "mark this task as needing revision";
     } else if (status == Task.STATUS_REJECTED) {
@@ -299,8 +305,7 @@ class TaskController extends GetxController {
           "Are you sure you want to $actionText? This action will update the task's status and notify relevant users.",
       onConfirm: () async {
         try {
-       bool isAdmin = selectedTask.value.status != Task.STATUS_COMPLETED &&
-               (AuthController.controller.user.value.defaultPosition?.grantAccess ?? false);
+     bool isAdmin = AuthController.controller.user.value.defaultPosition?.grantAccess ?? false;
 
           var data = {
             'status': status,
