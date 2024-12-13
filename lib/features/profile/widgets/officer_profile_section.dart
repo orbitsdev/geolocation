@@ -4,6 +4,8 @@ import 'package:geolocation/core/globalwidget/notification_global.dart';
 import 'package:geolocation/core/globalwidget/ripple_container.dart';
 import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
+import 'package:geolocation/features/notification/controller/notification_controller.dart';
+import 'package:geolocation/features/notification/notification_page.dart';
 import 'package:geolocation/features/settings/profile_page.dart';
 import 'package:get/get.dart';
 
@@ -13,6 +15,11 @@ class OfficerProfileSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<AuthController>(builder: (controller) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (Get.isRegistered<NotificationController>()) {
+        NotificationController.controller.loadNotifications();
+      }
+    });
       return SliverAppBar(
 
             flexibleSpace: FlexibleSpaceBar(
@@ -45,13 +52,19 @@ class OfficerProfileSection extends StatelessWidget {
                   ),
                   Row(
                     children: [
-                      NotificationGlobal(
-                        value: 3, // Badge value
-                        action: () {
-                          print('Notification Icon Clicked!');
-                        },
-                        badgeColor: Palette.GREEN3,
-                        textColor: Colors.white,
+                      GetBuilder<NotificationController>(
+                        builder: (notificationController) {
+
+                          final unreadCount = notificationController.notifications.where((notification) => notification.read_at == null).length;
+                          return NotificationGlobal(
+                            value: unreadCount, // Badge value
+                            action: () {
+                              Get.to(()=>  NotificationPage(), transition: Transition.cupertino);
+                            },
+                            badgeColor: Palette.GREEN3,
+                            textColor: Colors.white,
+                          );
+                        }
                       ),
                       const SizedBox(width: 8),
                       RippleContainer(

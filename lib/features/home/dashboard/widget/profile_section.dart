@@ -97,7 +97,7 @@ class _ProfileSectionState extends State<ProfileSection> {
                 GetBuilder<NotificationController>(
                   builder: (notificationController) {
                     final unreadCount = notificationController.notifications
-                            ?.where((notification) => notification.read_at == null)
+                            .where((notification) => notification.read_at == null)
                             .length ??
                         0;
 

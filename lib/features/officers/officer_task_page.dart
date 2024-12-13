@@ -3,6 +3,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:gap/gap.dart';
 import 'package:geolocation/core/globalwidget/ripple_container.dart';
 import 'package:geolocation/core/globalwidget/to_sliver.dart';
+import 'package:geolocation/features/officers/alltasks/task_main.dart';
 import 'package:geolocation/features/task/controller/task_controller.dart';
 import 'package:geolocation/features/task/model/task.dart';
 import 'package:geolocation/features/task/widget/task_card2.dart';
@@ -65,7 +66,7 @@ SliverGap(8),
                                 ]),
                             GestureDetector(
                               onTap: (){
-                                // MyOrderScreen(), transition: Transition.cupertino)
+                                Get.to(()=> TaskMain(), transition: Transition.cupertino);
                               },
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
