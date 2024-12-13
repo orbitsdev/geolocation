@@ -321,7 +321,7 @@ class TaskController extends GetxController {
               Get.back(); // Close modal
               Get.back(); // Close modal
               isLoading(false);
-
+               loadByOfficerTask();
               var data = success.data['data'];
               Task taskDetails = Task.fromMap(data);
               selectedTask(taskDetails);
@@ -585,7 +585,7 @@ class TaskController extends GetxController {
           AuthController.controller.user.value.defaultPosition?.councilId,
     };
 
-    print(data);
+
 
     var response = await ApiService.getAuthenticatedResource('tasks',
         queryParameters: data);
@@ -656,6 +656,95 @@ class TaskController extends GetxController {
       update();
     });
   }
+  Future<void> loadByOfficerTask() async {
+    print('task load ---------');
+    isLoading(true);
+    page(1);
+    perPage(20);
+    lastTotalValue(0);
+    tasks.clear();
+    update();
+    
+    var officerId =  AuthController.controller.user.value.defaultPosition?.id;
+    Map<String, dynamic> data = {
+      'page': page,
+      'per_page': perPage,
+      // 'councilId':officerId,
+    };
+
+    print(data);
+    // return;
+
+
+    var response = await ApiService.getAuthenticatedResource('tasks/council-tasks/${officerId}',
+        queryParameters: data);
+    response.fold((failed) {
+      isLoading(false);
+      update();
+      Modal.errorDialog(failure: failed);
+    }, (success) {
+      var data = success.data;
+
+      List<Task> newData = (data['data'] as List<dynamic>)
+          .map((task) => Task.fromMap(task))
+          .toList();
+      tasks(newData);
+      page.value++;
+      lastTotalValue.value = data['pagination']['total'];
+      hasData.value = tasks.length < lastTotalValue.value;
+      isLoading(false);
+      update();
+      // tasks.forEach((e){
+      //   print('___________');
+      //   print(e.toJson());
+      //   print('__________________');
+      // });
+    });
+  }
+
+  void loadByOfficerTaskOnScroll() async {
+    if (isScrollLoading.value) return;
+
+    isScrollLoading(true);
+    update();
+
+   
+    var officerId =  AuthController.controller.user.value.defaultPosition?.id;
+    Map<String, dynamic> data = {
+      'page': page,
+      'per_page': perPage,
+      'councilId':officerId,
+    };
+    var response = await ApiService.getAuthenticatedResource('tasks/council-tasks/${officerId}',
+        queryParameters: data);
+    response.fold((failed) {
+      isScrollLoading(false);
+      update();
+      Modal.errorDialog(failure: failed);
+    }, (success) {
+      isScrollLoading(false);
+      update();
+
+      var data = success.data;
+      if (lastTotalValue.value != data['pagination']['total']) {
+        loadTask();
+        return;
+      }
+
+      if (tasks.length == data['pagination']['total']) {
+        return;
+      }
+
+      List<Task> newData = (data['data'] as List<dynamic>)
+          .map((task) => Task.fromMap(task))
+          .toList();
+      tasks.addAll(newData);
+      page.value++;
+      lastTotalValue.value = data['pagination']['total'];
+      hasData.value = tasks.length < lastTotalValue.value;
+      update();
+    });
+  }
 
   Future<void> uploadFile() async {
     Modal.confirmation(
@@ -697,10 +786,12 @@ class TaskController extends GetxController {
             isLoading(false);
             uploadProgress.value = 0.0;
             mediaFiles.clear();
+            loadByOfficerTask();
             var data = success.data['data'];
             Task taskDetails = Task.fromMap(data);
             selectedTask(taskDetails);
             update();
+
             (success.data['data']['media'] as List<dynamic>).forEach((e) {
               print(e);
             });

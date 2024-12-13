@@ -36,19 +36,31 @@ class TaskDetailsPage extends StatelessWidget {
           style: TextStyle(color: Color(0xff333333)),
         ),
         actions: [
-          // Conditionally show "Manage Task" icon for authorized users
-          if (AuthController.controller.user.value
-              .hasAccess()) // Replace with correct logic
-            GetBuilder<TaskController>(builder: (controllert) {
-              return TextButton(
-                onPressed: () {
-                  controllert.showApprovalModal(); // Trigger the approval modal
-                },
-                child: Text(AuthController.controller.user.value.hasAccess()
-                    ? 'MANAGE'
-                    : 'COMPLY'), // Tooltip for better accessibility
-              );
-            }),
+         
+     GetBuilder<TaskController>(
+  builder: (controller) {
+    final user = AuthController.controller.user.value;
+    final task = TaskController.controller.selectedTask.value;
+
+    // Check if the user can manage the task:
+    final canManage = (user.defaultPosition?.grantAccess == true||(user.defaultPosition?.id == task.assignedCouncilPosition?.userId && task.status != Task.STATUS_COMPLETED) );
+
+    if (canManage) {
+      return TextButton(
+        onPressed: () {
+          controller.showApprovalModal();
+        },
+        child: const Text('MANAGE'),
+      );
+    }
+
+    // Return an empty widget if the condition is not met
+    return const SizedBox.shrink();
+  },
+),
+
+
+
         ],
       ),
       body: GetBuilder<TaskController>(builder: (taskController) {

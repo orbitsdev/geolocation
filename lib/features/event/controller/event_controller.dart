@@ -397,7 +397,7 @@ markers.clear();
 
 
   Future<void> loadEvents() async {
-    print('event load');
+    print('event load------------');
     isLoading(true);
     page(1);
     perPage(20);
@@ -431,6 +431,8 @@ markers.clear();
       hasData.value = events.length < lastTotalValue.value;
       isLoading(false);
       update();
+          print('event event------------');
+
     });
   }
 

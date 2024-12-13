@@ -65,7 +65,7 @@ class _OfficerAllPageState extends State<OfficerAllPage> {
                 ToSliver(
                     child: Container(
                       color: Palette.LIGHT_BACKGROUND,
-                     
+                    
                       height: 240,
                       //  color: Colors.red,
                       child: ListView.builder(
@@ -78,7 +78,9 @@ class _OfficerAllPageState extends State<OfficerAllPage> {
 
                            return EventCard2(
                               event: eventcontroller.events[index],
-                              onView: () {});
+                              onView: () {
+                                
+                              });
                         //  return  Container(
                         //   color: Colors.red,
                         //   margin: EdgeInsets.only(right: 16),

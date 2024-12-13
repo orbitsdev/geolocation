@@ -126,7 +126,6 @@ class _OfficerHomePageState extends State<OfficerHomePage> with SingleTickerProv
           slivers: [
             // Profile Section
             OfficerProfileSection(),
-            ToSliver(child: Divider(color: Palette.GRAY1)),
         
             // TabBar in SliverPersistentHeader
             SliverPersistentHeader(

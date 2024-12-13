@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:geolocation/core/globalwidget/ripple_container.dart';
 import 'package:geolocation/core/globalwidget/to_sliver.dart';
 import 'package:geolocation/features/task/controller/task_controller.dart';
 import 'package:geolocation/features/task/model/task.dart';
+import 'package:geolocation/features/task/widget/task_card2.dart';
 import 'package:get/get.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
@@ -22,14 +24,15 @@ class _OfficerTaskPageState extends State<OfficerTaskPage> {
 void initState() {
   super.initState();
   WidgetsBinding.instance.addPostFrameCallback((_) async {
-   taskController.loadTask();
+   taskController.loadByOfficerTask();
 
-        newScrollController.addListener(() async {
-        if (newScrollController.position.pixels >=
-            newScrollController.position.maxScrollExtent - 200) {
-           taskController.loadTaskOnScroll();
-        }
-      });
+      //   newScrollController.addListener(() async {
+      //   if (newScrollController.position.pixels >=
+      //       newScrollController.position.maxScrollExtent - 200) {
+      //      taskController.loadByOfficerTaskOnScroll();
+      //   }
+      // });
+
     });
 }
 
@@ -56,7 +59,9 @@ void initState() {
                   crossAxisCount: 1,
                   itemBuilder: (context, index) {
                     Task task = taskController.tasks[index];
-                    return Container();
+                    return RippleContainer(
+                      onTap: ()=>  taskController.selectTaskAndNavigateToFullDetails(task),
+                      child: TaskCard2(task: task));
                   }),
 
                    if (taskcontroller.isScrollLoading.value)

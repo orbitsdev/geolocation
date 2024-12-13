@@ -176,5 +176,22 @@ bool hasAnyRole(List<String> roles) {
     }
     return roles.contains(role);
   }
+ bool isAssignedToPosition(int positionId) {
+    return councilPositions?.any((position) => position.id == positionId) ?? false;
+  }
 
+  bool canManageTasks() {
+    return isAdmin() || hasAccess();
+  }
+
+
+  bool hasGrantAccessForPosition(int positionId) {
+    return councilPositions?.any((position) =>
+            position.id == positionId && position.grantAccess == true) ??
+        false;
+  }
+
+  bool hasDefaultPosition() {
+    return defaultPosition != null;
+  }
 }
