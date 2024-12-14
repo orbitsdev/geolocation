@@ -852,6 +852,88 @@ static showCollectionMenu() {
   );
 }
 
+
+
+static void showCreationModal() {
+  Get.bottomSheet(
+    Container(
+      padding: const EdgeInsets.all(16.0),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Text(
+            'Choose Action',
+            style: Get.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16),
+
+          // Create Post
+          ListTile(
+            leading: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.blue.shade50,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(Icons.post_add, color: Colors.blue.shade700),
+            ),
+            title: const Text('Create Post'),
+            subtitle: const Text('Share updates or news with others.'),
+            onTap: () {
+              Get.back(); // Close the modal
+              // Navigate to Create Post
+            },
+          ),
+          const Divider(),
+
+          // Create Event
+          ListTile(
+            leading: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.green.shade50,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(Icons.event, color: Colors.green.shade700),
+            ),
+            title: const Text('Create Event'),
+            subtitle: const Text('Plan and manage events easily.'),
+            onTap: () {
+              Get.back(); // Close the modal
+              // Navigate to Create Event
+            },
+          ),
+          const Divider(),
+
+          // Create Collection
+          ListTile(
+            leading: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.orange.shade50,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(Icons.collections, color: Colors.orange.shade700),
+            ),
+            title: const Text('Create Collection'),
+            subtitle: const Text('Organize and manage your collections.'),
+            onTap: () {
+              Get.back(); // Close the modal
+              // Navigate to Create Collection
+            },
+          ),
+        ],
+      ),
+    ),
+    isScrollControlled: true,
+  );
+}
 }
 
 

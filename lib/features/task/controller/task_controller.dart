@@ -113,104 +113,272 @@ class TaskController extends GetxController {
   var completedTasks = <Task>[].obs;
 
 
-  void showApprovalModal() {
-    Get.bottomSheet(
-      GetBuilder<AuthController>(
-        builder: (authcontroller) {
-          return Container(
-            padding: EdgeInsets.all(16.0),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
-            ),
-            child: authcontroller.user.value.hasAccess() ?  Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Manage Task Status',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 12),
-                    if (selectedTask.value.status == Task.STATUS_COMPLETED && selectedTask.value.approvedByCouncilPosition == null)
-                      ListTile(
-                        leading: Icon(Icons.check, color: Colors.green),
-                        title: Text('Approve Task'),
-                        onTap: () => updateTaskStatus(Task.STATUS_COMPLETED),
-                      ),
-                    if (selectedTask.value.status != Task.STATUS_COMPLETED)
-                      ListTile(
-                        leading: Icon(Icons.check, color: Colors.green),
-                        title: Text('Mark as completed'),
-                        onTap: () => updateTaskStatus(Task.STATUS_COMPLETED),
-                      ),
-                    if (selectedTask.value.status != Task.STATUS_NEED_REVISION)
-                      ListTile(
-                        leading: Icon(Icons.edit, color: Colors.orange),
-                        title: Text('Needs Revision'),
-                        onTap: () {
-                          Get.back(); // Close the modal
-                          showRemarksModal(Task.STATUS_NEED_REVISION);
-                        },
-                      ),
-                    if (selectedTask.value.status != Task.STATUS_REJECTED)
-                      ListTile(
-                        leading: Icon(Icons.close, color: Colors.red),
-                        title: Text('Reject Task'),
-                        onTap: () {
-                          Get.back(); // Close the modal
-                          showRemarksModal(Task.STATUS_REJECTED);
-                        },
-                      ),
-                      if (selectedTask.value.status != Task.STATUS_COMPLETED && selectedTask.value.isTaskNotCompleteAndAssignedToCurrentOfficer())
-                      ListTile(
-                        leading: Icon(Icons.done, color: Colors.blue),
-                        title: Text('Mark as Done'),
-                        onTap: () => updateTaskStatus(Task.STATUS_COMPLETED),
-                      ),
+  // void showApprovalModal() {
+  //   Get.bottomSheet(
+  //     GetBuilder<AuthController>(
+  //       builder: (authcontroller) {
+  //         return Container(
+  //           padding: EdgeInsets.all(16.0),
+  //           decoration: BoxDecoration(
+  //             color: Colors.white,
+  //             borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
+  //           ),
+  //           child: authcontroller.user.value.hasAccess() ?  Column(
+  //                 mainAxisSize: MainAxisSize.min,
+  //                 crossAxisAlignment: CrossAxisAlignment.start,
+  //                 children: [
+  //                   Text(
+  //                     'Manage Task Status',
+  //                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+  //                   ),
+  //                   SizedBox(height: 12),
+  //                   if (selectedTask.value.status == Task.STATUS_COMPLETED && selectedTask.value.approvedByCouncilPosition == null)
+  //                     ListTile(
+  //                       leading: Icon(Icons.check, color: Colors.green),
+  //                       title: Text('Approve Task'),
+  //                       onTap: () => updateTaskStatus(Task.STATUS_COMPLETED),
+  //                     ),
+  //                   if (selectedTask.value.status != Task.STATUS_COMPLETED)
+  //                     ListTile(
+  //                       leading: Icon(Icons.check, color: Colors.green),
+  //                       title: Text('Mark as completed'),
+  //                       onTap: () => updateTaskStatus(Task.STATUS_COMPLETED),
+  //                     ),
+  //                   if (selectedTask.value.status != Task.STATUS_NEED_REVISION)
+  //                     ListTile(
+  //                       leading: Icon(Icons.edit, color: Colors.orange),
+  //                       title: Text('Needs Revision'),
+  //                       onTap: () {
+  //                         Get.back(); // Close the modal
+  //                         showRemarksModal(Task.STATUS_NEED_REVISION);
+  //                       },
+  //                     ),
+  //                   if (selectedTask.value.status != Task.STATUS_REJECTED)
+  //                     ListTile(
+  //                       leading: Icon(Icons.close, color: Colors.red),
+  //                       title: Text('Reject Task'),
+  //                       onTap: () {
+  //                         Get.back(); // Close the modal
+  //                         showRemarksModal(Task.STATUS_REJECTED);
+  //                       },
+  //                     ),
+  //                     if (selectedTask.value.status != Task.STATUS_COMPLETED && selectedTask.value.isTaskNotCompleteAndAssignedToCurrentOfficer())
+  //                     ListTile(
+  //                       leading: Icon(Icons.done, color: Colors.blue),
+  //                       title: Text('Mark as Done'),
+  //                       onTap: () => updateTaskStatus(Task.STATUS_COMPLETED),
+  //                     ),
                                           
-                  ],
-                )
-              : Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Task Actions',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 12),
-                    if (selectedTask.value.status != Task.STATUS_COMPLETED)
-                      ListTile(
-                        leading: Icon(Icons.done, color: Colors.blue),
-                        title: Text('Mark as Done'),
-                        onTap: () => updateTaskStatus(Task.STATUS_COMPLETED),
-                      ),
-                     if (selectedTask.value.status != Task.STATUS_TODO  && selectedTask.value.isTaskNotCompleteAndAssignedToCurrentOfficer())
+  //                 ],
+  //               )
+  //             : Column(
+  //                 mainAxisSize: MainAxisSize.min,
+  //                 crossAxisAlignment: CrossAxisAlignment.start,
+  //                 children: [
+  //                   Text(
+  //                     'Task Actions',
+  //                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+  //                   ),
+  //                   SizedBox(height: 12),
+  //                   if (selectedTask.value.status != Task.STATUS_COMPLETED)
+  //                     ListTile(
+  //                       leading: Icon(Icons.done, color: Colors.blue),
+  //                       title: Text('Mark as Done'),
+  //                       onTap: () => updateTaskStatus(Task.STATUS_COMPLETED),
+  //                     ),
+  //                    if (selectedTask.value.status != Task.STATUS_TODO  && selectedTask.value.isTaskNotCompleteAndAssignedToCurrentOfficer())
                    
-                      ListTile(
-                        leading: Icon(Icons.refresh, color: Colors.orange),
-                        title: Text('Resubmit Task'),
-                        onTap: () {
-                          Get.back(); // Close the modal
-                          showRemarksModal(Task.STATUS_RESUBMIT);
-                        },
-                      ),
-                  ],
-                ),
-          );
-        }
+  //                     ListTile(
+  //                       leading: Icon(Icons.refresh, color: Colors.orange),
+  //                       title: Text('Resubmit Task'),
+  //                       onTap: () {
+  //                         Get.back(); // Close the modal
+  //                         showRemarksModal(Task.STATUS_RESUBMIT);
+  //                       },
+  //                     ),
+  //                 ],
+  //               ),
+  //         );
+  //       }
+  //     ),
+  //   );
+  // }
+
+
+void showApprovalModal() {
+  Get.bottomSheet(
+    Container(
+      padding: const EdgeInsets.all(16.0),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
       ),
-    );
-  }
+      child: GetBuilder<AuthController>(
+        builder: (authcontroller) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header
+              Text(
+                authcontroller.user.value.hasAccess()
+                    ? 'Manage Task Status'
+                    : 'Task Actions',
+                style: Get.textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Access-Dependent Options
+              if (authcontroller.user.value.hasAccess()) ...[
+                if (selectedTask.value.status == Task.STATUS_COMPLETED &&
+                    selectedTask.value.approvedByCouncilPosition == null)
+                  _buildListTile(
+                    icon: Icons.check_circle,
+                    iconColor: Colors.green,
+                    iconBackground: Colors.green.shade50,
+                    title: 'Approve Task',
+                    subtitle: 'Mark the task as approved.',
+                    onTap: () => updateTaskStatus(Task.STATUS_COMPLETED),
+                  ),
+                if (selectedTask.value.status != Task.STATUS_COMPLETED)
+                  _buildListTile(
+                    icon: Icons.done_all,
+                    iconColor: Colors.green,
+                    iconBackground: Colors.green.shade50,
+                    title: 'Mark as Completed',
+                    subtitle: 'Complete the task.',
+                    onTap: () => updateTaskStatus(Task.STATUS_COMPLETED),
+                  ),
+                if (selectedTask.value.status != Task.STATUS_NEED_REVISION)
+                  _buildListTile(
+                    icon: Icons.edit,
+                    iconColor: Colors.orange,
+                    iconBackground: Colors.orange.shade50,
+                    title: 'Needs Revision',
+                    subtitle: 'Request revisions for the task.',
+                    onTap: () {
+                      Get.back(); // Close the modal
+                      showRemarksModal(Task.STATUS_NEED_REVISION);
+                    },
+                  ),
+                if (selectedTask.value.status != Task.STATUS_REJECTED)
+                  _buildListTile(
+                    icon: Icons.close,
+                    iconColor: Colors.red,
+                    iconBackground: Colors.red.shade50,
+                    title: 'Reject Task',
+                    subtitle: 'Mark the task as rejected.',
+                    onTap: () {
+                      Get.back(); // Close the modal
+                      showRemarksModal(Task.STATUS_REJECTED);
+                    },
+                  ),
+                if (selectedTask.value.status != Task.STATUS_COMPLETED &&
+                    selectedTask.value.isTaskNotCompleteAndAssignedToCurrentOfficer())
+                  _buildListTile(
+                    icon: Icons.task_alt,
+                    iconColor: Colors.teal,
+                    iconBackground: Colors.teal.shade50,
+                    title: 'Mark as Done',
+                    subtitle: 'Mark the task as done.',
+                    onTap: () => updateTaskStatus(Task.STATUS_COMPLETED),
+                  ),
+              ] else ...[
+                if (selectedTask.value.status != Task.STATUS_COMPLETED)
+                  _buildListTile(
+                    icon: Icons.task_alt,
+                    iconColor: Colors.green,
+                    iconBackground: Colors.green.shade50,
+                    title: 'Mark as Done',
+                    subtitle: 'Mark the task as done.',
+                    onTap: () => updateTaskStatus(Task.STATUS_COMPLETED),
+                  ),
+                if (selectedTask.value.status != Task.STATUS_TODO &&
+                    selectedTask.value.isTaskNotCompleteAndAssignedToCurrentOfficer())
+                  _buildListTile(
+                    icon: Icons.refresh,
+                    iconColor: Colors.orange,
+                    iconBackground: Colors.orange.shade50,
+                    title: 'Resubmit Task',
+                    subtitle: 'Resubmit the task for approval.',
+                    onTap: () {
+                      Get.back(); // Close the modal
+                      showRemarksModal(Task.STATUS_RESUBMIT,title: 'Message');
+                    },
+                  ),
+              ],
+
+              // Divider for separation
+              
+
+              // Cancel Button
+              // SizedBox(
+              //   width: double.infinity,
+              //   child: ElevatedButton(
+              //     style: ElevatedButton.styleFrom(
+              //       backgroundColor: Colors.grey[200],
+              //       foregroundColor: Colors.black,
+              //       shape: RoundedRectangleBorder(
+              //         borderRadius: BorderRadius.circular(8),
+              //       ),
+              //     ),
+              //     onPressed: () => Get.back(),
+              //     child: const Text('Cancel'),
+              //   ),
+              // ),
+            ],
+          );
+        },
+      ),
+    ),
+    isScrollControlled: true,
+  );
+}
+
+Widget _buildListTile({
+  required IconData icon,
+  required Color iconColor,
+  required Color iconBackground,
+  required String title,
+  required String subtitle,
+  required VoidCallback onTap,
+}) {
+  return Column(
+    children: [
+      ListTile(
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: iconBackground,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: iconColor),
+        ),
+        title: Text(
+          title,
+          style: Get.textTheme.bodyMedium,
+        ),
+        subtitle: Text(
+          subtitle,
+          style: Get.textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
+        ),
+        onTap: onTap,
+      ),
+      const Divider(),
+    ],
+  );
+}
+
 
   // Modal to input remarks
-  void showRemarksModal(String status) {
+  void showRemarksModal(String status, {String? title ='Add Remarks'}) {
     final _formKey = GlobalKey<FormBuilderState>(); // FormBuilder key
 
     Get.defaultDialog(
       barrierDismissible: false,
-      title: "Add Remarks",
+      title: title ??"Add Remarks",
       content: FormBuilder(
         key: _formKey,
         child: Column(
@@ -220,7 +388,7 @@ class TaskController extends GetxController {
               name: 'remarks',
               maxLines: 4,
               decoration: InputDecoration(
-                hintText: "Enter remarks here...",
+                hintText: "Enter ${title ?? 'Remarks'} here...",
                 border: OutlineInputBorder(),
               ),
               validator: FormBuilderValidators.compose([

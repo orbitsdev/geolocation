@@ -4,6 +4,7 @@ import 'package:geolocation/core/globalwidget/images/online_image.dart';
 import 'package:geolocation/core/globalwidget/notification_global.dart';
 import 'package:geolocation/core/globalwidget/sliver_gap.dart';
 import 'package:geolocation/core/globalwidget/to_sliver.dart';
+import 'package:geolocation/core/modal/modal.dart';
 import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/attendance/attendance_page.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
@@ -134,6 +135,27 @@ class _OfficerHomePageState extends State<OfficerHomePage> with SingleTickerProv
           slivers: [
             // Profile Section
             OfficerProfileSection(),
+            
+SliverToBoxAdapter(
+  child: Container(
+    padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 24.0),
+    color: Colors.white,
+    child: ElevatedButton.icon(
+      onPressed: (){
+        Modal.showCreationModal();
+      }, // Call the modal
+      icon: const Icon(Icons.add, color: Colors.white),
+      label: const Text('Create New', style: TextStyle(color: Colors.white)),
+      style: ElevatedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(vertical: 12.0),
+        backgroundColor: Palette.GREEN3, // Adjust color to match design
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+      ),
+    ),
+  ),
+),
         
             // TabBar in SliverPersistentHeader
 //           SliverPersistentHeader(
@@ -212,7 +234,8 @@ class _OfficerHomePageState extends State<OfficerHomePage> with SingleTickerProv
                 ),
               ),
             ),
-        
+
+
             // TabBarView Content
             SliverFillRemaining(
               child: TabBarView(
