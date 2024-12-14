@@ -16,6 +16,7 @@ import 'package:geolocation/features/task/task_details_page.dart';
 import 'package:geolocation/features/task/task_page.dart';
 import 'package:geolocation/features/task/widget/admin_task_card.dart';
 import 'package:geolocation/features/task/widget/task_card.dart';
+import 'package:geolocation/features/task/widget/task_card2.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 
@@ -144,7 +145,7 @@ class _MemberTaskPageState extends State<MemberTaskPage> {
     onTap: () {
       taskController.selectTaskAndNavigateToFullDetails(task);
     },
-    child: AdminTaskCard(task: task),
+    child: TaskCard2(task: task),
   ),
 );
 

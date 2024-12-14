@@ -18,8 +18,8 @@ class GuestMiddleware extends GetMiddleware {
 
     if (authController.token.value.isNotEmpty) {
       
-      return RouteSettings(name: '/home-main');
-      // return RouteSettings(name: '/officers-task-main');
+     return RouteSettings(name: '/home-main');
+      // return RouteSettings(name: '/test');
    
     }
     

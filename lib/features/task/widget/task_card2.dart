@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:geolocation/core/globalwidget/images/online_image.dart';
+import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:geolocation/features/task/model/task.dart';
 class TaskCard2 extends StatelessWidget {
@@ -48,7 +49,8 @@ class TaskCard2 extends StatelessWidget {
                 ],
               ),
 
-            const SizedBox(height: 12),
+         if (task.assignedCouncilPosition != null && (task.assignedCouncilPosition?.id != AuthController.controller.user.value.defaultPosition?.id)) Divider(color: Palette.FBG,),
+         if (task.assignedCouncilPosition != null && (task.assignedCouncilPosition?.id != AuthController.controller.user.value.defaultPosition?.id)) Gap(8),
             // Header Row
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

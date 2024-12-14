@@ -7,6 +7,8 @@ import 'package:geolocation/core/globalwidget/to_sliver.dart';
 import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/attendance/attendance_page.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
+import 'package:geolocation/features/officers/controller/officer_controller.dart';
+import 'package:geolocation/features/officers/officer_all_event_page.dart';
 import 'package:geolocation/features/officers/officer_all_page.dart';
 import 'package:geolocation/features/officers/officer_files_page.dart';
 import 'package:geolocation/features/officers/officer_post_page.dart';
@@ -32,6 +34,7 @@ class _OfficerHomePageState extends State<OfficerHomePage> with SingleTickerProv
     OfficerAllPage(),
     OfficerPostPage(),
     OfficerTaskPage(),
+    OfficerAllEventPage(),
     OfficerFilesPage(),
     AttendancePage(),
   ];
@@ -40,6 +43,7 @@ class _OfficerHomePageState extends State<OfficerHomePage> with SingleTickerProv
     Tab(text: 'All'),
     Tab(text: 'Posts'),
     Tab(text: 'Tasks'),
+    Tab(text: 'Events'),
     Tab(text: 'Files'),
     Tab(text: 'Attendance'),
   ];
@@ -52,9 +56,10 @@ class _OfficerHomePageState extends State<OfficerHomePage> with SingleTickerProv
     tabController.addListener(() {
     switch (tabController.index) {
         case 0:
-          // postController.loadData();
+          //  OfficerController.controller.loadAllPageData();
           break;
         case 1:
+            // PostController.controller.loadData();
           print('Load Posts');
           // Call your function for posts
           break;

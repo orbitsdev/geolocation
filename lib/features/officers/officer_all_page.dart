@@ -23,7 +23,7 @@ class OfficerAllPage extends StatefulWidget {
 }
 
 class _OfficerAllPageState extends State<OfficerAllPage> {
-  var officerController = Get.put(OfficerController());
+  var eventController = Get.find<EventController>();
 
   final ScrollController newScrollController = ScrollController();
 
@@ -33,7 +33,7 @@ class _OfficerAllPageState extends State<OfficerAllPage> {
    
    
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await officerController.loadAllPageData();
+      await eventController.loadAllPageData();
 
         newScrollController.addListener(() async {
         if (newScrollController.position.pixels >=
@@ -50,78 +50,52 @@ class _OfficerAllPageState extends State<OfficerAllPage> {
   Widget build(BuildContext context) {
     return RefreshIndicator(
       triggerMode: RefreshIndicatorTriggerMode.anywhere,
-      onRefresh: () => officerController.loadAllPageData(),
+      onRefresh: () => eventController.loadAllPageData(),
       child: CustomScrollView(
         controller: newScrollController,
         shrinkWrap: true,
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
 
-           GetBuilder<EventController>(builder: (eventcontroller) {
-            return MultiSliver(children: [
-               ToSliver(child: Text('Latest Events')),
-               if (eventcontroller.isLoading.value == true)
+           GetBuilder<EventController>(
+             builder: (econtroller) {
+               return MultiSliver(
+                 children: [
+                    if (econtroller.isLoading.value == true)
                 ToSliver(child: LinearProgressIndicator()),
-                ToSliver(
-                    child: Container(
-                      color: Palette.LIGHT_BACKGROUND,
-                    
-                      height: 240,
-                      //  color: Colors.red,
-                      child: ListView.builder(
-                     
-                          shrinkWrap: true,
-                        scrollDirection:Axis.horizontal,
-                       
-                       itemCount: eventcontroller.events.length, // Adjust the number of items
-                        itemBuilder: (context, index) {
-
-                           return EventCard2(
-                              event: eventcontroller.events[index],
-                              onView: () {
+ToSliver(
+                                child: Container(
+                                  color: Palette.LIGHT_BACKGROUND,
                                 
-                              });
-                        //  return  Container(
-                        //   color: Colors.red,
-                        //   margin: EdgeInsets.only(right: 16),
-                        //   width: Get.size.width ,);
-                        //   // return EventCard2(
-                        //   //     event: eventcontroller.events[index],
-                        //   //     onView: () {});
-                        },
-                      ),
-                    ))
-            ]);
-            // return eventcontroller.isLoading.value == true
-            //     ? ToSliver(child: Container(
-            //       width: Get.size.width,
-            //       child: LinearProgressIndicator()))
-            //     : ToSliver(
-            //         child: Container(
-            //           color: Palette.LIGHT_BACKGROUND,
-            //           padding: EdgeInsets.symmetric(
-            //             vertical: 16,
-            //             horizontal: 8.0,
-            //           ),
-            //           height: 240,
-            //           //  color: Colors.red,
-            //           child: ListView.builder(
-            //             scrollDirection:Axis.horizontal,
-            //             itemCount: 10, // Enables horizontal scrolling
-            //             // itemCount: 10.events.length, // Adjust the number of items
-            //             itemBuilder: (context, index) {
-            //              return  Container(
-            //               color: Colors.red,
-            //               margin: EdgeInsets.only(right: 16),
-            //               width: Get.size.width ,);
-            //               // return EventCard2(
-            //               //     event: eventcontroller.events[index],
-            //               //     onView: () {});
-            //             },
-            //           ),
-            //         ),
-            //       );
-          }),
+                                  height: 240,
+                                  //  color: Colors.red,
+                                  child: ListView.builder(
+                                 
+                                    shrinkWrap: true,
+                                    scrollDirection:Axis.horizontal,
+                                   
+                                   itemCount: econtroller.events.length, // Adjust the number of items
+                                    itemBuilder: (context, index) {
+                            
+                                       return EventCard2(
+                                          event: econtroller.events[index],
+                                          onView: () {
+                                            
+                                          });
+                                    //  return  Container(
+                                    //   color: Colors.red,
+                                    //   margin: EdgeInsets.only(right: 16),
+                                    //   width: Get.size.width ,);
+                                    //   // return EventCard2(
+                                    //   //     event: eventcontroller.events[index],
+                                    //   //     onView: () {});
+                                    },
+                                  ),
+                                ))
+                 ],
+               );
+             }
+           ),
 
           SliverGap(16),
 

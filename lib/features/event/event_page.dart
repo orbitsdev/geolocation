@@ -27,19 +27,18 @@ class _EventPageState extends State<EventPage> {
   @override
   void initState() {
     super.initState();
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-
-    if (controller.events.isEmpty) {
-    controller.loadEvents();
-    }
-
-    newScrollController.addListener(() async {
-      if (newScrollController.position.pixels >=
-          newScrollController.position.maxScrollExtent - 200) {
-        controller.loadOnScroll();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (controller.events.isEmpty) {
+        controller.loadEvents();
       }
-    });
+
+      newScrollController.addListener(() async {
+        if (newScrollController.position.pixels >=
+            newScrollController.position.maxScrollExtent - 200) {
+          controller.loadOnScroll();
+        }
       });
+    });
   }
 
   @override
@@ -59,8 +58,16 @@ class _EventPageState extends State<EventPage> {
         actions: [
           IconButton(
             icon: Icon(Icons.add, color: Palette.PRIMARY),
-            onPressed: () {
-              Get.to(() => CreateEventPage());
+            onPressed: () async {
+              bool canProceed =
+                  await controller.checkLocationServicesAndPermissions();
+              if (canProceed) {
+                Get.to(() => CreateEventPage());
+              } else {
+                Modal.showToast(
+                    msg:
+                        'Location services are disabled or unavailable. Please enable location services to proceed.');
+              }
             },
           ),
         ],
@@ -90,38 +97,55 @@ class _EventPageState extends State<EventPage> {
                               itemBuilder: (context, index) {
                                 Event event = controller.events[index];
                                 return RippleContainer(
-                                                                
                                   onTap: () {
-                                
-                                     Modal.showEventOptions(
+                                    Modal.showEventOptions(
                                       event: event,
-                                   
-                                      onViewDetails: () {
-                                         Get.back();
-                                         controller.viewEvent(event);
+                                      onViewDetails: () async {
+                                        Get.back();
+
+                                        bool canProceed = await controller
+                                            .checkLocationServicesAndPermissions();
+                                        if (canProceed) {
+                                          controller.viewEvent(event);
+                                        } else {
+                                          Modal.showToast(
+                                              msg:
+                                                  'Location services are disabled or unavailable. Please enable location services to proceed.');
+                                        }
+
                                         // AttendanceController.controller.testLoad(event);
                                         // AttendanceController.controller.selectAndNavigateToAttendancePage(event);
-                                          
                                       },
                                       onViewAttendance: () {
-                                         if (event.id != null) {
-                                         Get.back();
-                                         AttendanceController.controller.selectAndNavigateToAttendanceRecord(event);
+                                        if (event.id != null) {
+                                          Get.back();
+                                          AttendanceController.controller
+                                              .selectAndNavigateToAttendanceRecord(
+                                                  event);
                                         }
                                       },
-                                      onUpdateEvent: () {
-                                       if (event.id != null) {
-                                                                                Get.back();
-
-                                          controller
-                                              .selectItemAndNavigateToUpdatePage(event);
+                                      onUpdateEvent: () async  {
+                                        if (event.id != null)   {
+                                          Get.back();
+                                            bool canProceed = await controller
+                                            .checkLocationServicesAndPermissions();
+                                        if (canProceed) {
+                                        controller
+                                              .selectItemAndNavigateToUpdatePage(
+                                                  event);
+                                        } else {
+                                          Modal.showToast(
+                                              msg:
+                                                  'Location services are disabled or unavailable. Please enable location services to proceed.');
+                                        }
+                                          
                                         }
                                       },
                                       onDeleteEvent: () {
-                                         if (event.id != null) {
-                                                                                  Get.back();
+                                        if (event.id != null) {
+                                          Get.back();
 
-                                                     controller.delete(event.id!);
+                                          controller.delete(event.id!);
                                         }
                                       },
                                     );
@@ -143,8 +167,7 @@ class _EventPageState extends State<EventPage> {
                     ToSliver(
                       child: const Center(child: CircularProgressIndicator()),
                     ),
-
-                      SliverGap(Get.size.height * 0.10)
+                  SliverGap(Get.size.height * 0.10)
                 ],
               );
             },

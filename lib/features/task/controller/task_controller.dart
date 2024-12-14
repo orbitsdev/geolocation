@@ -648,7 +648,7 @@ class TaskController extends GetxController {
 
 
     var response = await ApiService.getAuthenticatedResource('tasks',
-        data: data);
+        queryParameters: data);
     response.fold((failed) {
       isLoading(false);
       update();
@@ -687,7 +687,7 @@ class TaskController extends GetxController {
     };
 
     var response = await ApiService.getAuthenticatedResource('tasks',
-        data: data);
+        queryParameters: data);
     response.fold((failed) {
       isScrollLoading(false);
       update();

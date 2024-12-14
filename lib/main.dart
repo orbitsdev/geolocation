@@ -33,6 +33,7 @@ import 'package:geolocation/features/playground/page1_middleware.dart';
 import 'package:geolocation/features/playground/page2.dart';
 import 'package:geolocation/features/playground/page2_middleware.dart';
 import 'package:geolocation/features/playground/page3.dart';
+import 'package:geolocation/features/playground/test.dart';
 import 'package:geolocation/features/post/post_page.dart';
 import 'package:geolocation/features/role/login_selection_page.dart';
 import 'package:geolocation/features/auth/controller/login_controller.dart';
@@ -161,6 +162,7 @@ class _GeoLocationAppState extends State<GeoLocationApp>  with WidgetsBindingObs
         GetPage(name: '/councils', page: () => CouncilListPage(), middlewares: []),
         GetPage(name: '/forbidden', page: () => ForbiddenPage(), middlewares: []),
         GetPage(name: '/officers-task-main', page: () => TaskMain(), middlewares: []),
+        GetPage(name: '/test', page: () => Test(), middlewares: []),
       ],
     );
   }

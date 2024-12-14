@@ -1,12 +1,26 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:geolocation/core/globalwidget/map_loading.dart';
 import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/event/controller/event_controller.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:get/get.dart';
 
-class EventDetailsPage extends StatelessWidget {
+class EventDetailsPage extends StatefulWidget {
+  @override
+  State<EventDetailsPage> createState() => _EventDetailsPageState();
+}
+
+class _EventDetailsPageState extends State<EventDetailsPage> {
+  var controller = Get.find<EventController>();
+
+
+  @override
+  void initState() {
+    super.initState();
+    controller.prepareMap();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,8 +35,8 @@ class EventDetailsPage extends StatelessWidget {
         },
         child: GetBuilder<EventController>(
           builder: (controller) {
-            return controller.isLoading.value
-                ? Center(child: CircularProgressIndicator())
+            return controller.isMapReady == true? controller.isLoading.value
+                ? Center(child: MapLoading())
                 : SingleChildScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
                     child: Column(
@@ -154,7 +168,7 @@ class EventDetailsPage extends StatelessWidget {
                       Gap(Get.size.height * 0.10),
                       ],
                     ),
-                  );
+                  ): Container();
           },
         ),
       ),

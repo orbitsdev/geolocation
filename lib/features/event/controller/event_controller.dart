@@ -11,6 +11,7 @@ import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:geolocation/features/event/create_event_page.dart';
 import 'package:geolocation/features/event/event_details_page.dart';
 import 'package:geolocation/features/event/model/event.dart';
+import 'package:geolocation/features/post/controller/post_controller.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -30,7 +31,8 @@ class EventController extends GetxController {
   var selectedLocationDetails = ''.obs;
   var placeId = ''.obs;
 
-  Position? currentPosition;
+  Position? currentPosition;  
+  LatLng? position;
   CameraPosition? cameraPosition = CameraPosition(
     bearing: 192.8334901395799,
     target: LatLng(37.43296265331129, -122.08832357078792),
@@ -60,6 +62,71 @@ final DateFormat readableDateFormat = DateFormat('EEEE, MMMM d, yyyy, h:mm a');
   void onInit() {
     super.onInit();
     
+  }
+
+  Future<void> prepareMap() async {
+
+
+    var localpermission = await requestLocationPermision();
+    if (localpermission) {
+      try {
+        currentPosition = await Geolocator.getCurrentPosition(
+            desiredAccuracy: LocationAccuracy.high);
+        position =LatLng(currentPosition!.latitude, currentPosition!.longitude);
+        cameraPosition = CameraPosition(
+            target: position as LatLng, zoom: 16.999, tilt: 40, bearing: -1000);
+        if (currentPosition != null) {
+          isMapReady( true);
+          update();
+        } else {
+           isMapReady( false);
+          update();
+        }
+      } catch (e) {
+         isMapReady( false);
+          update();
+        
+      }
+    } else {
+      isMapReady( false);
+          update();
+      
+    }
+
+  }
+
+  Future<bool> requestLocationPermision() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Test if location services are enabled.
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // Location services are not enabled don't continue
+      // accessing the position and request users of the
+      // App to enable the location services.
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // Permissions are denied, next time you could try
+        // requesting permissions again (this is also where
+        // Android's shouldShowRequestPermissionRationale
+        // returned true. According to Android guidelines
+        // your App should show an explanatory UI now.
+        return Future.error('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately.
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+    return serviceEnabled;
   }
 
  void setMapReady() {
@@ -397,7 +464,7 @@ markers.clear();
 
 
   Future<void> loadEvents() async {
-    print('event load------------');
+   
     isLoading(true);
     page(1);
     perPage(20);
@@ -431,7 +498,10 @@ markers.clear();
       hasData.value = events.length < lastTotalValue.value;
       isLoading(false);
       update();
-          print('event event------------');
+
+      
+          print('event event------------load');
+          print(events.length);
 
     });
   }
@@ -608,6 +678,103 @@ Future<void> refreshEventDetails() async {
     );
       }
      
+}
+
+Future<void> loadAllPageData()  async {
+ 
+     await Future.wait([
+        EventController.controller.loadEvents(),
+       PostController.controller.loadData(),
+        // CollectionController.controller.loadData(),
+        // TaskController.controller.loadTask(),
+      ]);
+  } 
+
+
+Future<void> showCurrentLocation() async {
+  try {
+    // Check if location services are enabled
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {   
+      Modal.showToast(msg: "Location services are disabled. Please enable them.");
+      return;
+    }
+
+    // Check and request location permissions
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        Modal.showToast(msg: "Location permission denied.");
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      Modal.showToast(msg: "Location permissions are permanently denied. Please enable them from settings.");
+      return;
+    }
+
+    // Fetch the user's current position
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+
+    // Debugging to check the fetched location
+    print("Current Location: Latitude: ${position.latitude}, Longitude: ${position.longitude}");
+
+    // Location is fetched, and the blue dot will be displayed because `myLocationEnabled: true`
+  } catch (e) {
+    Modal.showToast(msg: "Failed to fetch your location: $e");
+  }
+}
+
+Future<bool> checkLocationServicesAndPermissions() async {
+  // Check if location services are enabled
+  bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  if (!serviceEnabled) {
+    await Get.dialog(
+      AlertDialog(
+        title: Text("Location Services Disabled"),
+        content: Text("Location services are turned off. Please enable them to proceed."),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Geolocator.openLocationSettings(); // Open location settings
+              Get.back(); // Close dialog
+            },
+            child: Text("Enable"),
+          ),
+          TextButton(
+            onPressed: () => Get.back(), // Close dialog
+            child: Text("Cancel"),
+          ),
+        ],
+      ),
+    );
+    return false;
+  }
+
+  // Check location permissions
+  LocationPermission permission = await Geolocator.checkPermission();
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {
+      Modal.showToast( msg:  "Permission Denied",);
+       
+       
+      return false;
+    }
+  }
+
+  if (permission == LocationPermission.deniedForever) {
+     Modal.showToast( msg:  "Location permissions are permanently denied. Please enable them in settings.",);
+   
+    await Geolocator.openAppSettings();
+    return false;
+  }
+
+  return true; // All checks passed
 }
 
 }

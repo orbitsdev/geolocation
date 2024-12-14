@@ -23,7 +23,7 @@ class _OfficerPostPageState extends State<OfficerPostPage> {
     // TODO: implement initState
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-   postController.loadData();
+       postController.loadData();
 
         newScrollController.addListener(() async {
         if (newScrollController.position.pixels >=
