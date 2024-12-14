@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
+import 'package:geolocation/core/globalwidget/custom_button.dart';
 import 'package:geolocation/core/globalwidget/ripple_container.dart';
 import 'package:geolocation/core/globalwidget/to_sliver.dart';
+import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/officers/alltasks/task_main.dart';
 import 'package:geolocation/features/task/controller/task_controller.dart';
 import 'package:geolocation/features/task/model/task.dart';
@@ -26,7 +29,7 @@ class _OfficerTaskPageState extends State<OfficerTaskPage> {
 void initState() {
   super.initState();
   WidgetsBinding.instance.addPostFrameCallback((_) async {
-   taskController.loadByOfficerTask();
+   taskController.loadMyTask();
 
       //   newScrollController.addListener(() async {
       //   if (newScrollController.position.pixels >=
@@ -42,49 +45,142 @@ void initState() {
   Widget build(BuildContext context){
     return RefreshIndicator(
       triggerMode: RefreshIndicatorTriggerMode.anywhere,
-      onRefresh: () => taskController.loadTask(),
+      onRefresh: () => taskController.loadMyTask(),
       child: CustomScrollView(
         controller: newScrollController,
         shrinkWrap: true,
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
 SliverGap(8),
-           ToSliver(
-             child: Padding(
-               padding: const EdgeInsets.symmetric(horizontal: 16),
-               child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                 
-                                  Text('Latest Task',
-                                      style: Get.textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold)),
-                                ]),
-                            GestureDetector(
-                              onTap: (){
-                                Get.to(()=> TaskMain(), transition: Transition.cupertino);
-                              },
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'View all Tasks',
-                                    style: Get.textTheme.bodyMedium!.copyWith(),
-                                  ),
-                                //   Gap(4),
-                                //  Icon(Icons.arrow_forward_ios,size: 12,)
-                                ],
+           
+            GetBuilder<TaskController>(
+      builder: (controller) {
+        return ToSliver(
+          child: Container(
+            color: Colors.white,
+            // decoration: BoxDecoration(color: avanteColor600),
+            padding: EdgeInsets.all(16),
+            child: GetBuilder<TaskController>(
+              builder: (controller) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                             
+                              Text('My Task',
+                                  style: Get.textTheme.bodyLarge!.copyWith()),
+                            ]),
+                        GestureDetector(
+                          onTap: ()=>  Get.to(()=> TaskMain(), transition: Transition.cupertino),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                'See All tasks',
+                                style: Get.textTheme.bodyMedium!.copyWith(),
                               ),
-                            )
-                          ],
-                        ),
-             ),
-           ),
+                              Gap(4),
+                             Icon(Icons.arrow_forward_ios,size: 12,)
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                    Gap(16),
+                    Container(
+                      height: 1,
+                      color: Palette.LIGHT_BACKGROUND,
+                    ),
+                    Container(
+                      // color: Colors.red,
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          CustomButton(
+                          value:controller.todoTasks.length,
+                          onPressed: (){
+                              
+                              Get.to(()=> TaskMain(initialPage: 1,), transition: Transition.cupertino);
+                          },
+                              label: 'Todo',
+                              icon: ShaderMask(
+                                blendMode: BlendMode.srcIn,
+                                shaderCallback: (Rect bounds) => LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [Palette.GREEN2, Palette.GREEN3],
+                                ).createShader(bounds),
+                                child: FaIcon(
+                                  FontAwesomeIcons.wallet,
+                                  color: Palette.GRAY1,
+                                ),
+                              )),
+                          CustomButton(
+                            value:controller.needRevisionTasks.length,
+                            onPressed: ()=> Get.to(()=> TaskMain(initialPage: 2,), transition: Transition.cupertino),
+                              label: 'Need Revision',
+                              icon: ShaderMask(
+                                blendMode: BlendMode.srcIn,
+                                shaderCallback: (Rect bounds) => LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [Palette.GREEN2, Palette.GREEN3],
+                                ).createShader(bounds),
+                                child: FaIcon(
+                                  FontAwesomeIcons.box,
+                                   color: Palette.GRAY1,
+                                ),
+                              )),
+                         
+                          CustomButton(
+                              value:controller.resubmitTasks.length,
+                                                onPressed: ()=> Get.to(()=> TaskMain(initialPage: 4,), transition: Transition.cupertino),
+                              label: 'Resubmit',
+                              icon: ShaderMask(
+                                blendMode: BlendMode.srcIn,
+                                shaderCallback: (Rect bounds) => LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [Palette.GREEN2, Palette.GREEN3],
+                                ).createShader(bounds),
+                                child: FaIcon(
+                                  FontAwesomeIcons.truck,
+                                   color: Palette.GRAY1,
+                                ),
+                              )),
+                         
+               
+                         
+                         
+                        ],
+                      ),
+                    ),
+                        Gap(16),
+                    Container(
+                      height: 1,
+                      color: Palette.LIGHT_BACKGROUND,
+                    ),
+                  ],
+                  
+                );
+              }
+            ),
+          ),
+        );
+      }
+    ),
+    
   SliverGap(8),
           GetBuilder<TaskController>(builder: (taskcontroller) {
             return MultiSliver(children: [

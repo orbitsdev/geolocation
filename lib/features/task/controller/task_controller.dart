@@ -68,6 +68,17 @@ class TaskController extends GetxController {
 
 
   ///------------------------------------------------------------
+  /// NEED REVISION
+  ///-----------------------------------------
+  var needRevisionIsLoading = false.obs;
+  var needRevisionIsScrollLoading = false.obs;
+  var needRevisionPage = 1.obs;
+  var needRevisionPerPage = 20.obs;
+  var needRevisionLastTotalValue = 0.obs;
+  var needRevisionHasData = false.obs;
+  var needRevisionTasks = <Task>[].obs;
+
+  ///------------------------------------------------------------
   /// REJEC
   ///-----------------------------------------
   var rejectIsLoading = false.obs;
@@ -91,7 +102,7 @@ class TaskController extends GetxController {
   var resubmitTasks = <Task>[].obs;
 
   ///------------------------------------------------------------
-  /// RESUBMIT
+  /// COMPLETED
   ///-----------------------------------------
   var completedIsLoading = false.obs;
   var completedIsScrollLoading = false.obs;
@@ -762,6 +773,17 @@ class TaskController extends GetxController {
     });
   }
 
+  Future<void> loadMyTask() async {
+    await Future.wait([
+      loadTask(),
+      loadToDoTask(),
+       loadNeedRevisionTask(),
+       loadResubmitTask()
+        // CollectionController.controller.loadData(),
+        // TaskController.controller.loadTask(),
+      ]);
+  }
+
   void loadByOfficerTaskOnScroll() async {
     if (isScrollLoading.value) return;
 
@@ -1261,7 +1283,7 @@ class TaskController extends GetxController {
     Map<String, dynamic> data = {
        'page': rejectPage,
       'per_page': rejectPerPage,
-      'status': Task.STATUS_REJECTED,
+      'status': Task.STATUS_RESUBMIT,
      
     };
     
@@ -1351,7 +1373,7 @@ class TaskController extends GetxController {
     Map<String, dynamic> data = {
        'page': rejectPage,
       'per_page': rejectPerPage,
-      'status': Task.STATUS_REJECTED,
+      'status': Task.STATUS_COMPLETED,
      
     };
     
@@ -1383,6 +1405,95 @@ class TaskController extends GetxController {
       page.value++;
       completedLastTotalValue.value = data['pagination']['total'];
       hasData.value = completedTasks.length < completedLastTotalValue.value;
+      update();
+    });
+  }
+  Future<void> loadNeedRevisionTask() async {
+   needRevisionIsLoading(true);
+   needRevisionPage(1);
+   needRevisionPerPage(20);
+   needRevisionLastTotalValue(0);
+   needRevisionTasks.clear();
+    update();
+    
+    var officerId =  AuthController.controller.user.value.defaultPosition?.id;
+    Map<String, dynamic> data = {
+      'page':needRevisionPage,
+      'per_page':needRevisionPerPage,
+      'status': Task.STATUS_NEED_REVISION,
+     
+    };
+
+  
+  
+    var response = await ApiService.getAuthenticatedResource('tasks/council-tasks/${officerId}', queryParameters: data);
+    response.fold((failed) {
+     needRevisionIsLoading(false);
+      update();
+      Modal.errorDialog(failure: failed);
+    }, (success) {
+      var data = success.data;  
+
+     
+      print(data);
+
+      
+      List<Task> newData = (data['data'] as List<dynamic>)
+          .map((task) => Task.fromMap(task))
+          .toList();
+     needRevisionTasks(newData);
+     needRevisionPage.value++;
+     needRevisionLastTotalValue.value = data['pagination']['total'];
+     needRevisionHasData.value =needRevisionTasks.length < lastTotalValue.value;
+     needRevisionIsLoading(false);
+      update();
+      
+    });
+  }
+
+  void loadNeedRevisionTaskOnScroll() async {
+    if (needRevisionIsScrollLoading.value) return;
+
+   needRevisionIsScrollLoading(true);
+    update();
+
+   
+    var officerId =  AuthController.controller.user.value.defaultPosition?.id;
+    Map<String, dynamic> data = {
+       'page': rejectPage,
+      'per_page': rejectPerPage,
+      'status': Task.STATUS_NEED_REVISION,
+     
+    };
+    
+   
+    var response = await ApiService.getAuthenticatedResource('tasks/council-tasks/${officerId}',
+        queryParameters: data);
+    response.fold((failed) {
+     needRevisionIsScrollLoading(false);
+      update();
+      Modal.errorDialog(failure: failed);
+    }, (success) {
+     needRevisionIsScrollLoading(false);
+      update();
+
+      var data = success.data;
+      if (completedLastTotalValue.value != data['pagination']['total']) {
+        loadTask();
+        return;
+      }
+
+      if (completedTasks.length == data['pagination']['total']) {
+        return;
+      }
+
+      List<Task> newData = (data['data'] as List<dynamic>)
+          .map((task) => Task.fromMap(task))
+          .toList();
+     needRevisionTasks.addAll(newData);
+      page.value++;
+     needRevisionLastTotalValue.value = data['pagination']['total'];
+      hasData.value =needRevisionTasks.length <needRevisionLastTotalValue.value;
       update();
     });
   }

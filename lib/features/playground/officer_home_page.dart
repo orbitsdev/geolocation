@@ -8,6 +8,7 @@ import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/attendance/attendance_page.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:geolocation/features/officers/controller/officer_controller.dart';
+import 'package:geolocation/features/officers/officer_all_collection_page.dart';
 import 'package:geolocation/features/officers/officer_all_event_page.dart';
 import 'package:geolocation/features/officers/officer_all_page.dart';
 import 'package:geolocation/features/officers/officer_files_page.dart';
@@ -35,8 +36,9 @@ class _OfficerHomePageState extends State<OfficerHomePage> with SingleTickerProv
     OfficerPostPage(),
     OfficerTaskPage(),
     OfficerAllEventPage(),
+    OfficerAllCollectionPage(),
     OfficerFilesPage(),
-    AttendancePage(),
+    // AttendancePage(),
   ];
 
   final List<Tab> tabs = const [
@@ -44,14 +46,15 @@ class _OfficerHomePageState extends State<OfficerHomePage> with SingleTickerProv
     Tab(text: 'Posts'),
     Tab(text: 'Tasks'),
     Tab(text: 'Events'),
+    Tab(text: 'Collections'),
     Tab(text: 'Files'),
-    Tab(text: 'Attendance'),
+    // Tab(text: 'Attendance'),
   ];
 
   @override
   void initState() {
     super.initState();
-    tabController = TabController(length: tabs.length, vsync: this,initialIndex: 3);
+    tabController = TabController(length: tabs.length, vsync: this,initialIndex: 2);
     
     tabController.addListener(() {
     switch (tabController.index) {
@@ -133,20 +136,72 @@ class _OfficerHomePageState extends State<OfficerHomePage> with SingleTickerProv
             OfficerProfileSection(),
         
             // TabBar in SliverPersistentHeader
+//           SliverPersistentHeader(
+//   pinned: true,
+//   delegate: _SliverTabBarDelegate(
+//     TabBar(
+//              tabAlignment: TabAlignment.start,
+//       controller: tabController,
+//       isScrollable: true, // Enable horizontal scrolling for tabs
+//       labelColor: Colors.white, // Active tab label color
+//       unselectedLabelColor: Colors.grey, // Inactive tab label color
+//       indicator: BoxDecoration(
+//         borderRadius: BorderRadius.circular(8),
+//         // borderRadius: BorderRadius.only(
+//         //   bottomLeft: Radius.circular(4),
+//         //   bottomRight: Radius.circular(4),
+//         // ),
+//         gradient: LinearGradient(
+//           begin: Alignment.topCenter,
+//           end: Alignment.bottomCenter,
+//           colors: [
+//             Palette.GREEN1,
+//             Palette.GREEN1,
+//           ],
+//         ),
+//       ),
+//       indicatorPadding: const EdgeInsets.symmetric(horizontal: 8),
+//       indicatorSize: TabBarIndicatorSize.tab,
+//       dividerColor: Colors.transparent,
+//       overlayColor: MaterialStateProperty.all(Colors.transparent),
+//       tabs: tabs.map((tab) {
+//         return Padding(
+//           padding: const EdgeInsets.symmetric(horizontal: 12),
+//           child: Tab(text: tab.text),
+//         );
+//       }).toList(),
+//     ),
+//   ),
+// ),
+
+
+
+
             SliverPersistentHeader(
               pinned: true,
               delegate: _SliverTabBarDelegate(
                 TabBar(
-                     dividerColor: Colors.transparent,
-              indicator: CustomUnderlineTabIndicator(
-                color: Palette.GREEN3,
-              ),
+                     dividerColor: Palette.LIGHT_BACKGROUND,
+              // indicatorSize: TabBarIndicatorSize.label,
+              //   indicator: BoxDecoration(
+              //     borderRadius: BorderRadius.only(
+              //         topLeft: Radius.circular(10),
+              //         topRight: Radius.circular(10)),
+              //     gradient: LinearGradient(
+              //       begin: Alignment.topCenter,
+              //       end: Alignment.bottomCenter,
+              //       colors: [
+              //         Palette.GREEN2,
+              //         Palette.GREEN3,
+              //       ],
+              //     )),
+              controller: tabController,
               indicatorSize: TabBarIndicatorSize.label,
               indicatorColor: Palette.GREEN3,
               isScrollable: true,
               labelColor: Palette.GREEN3,
+              
               tabAlignment: TabAlignment.start,
-              controller: tabController,
               unselectedLabelStyle: Get.textTheme.bodyMedium!.copyWith(
                 height: 0,
               ),

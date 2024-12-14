@@ -6,6 +6,7 @@ import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:geolocation/features/collections/controller/collection_controller.dart';
 import 'package:geolocation/features/event/controller/event_controller.dart';
 import 'package:geolocation/features/file/controller/files_controller.dart';
+import 'package:geolocation/features/files/controller/media_controller.dart';
 import 'package:geolocation/features/map/controller/sample_map_controller.dart';
 import 'package:geolocation/features/council_positions/controller/council_position_controller.dart';
 import 'package:geolocation/features/notification/controller/notification_controller.dart';
@@ -37,6 +38,7 @@ class AppBinding  extends Bindings{
     Get.put(SampleMapController(), permanent: true);
     Get.put(SearchOfficerController(), permanent: true);
     Get.put(OfficerController(), permanent: true);
+    Get.put(MediaController(), permanent: true);
 
   }
 

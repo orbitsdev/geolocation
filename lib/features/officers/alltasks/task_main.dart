@@ -8,6 +8,7 @@ import 'package:geolocation/core/globalwidget/custom_indicator.dart';
 import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/officers/alltasks/all_task.dart';
 import 'package:geolocation/features/officers/alltasks/completed_tasks.dart';
+import 'package:geolocation/features/officers/alltasks/need_revision_tasks.dart';
 import 'package:geolocation/features/officers/alltasks/rejected_tasks.dart';
 import 'package:geolocation/features/officers/alltasks/resubmit_tasks.dart';
 import 'package:geolocation/features/officers/alltasks/todo_tasks.dart';
@@ -30,7 +31,7 @@ class TaskMain extends StatefulWidget {
   @override
   State<TaskMain> createState() => _TaskMainState();
 }
-
+ 
 class _TaskMainState extends State<TaskMain> with   SingleTickerProviderStateMixin {
   
   late TabController tabController;
@@ -38,6 +39,7 @@ class _TaskMainState extends State<TaskMain> with   SingleTickerProviderStateMix
   List<Widget> page = [
     AllTask(),
     TodoTasks(),
+    NeedRevisionTasks(),
     RejectedTasks(),
     ResubmitTasks(),
     CompletedTasks(),
@@ -48,7 +50,7 @@ class _TaskMainState extends State<TaskMain> with   SingleTickerProviderStateMix
   void initState() {
      super.initState();
   
-    tabController = TabController(length: 5, vsync: this, initialIndex: widget.initialPage ?? 0);
+    tabController = TabController(length: 6, vsync: this, initialIndex: widget.initialPage ?? 0);
        WidgetsBinding.instance.addPostFrameCallback((_)  async {
           if(widget.shouldRefresh == true){
             // await cartController.loadCarts(context);
@@ -103,14 +105,18 @@ class _TaskMainState extends State<TaskMain> with   SingleTickerProviderStateMix
             ),
             tabs: [
               Tab(
-                text: 'All Tasks',
+                text: 'All',
               ),
               Tab(
                 text: 'To Do',
               ),
+               Tab(
+                text: 'Need Revision',
+              ),
               Tab(
                 text: 'Rejected',
               ),
+             
               Tab(
                 text: 'Resubmitted',
               ),
