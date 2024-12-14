@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:geolocation/core/api/dio/api_service.dart';
 import 'package:geolocation/core/modal/modal.dart';
+import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:geolocation/features/collections/create_or_edit_collection_page.dart';
 import 'package:geolocation/features/collections/model/collection.dart';
 import 'package:geolocation/features/collections/model/collection_item.dart';
+import 'package:geolocation/features/event/controller/event_controller.dart';
 import 'package:get/get.dart';
 
 class CollectionController extends GetxController {
@@ -163,14 +165,21 @@ class CollectionController extends GetxController {
         isLoading(false);
         update();
         Modal.errorDialog(failure: failure);
-      },
+    },
       (success) {
          Get.back();
         isLoading(false);
         update();
-              loadData();
-                    clearForm();
-        Get.offNamedUntil('/collections', (route) => route.isFirst);
+          clearForm();
+        
+        if(AuthController.controller.user.value.defaultPosition?.grantAccess == true){
+              Get.offNamedUntil('/collections', (route) => route.isFirst);
+                loadData();
+        }{
+              Get.offNamedUntil('/home-officer', (route) => route.isFirst);
+              EventController.controller.loadAllPageData();
+        }
+
         Modal.success(message: 'Collection created successfully');
             
       },

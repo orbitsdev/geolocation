@@ -11,6 +11,7 @@ import 'package:geolocation/core/globalwidget/images/local_file_image_full_scree
 import 'package:geolocation/core/modal/modal.dart';
 import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
+import 'package:geolocation/features/event/controller/event_controller.dart';
 import 'package:geolocation/features/file/model/media_file.dart';
 import 'package:geolocation/features/post/create_or_edit_post_page.dart';
 import 'package:geolocation/features/post/model/post.dart';
@@ -23,6 +24,8 @@ import 'package:dio/dio.dart' as dio;
 
 class PostController extends GetxController {
   static PostController controller = Get.find();
+
+  var eventController = Get.find<EventController>();
 
   final formKey = GlobalKey<FormBuilderState>();
 
@@ -221,13 +224,22 @@ Future<void> createPost() async {
           isLoading(false);
           Modal.errorDialog(failure: failure);
         },
-        (success) {
+        (success) async  {
           Get.back(); // Close the modal
           isLoading(false);
           clearForm(); // Clear the form and reset data
-          loadData();
-          Modal.success(message: 'Post created successfully!');
-          Get.offNamedUntil('/posts', (route) => route.isFirst); // Navigate to the posts page
+          // loadData();
+          // Modal.success(message: 'Post created successfully!');
+          // Get.offNamedUntil('/posts', (route) => route.isFirst); // Navigate to the posts page
+
+             if(AuthController.controller.user.value.defaultPosition?.grantAccess == true){
+              Get.offNamedUntil('/posts', (route) => route.isFirst);
+               await loadData();
+        }{
+              Get.offNamedUntil('/home-officer', (route) => route.isFirst);
+             await  eventController.loadAllPageData();
+        }
+        Modal.success(message: 'Post created successfully!');
         },
       );
     } catch (e) {

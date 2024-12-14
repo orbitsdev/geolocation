@@ -10,7 +10,9 @@ import 'package:geolocation/core/globalwidget/images/local_lottie_image.dart';
 import 'package:geolocation/core/globalwidget/loading_widget.dart';
 import 'package:geolocation/core/globalwidget/ripple_container.dart';
 import 'package:geolocation/core/theme/palette.dart';
+import 'package:geolocation/features/collections/create_or_edit_collection_page.dart';
 import 'package:geolocation/features/event/model/event.dart';
+import 'package:geolocation/features/post/create_or_edit_post_page.dart';
 import 'package:get/get.dart';
 import 'package:heroicons/heroicons.dart';
 
@@ -867,32 +869,13 @@ static void showCreationModal() {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header
-          Text(
-            'Choose Action',
-            style: Get.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 16),
+          // Text(
+          //   'Choose Action',
+          //   style: Get.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
+          // ),
+          // const SizedBox(height: 16),
 
-          // Create Post
-          ListTile(
-            leading: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.blue.shade50,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(Icons.post_add, color: Colors.blue.shade700),
-            ),
-            title: const Text('Create Post'),
-            subtitle: const Text('Share updates or news with others.'),
-            onTap: () {
-              Get.back(); // Close the modal
-              // Navigate to Create Post
-            },
-          ),
-          const Divider(),
-
-          // Create Event
+          // // Create Post
           ListTile(
             leading: Container(
               padding: const EdgeInsets.all(8),
@@ -900,32 +883,51 @@ static void showCreationModal() {
                 color: Colors.green.shade50,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(Icons.event, color: Colors.green.shade700),
+              child: Icon(Icons.post_add, color: Colors.green.shade700),
             ),
-            title: const Text('Create Event'),
-            subtitle: const Text('Plan and manage events easily.'),
+            title: const Text('Create Post'),
+            subtitle: const Text('Share updates or news with others.'),
             onTap: () {
               Get.back(); // Close the modal
-              // Navigate to Create Event
+               Get.to(()=> CreateOrEditPostPage(), transition: Transition.cupertino);
             },
           ),
           const Divider(),
+
+          // // Create Event
+          // ListTile(
+          //   leading: Container(
+          //     padding: const EdgeInsets.all(8),
+          //     decoration: BoxDecoration(
+          //       color: Colors.green.shade50,
+          //       borderRadius: BorderRadius.circular(8),
+          //     ),
+          //     child: Icon(Icons.event, color: Colors.green.shade700),
+          //   ),
+          //   title: const Text('Create Event'),
+          //   subtitle: const Text('Plan and manage events easily.'),
+          //   onTap: () {
+          //     Get.back(); // Close the modal
+          //     // Navigate to Create Event
+          //   },
+          // ),
+          // const Divider(),
 
           // Create Collection
           ListTile(
             leading: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.orange.shade50,
+                color: Colors.pink.shade50,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(Icons.collections, color: Colors.orange.shade700),
+              child: Icon(Icons.collections, color: Colors.pink.shade700),
             ),
             title: const Text('Create Collection'),
             subtitle: const Text('Organize and manage your collections.'),
             onTap: () {
               Get.back(); // Close the modal
-              // Navigate to Create Collection
+               Get.to(()=> CreateOrEditCollectionPage(), transition: Transition.cupertino);
             },
           ),
         ],

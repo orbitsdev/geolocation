@@ -8,6 +8,7 @@ import 'package:geolocation/core/modal/modal.dart';
 import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/attendance/event_attendance_list_page.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
+import 'package:geolocation/features/collections/controller/collection_controller.dart';
 import 'package:geolocation/features/event/create_event_page.dart';
 import 'package:geolocation/features/event/event_details_page.dart';
 import 'package:geolocation/features/event/model/event.dart';
@@ -684,8 +685,8 @@ Future<void> loadAllPageData()  async {
  
      await Future.wait([
         EventController.controller.loadEvents(),
-       PostController.controller.loadData(),
-        // CollectionController.controller.loadData(),
+        PostController.controller.loadData(),
+         CollectionController.controller.loadData(),
         // TaskController.controller.loadTask(),
       ]);
   } 

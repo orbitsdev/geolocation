@@ -8,6 +8,7 @@ import 'package:geolocation/core/modal/modal.dart';
 import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/attendance/attendance_page.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
+import 'package:geolocation/features/collections/create_or_edit_collection_page.dart';
 import 'package:geolocation/features/officers/controller/officer_controller.dart';
 import 'package:geolocation/features/officers/officer_all_collection_page.dart';
 import 'package:geolocation/features/officers/officer_all_event_page.dart';
@@ -55,7 +56,7 @@ class _OfficerHomePageState extends State<OfficerHomePage> with SingleTickerProv
   @override
   void initState() {
     super.initState();
-    tabController = TabController(length: tabs.length, vsync: this,initialIndex: 2);
+    tabController = TabController(length: tabs.length, vsync: this,initialIndex: 1);
     
     tabController.addListener(() {
     switch (tabController.index) {
@@ -135,27 +136,73 @@ class _OfficerHomePageState extends State<OfficerHomePage> with SingleTickerProv
           slivers: [
             // Profile Section
             OfficerProfileSection(),
-            
-SliverToBoxAdapter(
+          SliverToBoxAdapter(
   child: Container(
-    padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 24.0),
+    padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
     color: Colors.white,
-    child: ElevatedButton.icon(
-      onPressed: (){
-        Modal.showCreationModal();
-      }, // Call the modal
-      icon: const Icon(Icons.add, color: Colors.white),
-      label: const Text('Create New', style: TextStyle(color: Colors.white)),
-      style: ElevatedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 12.0),
-        backgroundColor: Palette.GREEN3, // Adjust color to match design
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8.0),
+    child: Row(
+      children: [
+        // Profile Picture
+        GetBuilder<AuthController>(
+          builder: (authcontroller) {
+            return Container(
+              width: 40.0,
+              height: 40.0,
+              child: OnlineImage(imageUrl: authcontroller.user.value.image ??'',borderRadius: BorderRadius.circular(30),),
+            );
+          }
         ),
-      ),
+        const SizedBox(width: 12.0),
+
+        // Input Placeholder
+        Expanded(
+          child: GestureDetector(
+            onTap: () {
+              // Get.to(()=> CreateOrEditCollectionPage(), transition: Transition.cupertino);
+             Modal.showCreationModal(); // Open modal
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200,
+                borderRadius: BorderRadius.circular(24.0),
+              ),
+              child: Text(
+                "Collection|Announcement",
+                style: TextStyle(
+                  color: Colors.grey.shade600,
+                  fontSize: 14.0,
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 12.0),
+
+        // Action Icon (Add New)
+        GestureDetector(
+          onTap: () {
+            Modal.showCreationModal();
+            // Get.to(()=> CreateOrEditCollectionPage(), transition: Transition.cupertino);
+          },
+          child: Container(
+            padding: const EdgeInsets.all(10.0),
+            decoration: BoxDecoration(
+              color: Palette.GREEN3,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.add,
+              color: Colors.white,
+              size: 24.0,
+            ),
+          ),
+        ),
+      ],
     ),
   ),
 ),
+
         
             // TabBar in SliverPersistentHeader
 //           SliverPersistentHeader(
@@ -200,7 +247,7 @@ SliverToBoxAdapter(
 
 
             SliverPersistentHeader(
-              pinned: true,
+              // pinned: true,
               delegate: _SliverTabBarDelegate(
                 TabBar(
                      dividerColor: Palette.LIGHT_BACKGROUND,

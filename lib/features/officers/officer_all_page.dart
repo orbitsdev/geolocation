@@ -128,6 +128,7 @@ class _OfficerAllPageState extends State<OfficerAllPage> {
                   itemBuilder: (context, index) {
                     Post post = postcontroller.posts[index];
                     return PostCard(
+                      onView: (){},
                       onEdit: () {},
                       onDelete: () {},
                       post: post,
