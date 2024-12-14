@@ -63,7 +63,7 @@ class _OfficerAllPageState extends State<OfficerAllPage> {
   builder: (econtroller) {
     return MultiSliver(
       children: [
-        SliverGap(8),
+        SliverGap(16),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(

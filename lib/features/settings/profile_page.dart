@@ -62,6 +62,7 @@ class ProfilePage extends StatelessWidget {
        
         _buildListTile(
           icon: Icons.logout,
+          
           title: "Log Out",
           onTap: () {
             controller.logout();
@@ -100,7 +101,7 @@ class ProfilePage extends StatelessWidget {
           },
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Palette.PRIMARY, // Background color for the icon
+                    color: Palette.GREEN3, // Background color for the icon
                     shape: BoxShape.circle,
                   ),
                   padding: const EdgeInsets.all(4),
@@ -149,10 +150,10 @@ class ProfilePage extends StatelessWidget {
           children: [
             Text(
               defaultPosition.councilName ?? "No Council",
-              style: const TextStyle(
+              style:  TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Colors.black,
+                color: Palette.GREEN3,
               ),
             ),
             Text(
@@ -162,6 +163,8 @@ class ProfilePage extends StatelessWidget {
                 color: Colors.grey,
               ),
             ),
+            Gap(8),
+            Divider(height: 16,)
           ],
         ),
       ),
@@ -211,9 +214,20 @@ class ProfilePage extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     return ListTile(
-      leading: Icon(icon, color: Palette.PRIMARY),
-      title: Text(title),
-      trailing:  Icon(Icons.arrow_forward_ios, size: 16, color: Palette.FBG,),
+      leading: Container(
+        padding: EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Palette.LIGHT_BACKGROUND,
+          borderRadius: BorderRadius.circular(40)
+          
+
+        ),
+        child: Icon(icon, color: Palette.TEXT_DARK,)),
+      title: Text(title, style: Get.textTheme.bodyLarge?.copyWith(
+        fontWeight: FontWeight.bold,
+        color: Palette.RED
+      
+      ),),
       onTap: onTap,
     );
   }

@@ -53,7 +53,7 @@ class _ProfileSectionState extends State<ProfileSection> {
                   mainAxisSize: MainAxisSize.min, // Prevent infinite width issues
                   children: [
                     RippleContainer(
-                      onTap: () => Get.to(() => const ProfilePage()),
+                      onTap: () => Get.to(() =>  ProfilePage()),
                       child: Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(40),

@@ -105,7 +105,7 @@ class PostCard extends StatelessWidget {
           },
           itemBuilder: (context) => [
             const PopupMenuItem(
-              value: 'voew',
+              value: 'View',
               child: ListTile(
                 leading: Icon(Icons.remove_red_eye),
                 title: Text('View'),
@@ -240,12 +240,9 @@ class PostCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Collection Chart:',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-        ),
-        const Gap(8),
+       
         CollectionChartWidget(collection: collection),
+        Gap(24),
       ],
     );
   }

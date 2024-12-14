@@ -49,7 +49,7 @@ class _OfficerHomePageState extends State<OfficerHomePage> with SingleTickerProv
     Tab(text: 'Tasks'),
     Tab(text: 'Events'),
     Tab(text: 'Collections'),
-    Tab(text: 'Files'),
+    Tab(text: 'Approve Files'),
     // Tab(text: 'Attendance'),
   ];
 
