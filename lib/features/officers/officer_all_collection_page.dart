@@ -56,7 +56,7 @@ class _OfficerAllCollectionPageState extends State<OfficerAllCollectionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
+      backgroundColor: Palette.FBG,
       body: RefreshIndicator(
         triggerMode: RefreshIndicatorTriggerMode.anywhere,
         onRefresh: () => controller.loadData(),

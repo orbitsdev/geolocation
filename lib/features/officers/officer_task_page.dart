@@ -51,7 +51,6 @@ void initState() {
         shrinkWrap: true,
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
-SliverGap(8),
            
             GetBuilder<TaskController>(
       builder: (controller) {
@@ -66,35 +65,32 @@ SliverGap(8),
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                             
-                              Text('My Task',
-                                  style: Get.textTheme.bodyLarge!.copyWith()),
-                            ]),
-                        GestureDetector(
-                          onTap: ()=>  Get.to(()=> TaskMain(), transition: Transition.cupertino),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                'See All tasks',
-                                style: Get.textTheme.bodyMedium!.copyWith(),
-                              ),
-                              Gap(4),
-                             Icon(Icons.arrow_forward_ios,size: 12,)
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
+                  Row(
+  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  children: [
+    Text(
+      'My Tasks',
+      style: Get.textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold),
+    ),
+    GestureDetector(
+      onTap: () => Get.to(() => TaskMain(), transition: Transition.cupertino),
+      child: Row(
+        children: [
+          Text(
+            'See All Tasks',
+            style: Get.textTheme.bodyMedium!.copyWith(
+              color: Palette.GREEN2,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const Gap(4),
+           Icon(Icons.arrow_forward_ios, size: 12, color: Palette.GREEN2),
+        ],
+      ),
+    ),
+  ],
+),
+
                     Gap(16),
                     Container(
                       height: 1,

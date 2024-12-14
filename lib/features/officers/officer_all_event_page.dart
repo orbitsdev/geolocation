@@ -47,7 +47,7 @@ class _OfficerAllEventPageState extends State<OfficerAllEventPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-    
+    backgroundColor: Palette.FBG,
       body: RefreshIndicator(
         triggerMode: RefreshIndicatorTriggerMode.anywhere,
         onRefresh: () => controller.loadEvents(),
