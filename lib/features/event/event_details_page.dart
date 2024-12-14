@@ -55,6 +55,10 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(12),
                                 child: GoogleMap(
+                                  mapToolbarEnabled: true,
+                                  myLocationEnabled: true,
+                                  myLocationButtonEnabled: true,
+                                  
                                   initialCameraPosition: CameraPosition(
                                     target: LatLng(
                                       controller.selectedItem.value.latitude?.toDouble() ?? 0.0,

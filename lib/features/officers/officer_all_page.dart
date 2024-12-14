@@ -3,9 +3,11 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:geolocation/core/globalwidget/ripple_container.dart';
 import 'package:geolocation/core/globalwidget/sliver_gap.dart';
 import 'package:geolocation/core/globalwidget/to_sliver.dart';
+import 'package:geolocation/core/modal/modal.dart';
 import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/event/controller/event_controller.dart';
 import 'package:geolocation/features/event/widgets/event_card2.dart';
+import 'package:geolocation/features/event/widgets/event_card3.dart';
 import 'package:geolocation/features/officers/controller/officer_controller.dart';
 import 'package:geolocation/features/post/controller/post_controller.dart';
 import 'package:geolocation/features/post/widget/post_card.dart';
@@ -57,45 +59,58 @@ class _OfficerAllPageState extends State<OfficerAllPage> {
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
 
-           GetBuilder<EventController>(
-             builder: (econtroller) {
-               return MultiSliver(
-                 children: [
-                    if (econtroller.isLoading.value == true)
-                ToSliver(child: LinearProgressIndicator()),
-ToSliver(
-                                child: Container(
-                                  color: Palette.LIGHT_BACKGROUND,
-                                
-                                  height: 240,
-                                  //  color: Colors.red,
-                                  child: ListView.builder(
-                                 
-                                    shrinkWrap: true,
-                                    scrollDirection:Axis.horizontal,
-                                   
-                                   itemCount: econtroller.events.length, // Adjust the number of items
-                                    itemBuilder: (context, index) {
-                            
-                                       return EventCard2(
-                                          event: econtroller.events[index],
-                                          onView: () {
-                                            
-                                          });
-                                    //  return  Container(
-                                    //   color: Colors.red,
-                                    //   margin: EdgeInsets.only(right: 16),
-                                    //   width: Get.size.width ,);
-                                    //   // return EventCard2(
-                                    //   //     event: eventcontroller.events[index],
-                                    //   //     onView: () {});
-                                    },
-                                  ),
-                                ))
-                 ],
-               );
-             }
-           ),
+          GetBuilder<EventController>(
+  builder: (econtroller) {
+    return MultiSliver(
+      children: [
+        SliverGap(8),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Text(
+            'Latest Events',
+            style: Get.textTheme.bodyLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        SliverGap(8),
+        if (econtroller.isLoading.value)
+          ToSliver(
+            child: LinearProgressIndicator(),
+          ),
+        ToSliver(
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            height: 240, // Matches the EventCard3 height with padding
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: econtroller.events.length,
+              itemBuilder: (context, index) {
+                return EventCard3(
+                  event: econtroller.events[index],
+                  onView: ()  async {
+                     Get.back();
+
+                                        bool canProceed = await econtroller
+                                            .checkLocationServicesAndPermissions();
+                                        if (canProceed) {
+                                          econtroller.viewEvent(econtroller.events[index]);
+                                        } else {
+                                          Modal.showToast(
+                                              msg:
+                                                  'Location services are disabled or unavailable. Please enable location services to proceed.');
+                                        }
+                  },
+                );
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  },
+),
+
 
           SliverGap(16),
 

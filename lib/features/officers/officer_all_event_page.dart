@@ -72,8 +72,16 @@ class _OfficerAllEventPageState extends State<OfficerAllEventPage> {
                               crossAxisCount: 1,
                               itemBuilder: (context, index) {
                                 Event event = controller.events[index];
-                                return EventCard2(event: event, onView: (){
-                                    Get.to(()=>  EventDetailsPage(), transition: Transition.cupertino);
+                                return EventCard2(event: event, onView: () async {
+                                    bool canProceed = await controller
+                                            .checkLocationServicesAndPermissions();
+                                        if (canProceed) {
+                                          controller.viewEvent(event);
+                                        } else {
+                                          Modal.showToast(
+                                              msg:
+                                                  'Location services are disabled or unavailable. Please enable location services to proceed.');
+                                        }
                                 },);
                               },
                             )
