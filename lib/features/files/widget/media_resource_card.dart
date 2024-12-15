@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:geolocation/core/globalwidget/images/online_image.dart';
 import 'package:geolocation/core/globalwidget/preview_image_new.dart';
 import 'package:geolocation/core/globalwidget/preview_other_file_new.dart';
 import 'package:geolocation/core/globalwidget/preview_video_new.dart';
@@ -49,13 +50,12 @@ class MediaResourceCardNew extends StatelessWidget {
         const Gap(4),
         Row(
           children: [
-            CircleAvatar(
-              radius: 10,
-              backgroundImage: NetworkImage(
-                mediaResource.councilPosition?.image ??
-                    'https://via.placeholder.com/150',
-              ),
+            Container(
+              height: 20,
+              width: 20,child: OnlineImage(imageUrl: mediaResource.councilPosition?.image ??'', borderRadius: BorderRadius.circular(20),),
+              
             ),
+            
             const Gap(4),
             Flexible(
               child: Text(

@@ -10,6 +10,7 @@ import 'package:geolocation/features/attendance/controller/attendance_controller
 import 'package:geolocation/features/attendance/make_attendace_page.dart';
 import 'package:geolocation/features/attendance/model/attendance.dart';
 import 'package:geolocation/features/attendance/widgets/attendance_card.dart';
+import 'package:geolocation/features/attendance/widgets/attendance_card_shimmer.dart';
 import 'package:geolocation/features/collections/collection_details_page.dart';
 import 'package:geolocation/features/collections/controller/collection_controller.dart';
 import 'package:geolocation/features/collections/create_or_edit_collection_page.dart';
@@ -29,7 +30,8 @@ class OfficerAllAttendancePage extends StatefulWidget {
   const OfficerAllAttendancePage({Key? key}) : super(key: key);
 
   @override
-  State<OfficerAllAttendancePage> createState() => _OfficerAllAttendancePageState();
+  State<OfficerAllAttendancePage> createState() =>
+      _OfficerAllAttendancePageState();
 }
 
 class _OfficerAllAttendancePageState extends State<OfficerAllAttendancePage> {
@@ -40,10 +42,10 @@ class _OfficerAllAttendancePageState extends State<OfficerAllAttendancePage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (controller.attendances.isEmpty) {
       controller.loadMyAttendance();
-      // if (controller.collections.isEmpty) {
-      //   controller.loadData(); // Load initial data
-      // }
+       
+      }
 
       // Debounce scroll listener
       newScrollController.addListener(() async {
@@ -74,25 +76,31 @@ class _OfficerAllAttendancePageState extends State<OfficerAllAttendancePage> {
                 physics: const AlwaysScrollableScrollPhysics(),
                 slivers: [
                   // Add spacing at the top
-                  SliverToBoxAdapter(child: const SizedBox(height: 8)),
 
                   // Main content
                   controller.isPageLoading.value
-                      ? const SliverToBoxAdapter(
-                          child: Center(child: CircularProgressIndicator()),
-                        )
+                      ? SliverMasonryGrid.count(
+                              crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                              crossAxisCount: 1,
+                              childCount: 10,
+                              itemBuilder: (context, index) {
+                             
+                                return AttendanceCardShimmer();
+                              },
+                            )
                       : controller.attendances.isNotEmpty
                           ? SliverMasonryGrid.count(
-  crossAxisSpacing: 16,
-  mainAxisSpacing: 16,
-  crossAxisCount: 1,
-  childCount: controller.attendances.length,
-  itemBuilder: (context, index) {
-    Attendance attendance = controller.attendances[index];
-    return AttendanceCard(attendance: attendance);
-  },
-)
-
+                              crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                              crossAxisCount: 1,
+                              childCount: controller.attendances.length,
+                              itemBuilder: (context, index) {
+                                Attendance attendance =
+                                    controller.attendances[index];
+                                return AttendanceCard(attendance: attendance);
+                              },
+                            )
                           : const SliverToBoxAdapter(
                               child: Center(
                                 child: Text(
@@ -107,11 +115,16 @@ class _OfficerAllAttendancePageState extends State<OfficerAllAttendancePage> {
 
                   // Scroll-loading indicator
                   if (controller.isScrollLoading.value)
-                    const SliverToBoxAdapter(
-                      child: Center(child: CircularProgressIndicator()),
-                    ),
-
-                    
+                    SliverMasonryGrid.count(
+                              crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                              crossAxisCount: 1,
+                              childCount: 10,
+                              itemBuilder: (context, index) {
+                             
+                                return AttendanceCardShimmer();
+                              },
+                            ),
 
                   SliverGap(Get.size.height * 0.10)
                 ],

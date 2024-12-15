@@ -16,7 +16,7 @@ class PreviewImageNew extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
       ),
-      height: height ?? 125,
+      height: height ?? 110,
       child: Stack(
         children: [
           ClipRRect(

@@ -15,6 +15,7 @@ import 'package:geolocation/features/event/model/event.dart';
 import 'package:geolocation/features/event/widgets/event_card.dart';
 import 'package:geolocation/features/event/widgets/event_card2.dart';
 import 'package:geolocation/features/event/widgets/event_card3.dart';
+import 'package:geolocation/features/event/widgets/shimmer_event_card.dart';
 import 'package:get/get.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
@@ -61,10 +62,20 @@ class _OfficerAllEventPageState extends State<OfficerAllEventPage> {
                 shrinkWrap: true,
                 physics: const AlwaysScrollableScrollPhysics(),
                 slivers: [
-                  SliverGap(8),
-                  controller.isLoading.value
-                      ? ToSliver(
-                          child: Center(child: CircularProgressIndicator()))
+                 SliverGap(8),
+controller.isLoading.value
+    ? SliverAlignedGrid.count(
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 16,
+        itemCount: 10,
+        crossAxisCount: 1, // Ensure it spans full width
+        itemBuilder: (context, index) {
+          return ShimmerEventCard3(
+            width: Get.size.width, // Adjust for padding
+          );
+        },
+      )
+    
                       : controller.events.isNotEmpty
                           ? SliverAlignedGrid.count(
                               crossAxisSpacing: 8,
@@ -74,19 +85,9 @@ class _OfficerAllEventPageState extends State<OfficerAllEventPage> {
                               itemBuilder: (context, index) {
                                 Event event = controller.events[index];
                                 return EventCard3(width: Get.size.width, event: event, onView: (){      
-                                        
+
                                 });
-                                // return EventCard2(event: event, onView: () async {
-                                //     bool canProceed = await controller
-                                //             .checkLocationServicesAndPermissions();
-                                //         if (canProceed) {
-                                //           controller.viewEvent(event);
-                                //         } else {
-                                //           Modal.showToast(
-                                //               msg:
-                                //                   'Location services are disabled or unavailable. Please enable location services to proceed.');
-                                //         }
-                                // },);
+                              
                               },
                             )
                           : ToSliver(
@@ -99,10 +100,19 @@ class _OfficerAllEventPageState extends State<OfficerAllEventPage> {
                               ),
                             ),
                   if (controller.isScrollLoading.value)
-                    ToSliver(
-                      child: const Center(child: CircularProgressIndicator()),
-                    ),
-
+                    SliverAlignedGrid.count(
+                              crossAxisSpacing: 8,
+                              mainAxisSpacing: 16,
+                              itemCount: controller.events.length,
+                              crossAxisCount: 10,
+                              itemBuilder: (context, index) {
+                               
+                                return ShimmerEventCard3(
+            width: Get.size.width, // Adjust for padding
+          );
+                              
+                              },
+                            ),
                       SliverGap(Get.size.height * 0.10)
                 ],
               );

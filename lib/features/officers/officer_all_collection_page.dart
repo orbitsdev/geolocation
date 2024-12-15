@@ -13,6 +13,7 @@ import 'package:geolocation/features/collections/controller/collection_controlle
 import 'package:geolocation/features/collections/create_or_edit_collection_page.dart';
 import 'package:geolocation/features/collections/model/collection.dart';
 import 'package:geolocation/features/collections/widgets/collection_card.dart';
+import 'package:geolocation/features/collections/widgets/shimmer_collection_card.dart';
 import 'package:geolocation/features/event/controller/event_controller.dart';
 import 'package:geolocation/features/event/create_event_page.dart';
 import 'package:geolocation/features/event/event_details_page.dart';
@@ -74,9 +75,15 @@ class _OfficerAllCollectionPageState extends State<OfficerAllCollectionPage> {
 
                   // Main content
                   controller.isPageLoading.value
-                      ? const SliverToBoxAdapter(
-                          child: Center(child: CircularProgressIndicator()),
-                        )
+                      ?SliverMasonryGrid.count(
+                              crossAxisSpacing: 16,
+                              mainAxisSpacing: 16,
+                              crossAxisCount: 1,
+                              childCount: 10,
+                              itemBuilder: (context, index) {
+                                return ShimmerCollectionCard();
+                              },
+                            )
                       : controller.collections.isNotEmpty
                           ? SliverMasonryGrid.count(
                               crossAxisSpacing: 16,
@@ -117,9 +124,15 @@ class _OfficerAllCollectionPageState extends State<OfficerAllCollectionPage> {
 
                   // Scroll-loading indicator
                   if (controller.isScrollLoading.value)
-                    const SliverToBoxAdapter(
-                      child: Center(child: CircularProgressIndicator()),
-                    ),
+                   SliverMasonryGrid.count(
+                              crossAxisSpacing: 16,
+                              mainAxisSpacing: 16,
+                              crossAxisCount: 1,
+                              childCount: 10,
+                              itemBuilder: (context, index) {
+                                return ShimmerCollectionCard();
+                              },
+                            ),
 
                     
 
