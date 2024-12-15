@@ -135,7 +135,7 @@ class _OfficerHomePageState extends State<OfficerHomePage> with SingleTickerProv
           controller: newScrollController,
           physics: const  NeverScrollableScrollPhysics(),
           slivers: [
-            // Profile Section
+           SliverGap(16),
             OfficerProfileSection(),
           SliverToBoxAdapter(
   child: Container(

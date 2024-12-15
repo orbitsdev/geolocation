@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
+import 'package:geolocation/core/theme/palette.dart';
 import 'package:get/get.dart';
 
 // class CustomButton extends StatelessWidget {
@@ -113,19 +114,18 @@ class CustomButton extends StatelessWidget {
                   const Gap(6),
                   Text(
                     label,
-                    style: Get.textTheme.bodySmall!.copyWith(fontWeight: FontWeight.w600),
+                    style: Get.textTheme.bodySmall!.copyWith(),
                   ),
                 ],
               ),
             ),
             if (value > 0)
               Positioned(
-                right: -4,
+                right: 10,
                 top: -4,
                 child: Container(
-                  padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: Colors.redAccent,
+                    color: Palette.RED,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   constraints: const BoxConstraints(
@@ -134,7 +134,7 @@ class CustomButton extends StatelessWidget {
                   ),
                   child: Center(
                     child: Text(
-                      '$value',
+                      '${value}',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 12,

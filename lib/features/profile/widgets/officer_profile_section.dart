@@ -21,7 +21,7 @@ class OfficerProfileSection extends StatelessWidget {
       }
     });
       return SliverAppBar(
-
+            automaticallyImplyLeading: false,
             flexibleSpace: FlexibleSpaceBar(
               titlePadding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               title: Row(

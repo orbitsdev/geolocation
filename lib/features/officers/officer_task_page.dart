@@ -52,51 +52,55 @@ void initState() {
         shrinkWrap: true,
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
-           
+           SliverGap(8),
             GetBuilder<TaskController>(
       builder: (controller) {
         return ToSliver(
           child: Container(
             color: Colors.white,
             // decoration: BoxDecoration(color: avanteColor600),
-            padding: EdgeInsets.all(16),
+            
             child: GetBuilder<TaskController>(
               builder: (controller) {
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                  Row(
-  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  children: [
-    Text(
-      'My Tasks',
-      style: Get.textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold),
-    ),
-    GestureDetector(
-      onTap: () => Get.to(() => TaskMain(), transition: Transition.cupertino),
-      child: Row(
-        children: [
-          Text(
-            'See All Tasks',
-            style: Get.textTheme.bodyMedium!.copyWith(
-              color: Palette.GREEN2,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const Gap(4),
-           Icon(Icons.arrow_forward_ios, size: 12, color: Palette.GREEN2),
-        ],
-      ),
-    ),
-  ],
-),
-
-                    Gap(16),
-                    Container(
-                      height: 1,
-                      color: Palette.LIGHT_BACKGROUND,
+                    Gap(8),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        // Text(
+                        //   'My Tasks',
+                        //   style: Get.textTheme.bodyLarge!.copyWith(),
+                        // ),
+                        GestureDetector(
+                          onTap: () => Get.to(() => TaskMain(), transition: Transition.cupertino),
+                          child: Row(
+                            children: [
+                              Text(
+                                'View All',
+                                style: Get.textTheme.bodyMedium!.copyWith(
+                                  color: Palette.GREEN2,
+                                  
+                                ),
+                              ),
+                              // const Gap(4),
+                              //  Icon(Icons.arrow_forward_ios, size: 12, color: Palette.GREEN2),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
+                  ),
+
+                    // Gap(16),
+                    // Container(
+                    //   height: 1,
+                    //   color: Palette.LIGHT_BACKGROUND,
+                    // ),
                     Container(
                       // color: Colors.red,
                       padding: EdgeInsets.symmetric(vertical: 16),
@@ -143,7 +147,7 @@ void initState() {
                           CustomButton(
                               value:controller.resubmitTasks.length,
                                                 onPressed: ()=> Get.to(()=> TaskMain(initialPage: 4,), transition: Transition.cupertino),
-                              label: 'Resubmit',
+                              label: 'Resubmitted',
                               icon: ShaderMask(
                                 blendMode: BlendMode.srcIn,
                                 shaderCallback: (Rect bounds) => LinearGradient(
@@ -163,7 +167,6 @@ void initState() {
                         ],
                       ),
                     ),
-                        Gap(16),
                     Container(
                       height: 1,
                       color: Palette.LIGHT_BACKGROUND,
