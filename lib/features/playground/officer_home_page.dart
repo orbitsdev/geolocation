@@ -10,6 +10,7 @@ import 'package:geolocation/features/attendance/attendance_page.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:geolocation/features/collections/create_or_edit_collection_page.dart';
 import 'package:geolocation/features/officers/controller/officer_controller.dart';
+import 'package:geolocation/features/officers/officer_all_attendance_page.dart';
 import 'package:geolocation/features/officers/officer_all_collection_page.dart';
 import 'package:geolocation/features/officers/officer_all_event_page.dart';
 import 'package:geolocation/features/officers/officer_all_page.dart';
@@ -40,7 +41,7 @@ class _OfficerHomePageState extends State<OfficerHomePage> with SingleTickerProv
     OfficerAllEventPage(),
     OfficerAllCollectionPage(),
     OfficerFilesPage(),
-    // AttendancePage(),
+     OfficerAllAttendancePage(),
   ];
 
   final List<Tab> tabs = const [
@@ -50,13 +51,13 @@ class _OfficerHomePageState extends State<OfficerHomePage> with SingleTickerProv
     Tab(text: 'Events'),
     Tab(text: 'Collections'),
     Tab(text: 'Approve Files'),
-    // Tab(text: 'Attendance'),
+    Tab(text: 'Attendance'),
   ];
 
   @override
   void initState() {
     super.initState();
-    tabController = TabController(length: tabs.length, vsync: this,initialIndex: 0);
+    tabController = TabController(length: tabs.length, vsync: this,initialIndex: 6);
     
     tabController.addListener(() {
     switch (tabController.index) {

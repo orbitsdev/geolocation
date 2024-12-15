@@ -119,9 +119,9 @@ class _EventPageState extends State<EventPage> {
                                       onViewAttendance: () {
                                         if (event.id != null) {
                                           Get.back();
-                                          AttendanceController.controller
-                                              .selectAndNavigateToAttendanceRecord(
-                                                  event);
+                                          // AttendanceController.controller
+                                          //     .selectAndNavigateToAttendanceRecord(
+                                          //         event);
                                         }
                                       },
                                       onUpdateEvent: () async  {

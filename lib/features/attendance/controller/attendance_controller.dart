@@ -56,7 +56,7 @@ class AttendanceController extends GetxController {
   var perPage = 20.obs;
   var lastTotalValue = 0.obs;
   var hasData = false.obs;
-  var attendance = <Attendance>[].obs;
+  var attendances = <Attendance>[].obs;
   var selectedItem = EventAttendance().obs;
 
   //for viewing
@@ -386,11 +386,11 @@ void selectAndNavigateToAttendancePage(Event item) async {
         });
 }
 
-void selectAndNavigateToAttendanceRecord(Event item) async {
-  selectedEvent(item);
-  update();
-   await Get.to(() => AttendanceListPage());
-}
+// void selectAndNavigateToAttendanceRecord(Event item) async {
+//   selectedEvent(item);
+//   update();
+//    await Get.to(() => AttendanceListPage());
+// }
 
 
 
@@ -612,124 +612,124 @@ Future<void> testLoad(Event item) async {
     },
   );
 }
-Future<void> loadData() async {
+// Future<void> loadData() async {
 
 
-  isPageLoading(true);
-  page(1);
-  perPage(20);
-  lastTotalValue(0);
-  attendance.clear();
-  update();
+//   isPageLoading(true);
+//   page(1);
+//   perPage(20);
+//   lastTotalValue(0);
+//   attendances.clear();
+//   update();
 
-  var eventId = selectedEvent.value.id;
-  var councilId = selectedEvent.value.council?.id;
+//   var eventId = selectedEvent.value.id;
+//   var councilId = selectedEvent.value.council?.id;
 
-  // Debug the eventId and councilId
-  print("Event ID: $eventId");
-  print("Council ID: $councilId");
+//   // Debug the eventId and councilId
+//   print("Event ID: $eventId");
+//   print("Council ID: $councilId");
 
-  if (eventId == null || councilId == null) {
-    isPageLoading(false);
-    Modal.errorDialog(message: "Event ID or Council ID is null.");
-    return;
-  }
+//   if (eventId == null || councilId == null) {
+//     isPageLoading(false);
+//     Modal.errorDialog(message: "Event ID or Council ID is null.");
+//     return;
+//   }
 
-  var endpoint = '/councils/$councilId/events/$eventId/attendance-record';
-  // var endpoint = '/councils/28/events/8/attendance-record';
+//   var endpoint = '/councils/$councilId/events/$eventId/attendance-record';
+//   // var endpoint = '/councils/28/events/8/attendance-record';
 
-  Map<String, dynamic> queryParameters = {
-    'page': page.value,
-    'perPage': perPage.value,
-  };
+//   Map<String, dynamic> queryParameters = {
+//     'page': page.value,
+//     'perPage': perPage.value,
+//   };
 
-  var response = await ApiService.getAuthenticatedResource(
-    endpoint,
-    queryParameters: queryParameters,
-  );
+//   var response = await ApiService.getAuthenticatedResource(
+//     endpoint,
+//     queryParameters: queryParameters,
+//   );
 
-  response.fold(
-    (failure) {
-      isPageLoading(false);
-      update();
-      Modal.errorDialog(failure: failure);
-    },
-    (success) {
-      print('------------------- ATTENDA RECORD');
-      print(success.data['data'][0]['check_out_coordinates']);
-      print('-------------------');
-      var data = success.data;
+//   response.fold(
+//     (failure) {
+//       isPageLoading(false);
+//       update();
+//       Modal.errorDialog(failure: failure);
+//     },
+//     (success) {
+//       print('------------------- ATTENDA RECORD');
+//       print(success.data['data'][0]['check_out_coordinates']);
+//       print('-------------------');
+//       var data = success.data;
 
       
 
-      List<Attendance> newData = (data['data'] as List<dynamic>)
-          .map((record) => Attendance.fromMap(record))
-          .toList();
+//       List<EventAttendance> newData = (data['data'] as List<dynamic>)
+//           .map((record) => EventAttendance.fromMap(record))
+//           .toList();
 
-      attendance(newData);
-      page.value++;
-      lastTotalValue.value = data['pagination']['total'];
-      hasData.value = attendance.length < lastTotalValue.value;
-      isPageLoading(false);
-      update();
-    },
-  );
-}
+//       attendances(newData);
+//       page.value++;
+//       lastTotalValue.value = data['pagination']['total'];
+//       hasData.value = attendances.length < lastTotalValue.value;
+//       isPageLoading(false);
+//       update();
+//     },
+//   );
+// }
 
 
 
 
   
-  void loadOnScroll() async {
-    if (isScrollLoading.value) return;
+  // void loadOnScroll() async {
+  //   if (isScrollLoading.value) return;
 
-    isScrollLoading(true);
-    update();
+  //   isScrollLoading(true);
+  //   update();
    
   
-  var eventId = selectedItem.value.id;
-  var councilId = selectedItem.value.council?.id;
+  // var eventId = selectedItem.value.id;
+  // var councilId = selectedItem.value.council?.id;
 
   
-  var endpoint = '/councils/$councilId/events/$eventId/attendance-record';
+  // var endpoint = '/councils/$councilId/events/$eventId/attendance-record';
 
    
-    Map<String, dynamic> queryParameters = {
-      'page': page.value,
-      'perPage': perPage.value,
-    };
+  //   Map<String, dynamic> queryParameters = {
+  //     'page': page.value,
+  //     'perPage': perPage.value,
+  //   };
 
 
-    var response = await ApiService.getAuthenticatedResource(endpoint,
-        queryParameters: queryParameters);
-    response.fold((failed) {
-      isScrollLoading(false);
-      update();
-      Modal.errorDialog(failure: failed);
-    }, (success) {
-      isScrollLoading(false);
-      update();
+  //   var response = await ApiService.getAuthenticatedResource(endpoint,
+  //       queryParameters: queryParameters);
+  //   response.fold((failed) {
+  //     isScrollLoading(false);
+  //     update();
+  //     Modal.errorDialog(failure: failed);
+  //   }, (success) {
+  //     isScrollLoading(false);
+  //     update();
 
-      var data = success.data;
-      if (lastTotalValue.value != data['pagination']['total']) {
-        loadData();
-        return;
-      }
+  //     var data = success.data;
+  //     if (lastTotalValue.value != data['pagination']['total']) {
+  //       loadData();
+  //       return;
+  //     }
 
-      if (attendance.length == data['pagination']['total']) {
-        return;
-      }
+  //     if (attendance.length == data['pagination']['total']) {
+  //       return;
+  //     }
 
-      List<Attendance> newData = (data['data'] as List<dynamic>)
-          .map((task) => Attendance.fromMap(task))
-          .toList();
-      attendance.addAll(newData);
-      page.value++;
-      lastTotalValue.value = data['pagination']['total'];
-      hasData.value = attendance.length < lastTotalValue.value;
-      update();
-    });
-  }
+  //     List<Attendance> newData = (data['data'] as List<dynamic>)
+  //         .map((task) => Attendance.fromMap(task))
+  //         .toList();
+  //     attendance.addAll(newData);
+  //     page.value++;
+  //     lastTotalValue.value = data['pagination']['total'];
+  //     hasData.value = attendance.length < lastTotalValue.value;
+  //     update();
+  //   });
+  // }
 
   Future<bool> requestLocationPermision() async {
     bool serviceEnabled;
@@ -791,27 +791,112 @@ Future<void> loadData() async {
   update();
 }
 
- Future<void> loadAttendance() async {
-   needRevisionIsLoading(true);
-   needRevisionPage(1);
-   needRevisionPerPage(20);
-   needRevisionLastTotalValue(0);
-   needRevisionTasks.clear();
+//  Future<void> loadAttendance(int eventId) async {
+//    isPageLoading(true);
+//    page(1);
+//    perPage(20);
+//    lastTotalValue(0);
+//    attendances.clear();
+//     update();
+    
+   
+//     Map<String, dynamic> data = {
+//       'page':page,
+//       'per_page':perPage,
+     
+//     };
+
+  
+  
+//     var response = await ApiService.getAuthenticatedResource('councils/events/${eventId}/attendances', queryParameters: data);
+//     response.fold((failed) {
+//      isPageLoading(false);
+//       update();
+//       Modal.errorDialog(failure: failed);
+//     }, (success) {
+//       var data = success.data;  
+
+     
+//       print(data);
+
+      
+//       List<EventAttendance> newData = (data['data'] as List<dynamic>)
+//           .map((task) => EventAttendance.fromMap(task))
+//           .toList();
+//      attendances(newData);
+//      page.value++;
+//      lastTotalValue.value = data['pagination']['total'];
+//      hasData.value =attendances.length < lastTotalValue.value;
+//      isPageLoading(false);
+//       update();
+      
+//     });
+//   }
+
+//   void loadAttendanceOnSCroll(int eventId) async {
+//     if (isScrollLoading.value) return;
+
+//    isScrollLoading(true);
+//     update();
+
+   
+    
+//     Map<String, dynamic> data = {
+//       'page':page,
+//       'per_page':perPage,
+     
+//     };
+    
+   
+//     var response = await ApiService.getAuthenticatedResource('councils/events/${eventId}/attendances', queryParameters: data);
+//     response.fold((failed) {
+//      isScrollLoading(false);
+//       update();
+//       Modal.errorDialog(failure: failed);
+//     }, (success) {
+//      isScrollLoading(false);
+//       update();
+
+//       var data = success.data;
+//       if (lastTotalValue.value != data['pagination']['total']) {
+//         loadAttendance(eventId);
+//         return;
+//       }
+
+//       if (attendances.length == data['pagination']['total']) {
+//         return;
+//       }
+
+//       List<EventAttendance> newData = (data['data'] as List<dynamic>)
+//           .map((task) => EventAttendance.fromMap(task))
+//           .toList();
+//      attendances.addAll(newData);
+//       page.value++;
+//       lastTotalValue.value = data['pagination']['total'];
+//       hasData.value =attendances.length <lastTotalValue.value;
+//       update();
+//     });
+//   }
+ Future<void> loadMyAttendance() async {
+   isPageLoading(true);
+   page(1);
+   perPage(20);
+   lastTotalValue(0);
+   attendances.clear();
     update();
     
-    var officerId =  AuthController.controller.user.value.defaultPosition?.id;
+   
     Map<String, dynamic> data = {
-      'page':needRevisionPage,
-      'per_page':needRevisionPerPage,
-      'status': Task.STATUS_NEED_REVISION,
+      'page':page,
+      'per_page':perPage,
      
     };
 
   
   
-    var response = await ApiService.getAuthenticatedResource('tasks/council-tasks/${officerId}', queryParameters: data);
+    var response = await ApiService.getAuthenticatedResource('councils/events/my-attendances', queryParameters: data);
     response.fold((failed) {
-     needRevisionIsLoading(false);
+     isPageLoading(false);
       update();
       Modal.errorDialog(failure: failed);
     }, (success) {
@@ -821,62 +906,60 @@ Future<void> loadData() async {
       print(data);
 
       
-      List<Task> newData = (data['data'] as List<dynamic>)
-          .map((task) => Task.fromMap(task))
+      List<Attendance> newData = (data['data'] as List<dynamic>)
+          .map((task) => Attendance.fromMap(task))
           .toList();
-     needRevisionTasks(newData);
-     needRevisionPage.value++;
-     needRevisionLastTotalValue.value = data['pagination']['total'];
-     needRevisionHasData.value =needRevisionTasks.length < lastTotalValue.value;
-     needRevisionIsLoading(false);
+     attendances(newData);
+     page.value++;
+     lastTotalValue.value = data['pagination']['total'];
+     hasData.value =attendances.length < lastTotalValue.value;
+     isPageLoading(false);
       update();
       
     });
   }
 
-  void loadAttendanceOnSCroll() async {
-    if (needRevisionIsScrollLoading.value) return;
+  void loadMyAttendanceOnScroll() async {
+    if (isScrollLoading.value) return;
 
-   needRevisionIsScrollLoading(true);
+   isScrollLoading(true);
     update();
 
    
-    var officerId =  AuthController.controller.user.value.defaultPosition?.id;
+    
     Map<String, dynamic> data = {
-       'page': rejectPage,
-      'per_page': rejectPerPage,
-      'status': Task.STATUS_NEED_REVISION,
+      'page':page,
+      'per_page':perPage,
      
     };
     
    
-    var response = await ApiService.getAuthenticatedResource('tasks/council-tasks/${officerId}',
-        queryParameters: data);
+    var response = await ApiService.getAuthenticatedResource('councils/events/my-attendances', queryParameters: data);
     response.fold((failed) {
-     needRevisionIsScrollLoading(false);
+     isScrollLoading(false);
       update();
       Modal.errorDialog(failure: failed);
     }, (success) {
-     needRevisionIsScrollLoading(false);
+     isScrollLoading(false);
       update();
 
       var data = success.data;
-      if (completedLastTotalValue.value != data['pagination']['total']) {
-        loadTask();
+      if (lastTotalValue.value != data['pagination']['total']) {
+        loadMyAttendance();
         return;
       }
 
-      if (completedTasks.length == data['pagination']['total']) {
+      if (attendances.length == data['pagination']['total']) {
         return;
       }
 
-      List<Task> newData = (data['data'] as List<dynamic>)
-          .map((task) => Task.fromMap(task))
+      List<Attendance> newData = (data['data'] as List<dynamic>)
+          .map((task) => Attendance.fromMap(task))
           .toList();
-     needRevisionTasks.addAll(newData);
+     attendances.addAll(newData);
       page.value++;
-     needRevisionLastTotalValue.value = data['pagination']['total'];
-      hasData.value =needRevisionTasks.length <needRevisionLastTotalValue.value;
+      lastTotalValue.value = data['pagination']['total'];
+      hasData.value =attendances.length <lastTotalValue.value;
       update();
     });
   }
