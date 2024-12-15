@@ -877,6 +877,7 @@ Future<void> testLoad(Event item) async {
 //       update();
 //     });
 //   }
+
  Future<void> loadMyAttendance() async {
    isPageLoading(true);
    page(1);

@@ -216,4 +216,7 @@ class Attendance {
   String toString() {
     return 'Attendance(id: $id, eventId: $eventId, checkInTime: $checkInTime, ...)';
   }
+  bool owner(int? positionId) {
+    return councilPosition?.id == positionId;
+  }
 }

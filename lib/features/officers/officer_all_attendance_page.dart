@@ -9,6 +9,7 @@ import 'package:geolocation/features/attendance/attendance_page.dart';
 import 'package:geolocation/features/attendance/controller/attendance_controller.dart';
 import 'package:geolocation/features/attendance/make_attendace_page.dart';
 import 'package:geolocation/features/attendance/model/attendance.dart';
+import 'package:geolocation/features/attendance/widgets/attendance_card.dart';
 import 'package:geolocation/features/collections/collection_details_page.dart';
 import 'package:geolocation/features/collections/controller/collection_controller.dart';
 import 'package:geolocation/features/collections/create_or_edit_collection_page.dart';
@@ -82,19 +83,20 @@ class _OfficerAllAttendancePageState extends State<OfficerAllAttendancePage> {
                         )
                       : controller.attendances.isNotEmpty
                           ? SliverMasonryGrid.count(
-                              crossAxisSpacing: 16,
-                              mainAxisSpacing: 16,
-                              crossAxisCount: 1,
-                              childCount: controller.attendances.length,
-                              itemBuilder: (context, index) {
-                                Attendance attendance =controller.attendances[index];
-                                 return Container(child: Text('${attendance.id}'),);
-                              },
-                            )
+  crossAxisSpacing: 16,
+  mainAxisSpacing: 16,
+  crossAxisCount: 1,
+  childCount: controller.attendances.length,
+  itemBuilder: (context, index) {
+    Attendance attendance = controller.attendances[index];
+    return AttendanceCard(attendance: attendance);
+  },
+)
+
                           : const SliverToBoxAdapter(
                               child: Center(
                                 child: Text(
-                                  'No collections found',
+                                  'No Attenance found',
                                   style: TextStyle(
                                     fontSize: 16,
                                     color: Colors.black54,

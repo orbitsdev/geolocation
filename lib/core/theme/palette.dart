@@ -67,4 +67,6 @@ static Color  FBGPRIMARY = Color(0xff3EB075);
     static Color GREEN3 = Color(0xff15A671);
     static Color GRAY1 = Color(0xffDADADA);
     static Color GREEN0 = Color(0xffDCF5D4);
+    static Color FGREEN1 = Color(0xff0ba360);
+    static Color FGREEN2 = Color(0xff3cba92);
 }
