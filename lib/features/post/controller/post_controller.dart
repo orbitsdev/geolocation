@@ -551,7 +551,6 @@ Future<void> updatePost(int id) async {
 
 
 
-  Future<void> deletePost() async {}
   Future<void> getPost() async {}
 
   void confirmDeleteMedia(int index) {

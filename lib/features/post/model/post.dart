@@ -115,4 +115,8 @@ class Post {
   String toString() {
     return 'Post(id: $id, title: $title, content: $content, description: $description, createdAt: $createdAt, updatedAt: $updatedAt,isPublish: $isPublish, media: $media, council: $council, councilPosition: $councilPosition, relatedModel: $relatedModel)';
   }
+
+   bool owner(int? positionId) {
+    return councilPosition?.id == positionId;
+  }
 }

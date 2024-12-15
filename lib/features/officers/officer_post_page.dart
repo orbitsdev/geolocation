@@ -3,7 +3,9 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:geolocation/core/globalwidget/sliver_gap.dart';
 import 'package:geolocation/core/globalwidget/to_sliver.dart';
 import 'package:geolocation/features/post/controller/post_controller.dart';
+import 'package:geolocation/features/post/create_or_edit_post_page.dart';
 import 'package:geolocation/features/post/model/post.dart';
+import 'package:geolocation/features/post/post_details_page.dart';
 import 'package:geolocation/features/post/widget/post_card.dart';
 import 'package:get/get.dart';
 import 'package:sliver_tools/sliver_tools.dart';
@@ -59,9 +61,16 @@ class _OfficerPostPageState extends State<OfficerPostPage> {
                   itemBuilder: (context, index) {
                     Post post = postcontroller.posts[index];
                     return PostCard(
-                      onView: (){},
-                      onEdit: () {},
-                      onDelete: () {},
+                      onView: (){
+                      Get.to(()=>  PostDetailsPage(post: post,), transition: Transition.cupertino);
+                      },
+                      onEdit: () {
+                        postcontroller.selectItemAndNavigateToUpdatePage(post);
+                      },
+                      onDelete: () {
+                        postcontroller.delete(post.id as int);
+                      },
+                    
                       post: post,
                     );
                   }),

@@ -186,12 +186,13 @@ bool hasAnyRole(List<String> roles) {
 
 
   bool hasGrantAccessForPosition(int positionId) {
-    return councilPositions?.any((position) =>
-            position.id == positionId && position.grantAccess == true) ??
+    return councilPositions?.any((position) => position.id == positionId && position.grantAccess == true) ??
         false;
   }
 
   bool hasDefaultPosition() {
     return defaultPosition != null;
   }
+
+  
 }

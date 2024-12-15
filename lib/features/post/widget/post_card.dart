@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:geolocation/core/theme/palette.dart';
+import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:geolocation/features/collections/model/collection.dart';
 import 'package:geolocation/features/post/widget/collection_chart_widget.dart';
 import 'package:get/get.dart';
@@ -97,28 +98,42 @@ class PostCard extends StatelessWidget {
         PopupMenuButton<String>(
           icon: const Icon(Icons.more_vert),
           onSelected: (value) {
-            if (value == 'edit') {
+            switch(value){
+              case 'view':
+              onView();
+              break;
+              case 'edit':
               onEdit();
-            } else if (value == 'delete') {
-              onDelete();
+              break;
+              case 'delete':
+                            onDelete();
+
+              break;
+              default:
+              
             }
+            // if (value == 'edit') {
+            //   onEdit();
+            // } else if (value == 'delete') {
+            //   onDelete();
+            // }
           },
           itemBuilder: (context) => [
             const PopupMenuItem(
-              value: 'View',
+              value: 'view',
               child: ListTile(
                 leading: Icon(Icons.remove_red_eye),
                 title: Text('View'),
               ),
             ),
-            const PopupMenuItem(
+           if(post.owner(AuthController.controller.user.value.defaultPosition?.id)) PopupMenuItem(
               value: 'edit',
               child: ListTile(
                 leading: Icon(Icons.edit),
                 title: Text('Edit'),
               ),
             ),
-            const PopupMenuItem(
+               if(post.owner(AuthController.controller.user.value.defaultPosition?.id)) const PopupMenuItem(
               value: 'delete',
               child: ListTile(
                 leading: Icon(Icons.delete),
