@@ -5,6 +5,7 @@ import 'package:geolocation/core/globalwidget/sliver_gap.dart';
 import 'package:geolocation/core/globalwidget/to_sliver.dart';
 import 'package:geolocation/core/modal/modal.dart';
 import 'package:geolocation/core/theme/palette.dart';
+import 'package:geolocation/features/attendance/attendance_full_details_page.dart';
 import 'package:geolocation/features/attendance/attendance_page.dart';
 import 'package:geolocation/features/attendance/controller/attendance_controller.dart';
 import 'package:geolocation/features/attendance/make_attendace_page.dart';
@@ -98,7 +99,11 @@ class _OfficerAllAttendancePageState extends State<OfficerAllAttendancePage> {
                               itemBuilder: (context, index) {
                                 Attendance attendance =
                                     controller.attendances[index];
-                                return AttendanceCard(attendance: attendance);
+                                return RippleContainer(
+                                  onTap: (){
+                                    Get.to(()=> AttendanceFullDetailsPage(attendance: attendance,), transition: Transition.cupertino);
+                                  },
+                                  child: AttendanceCard(attendance: attendance));
                               },
                             )
                           : const SliverToBoxAdapter(

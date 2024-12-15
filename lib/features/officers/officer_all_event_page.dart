@@ -84,9 +84,46 @@ controller.isLoading.value
                               crossAxisCount: 1,
                               itemBuilder: (context, index) {
                                 Event event = controller.events[index];
-                                return EventCard3(width: Get.size.width, event: event, onView: (){      
+                                return EventCard3(
+                                  width: Get.size.width,
+                            event: event,
+                            onView: () async {
+                              Modal.showEventActionModal(
+                                onViewEvent: () async {
+                                  Get.back();
 
-                                });
+                                  bool canProceed = await controller
+                                      .checkLocationServicesAndPermissions();
+                                  if (canProceed) {
+                                    controller.viewEvent(event);
+                                  } else {
+                                    Modal.showToast(
+                                        msg:
+                                            'Location services are disabled or unavailable. Please enable location services to proceed.');
+                                  }
+                                },
+                                onViewAttendance: () {
+                                  // Navigate to View Attendance Page
+                                  // Get.to(() => ViewAttendancePage(), transition: Transition.cupertino);
+                                },
+                                onMakeAttendance: () async {
+                                  bool canProceed = await controller
+                                      .checkLocationServicesAndPermissions();
+                                  if (canProceed) {
+                                    Get.to(() => MakeAttendancePage(),
+                                        arguments: {'event': event},
+                                        transition: Transition.cupertino);
+                                  } else {
+                                    Modal.showToast(
+                                        msg:
+                                            'Location services are disabled or unavailable. Please enable location services to proceed.');
+                                  }
+                                  // Navigate to Make Attendance Page
+                                  // Get.to(() => MakeAttendancePage(), transition: Transition.cupertino);
+                                },
+                              );
+                            },
+                          );
                               
                               },
                             )

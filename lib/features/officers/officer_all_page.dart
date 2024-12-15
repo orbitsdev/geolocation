@@ -38,15 +38,14 @@ class _OfficerAllPageState extends State<OfficerAllPage> {
   @override
   void initState() {
     super.initState();
-   
-   
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await eventController.loadAllPageData();
 
-        newScrollController.addListener(() async {
+      newScrollController.addListener(() async {
         if (newScrollController.position.pixels >=
             newScrollController.position.maxScrollExtent - 200) {
-             PostController.controller.loadDataOnScroll();
+          PostController.controller.loadDataOnScroll();
         }
       });
     });
@@ -64,110 +63,104 @@ class _OfficerAllPageState extends State<OfficerAllPage> {
         shrinkWrap: true,
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
-
           GetBuilder<EventController>(
-  builder: (econtroller) {
-    return MultiSliver(
-      children: [
-        SliverGap(16),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Text(
-            'Latest Events',
-            style: Get.textTheme.bodyLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+            builder: (econtroller) {
+              return MultiSliver(
+                children: [
+                  SliverGap(16),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Text(
+                      'Latest Events',
+                      style: Get.textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  SliverGap(8),
+                  if (econtroller.isLoading.value == true)
+                    ToSliver(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        height:
+                            240, // Matches the EventCard3 height with padding
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: 10,
+                          itemBuilder: (context, index) {
+                            return ShimmerEventCard3();
+                          },
+                        ),
+                      ),
+                    ),
+                  ToSliver(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      height: 240, // Matches the EventCard3 height with padding
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: econtroller.events.length,
+                        itemBuilder: (context, index) {
+                          Event event = econtroller.events[index];
+                          return EventCard3(
+                            event: event,
+                            onView: () async {
+                              Modal.showEventActionModal(
+                                onViewEvent: () async {
+                                  Get.back();
+
+                                  bool canProceed = await econtroller
+                                      .checkLocationServicesAndPermissions();
+                                  if (canProceed) {
+                                    econtroller.viewEvent(event);
+                                  } else {
+                                    Modal.showToast(
+                                        msg:
+                                            'Location services are disabled or unavailable. Please enable location services to proceed.');
+                                  }
+                                },
+                                onViewAttendance: () {
+                                  // Navigate to View Attendance Page
+                                  // Get.to(() => ViewAttendancePage(), transition: Transition.cupertino);
+                                },
+                                onMakeAttendance: () async {
+                                  bool canProceed = await econtroller
+                                      .checkLocationServicesAndPermissions();
+                                  if (canProceed) {
+                                    Get.to(() => MakeAttendancePage(),
+                                        arguments: {'event': event},
+                                        transition: Transition.cupertino);
+                                  } else {
+                                    Modal.showToast(
+                                        msg:
+                                            'Location services are disabled or unavailable. Please enable location services to proceed.');
+                                  }
+                                  // Navigate to Make Attendance Page
+                                  // Get.to(() => MakeAttendancePage(), transition: Transition.cupertino);
+                                },
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
-        ),
-        SliverGap(8),
-        if (econtroller.isLoading.value == true)
-          ToSliver(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            height: 240, // Matches the EventCard3 height with padding
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: 10,
-              itemBuilder: (context, index) {
-                return ShimmerEventCard3();
-              },
-            ),
-          ),
-        ),
-        ToSliver(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            height: 240, // Matches the EventCard3 height with padding
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: econtroller.events.length,
-              itemBuilder: (context, index) {
-                Event event  =  econtroller.events[index];
-                return EventCard3(
-                  event: event,
-                  onView: ()  async {
-
-                    Modal.showEventActionModal(
-  onViewEvent: () async {
-   
-                     Get.back();
-
-                                        bool canProceed = await econtroller
-                                            .checkLocationServicesAndPermissions();
-                                        if (canProceed) {
-                                          econtroller.viewEvent(event);
-                                        } else {
-                                          Modal.showToast(
-                                              msg:
-                                                  'Location services are disabled or unavailable. Please enable location services to proceed.');
-                                        }
-  },
-  onViewAttendance: () {
-    // Navigate to View Attendance Page
-    // Get.to(() => ViewAttendancePage(), transition: Transition.cupertino);
-  },
-  onMakeAttendance: () async {
-    bool canProceed = await econtroller
-                                            .checkLocationServicesAndPermissions();
-                                        if (canProceed) {
-                                              Get.to(()=>  MakeAttendancePage(), arguments: {'event': event}, transition: Transition.cupertino);
-                                        } else {
-                                          Modal.showToast(
-                                              msg:
-                                                  'Location services are disabled or unavailable. Please enable location services to proceed.');
-                                        }
-    // Navigate to Make Attendance Page
-    // Get.to(() => MakeAttendancePage(), transition: Transition.cupertino);
-  },
-);
-
-                  },
-                );
-              },
-            ),
-          ),
-        ),
-      ],
-    );
-  },
-),
-
-
           SliverGap(16),
-
-            
-
           GetBuilder<PostController>(builder: (postcontroller) {
             return MultiSliver(children: [
               if (postcontroller.isLoading.value == true)
                 SliverAlignedGrid.count(
-                  crossAxisSpacing: 8,
-                  mainAxisSpacing: 8,
-                  itemCount: 10,
-                  crossAxisCount: 1,
-                  itemBuilder: (context, index) {
-                    return ShimmerPostCard();
-                  }),
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
+                    itemCount: 10,
+                    crossAxisCount: 1,
+                    itemBuilder: (context, index) {
+                      return ShimmerPostCard();
+                    }),
               SliverAlignedGrid.count(
                   crossAxisSpacing: 8,
                   mainAxisSpacing: 8,
@@ -176,13 +169,16 @@ class _OfficerAllPageState extends State<OfficerAllPage> {
                   itemBuilder: (context, index) {
                     Post post = postcontroller.posts[index];
                     return RippleContainer(
-                      onTap: ()=> Get.to(()=>  PostDetailsPage(post: post,), transition: Transition.cupertino),
+                      onTap: () => Get.to(
+                          () => PostDetailsPage(
+                                post: post,
+                              ),
+                          transition: Transition.cupertino),
                       child: PostCard(
-                        onView: (){
-                       
-                        },
+                        onView: () {},
                         onEdit: () {
-                          postcontroller.selectItemAndNavigateToUpdatePage(post);
+                          postcontroller
+                              .selectItemAndNavigateToUpdatePage(post);
                         },
                         onDelete: () {
                           postcontroller.delete(post.id as int);
@@ -191,20 +187,17 @@ class _OfficerAllPageState extends State<OfficerAllPage> {
                       ),
                     );
                   }),
-
-                   if (postcontroller.isScrollLoading.value)
-                    SliverAlignedGrid.count(
-                  crossAxisSpacing: 8,
-                  mainAxisSpacing: 8,
-                  itemCount: 10,
-                  crossAxisCount: 1,
-                  itemBuilder: (context, index) {
-                    return ShimmerPostCard();
-                  }),
+              if (postcontroller.isScrollLoading.value)
+                SliverAlignedGrid.count(
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
+                    itemCount: 10,
+                    crossAxisCount: 1,
+                    itemBuilder: (context, index) {
+                      return ShimmerPostCard();
+                    }),
             ]);
           }),
-
-
         ],
       ),
     );
