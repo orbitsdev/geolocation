@@ -321,11 +321,17 @@ Future<void> updatePost(int id) async {
           isLoading(false);
           Modal.errorDialog(failure: failure);
         },
-        (success) {
+        (success) async {
           Get.back(); // Close the modal
           isLoading(false);
           
-          Get.offNamedUntil('/posts', (route) => route.isFirst); // Navigate to the posts page
+          if(AuthController.controller.user.value.defaultPosition?.grantAccess == true){
+              Get.offNamedUntil('/posts', (route) => route.isFirst);
+               await loadData();
+        }{
+              Get.offNamedUntil('/home-officer', (route) => route.isFirst);
+             await  eventController.loadAllPageData();
+        }
           Modal.success(message: 'Post updated successfully!');
         },
       );

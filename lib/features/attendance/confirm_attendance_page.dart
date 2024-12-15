@@ -23,11 +23,11 @@ class ConfirmAttendancePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          isCheckIn ? 'Confirm Check-In' : 'Confirm Check-Out',
+          isCheckIn ? 'Confirm In' : 'Confirm Out',
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        backgroundColor: Colors.blueAccent,
+        
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -37,7 +37,7 @@ class ConfirmAttendancePage extends StatelessWidget {
           children: [
             // Title and Instructions
             Text(
-              'Take a selfie to verify your ${isCheckIn ? "Check-In" : "Check-Out"}',
+              'Take a selfie to verify your ${isCheckIn ? "In" : "Out"}',
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 18,
@@ -136,7 +136,7 @@ class ConfirmAttendancePage extends StatelessWidget {
               height: Get.size.height,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Palette.PRIMARY,
+                  backgroundColor: Palette.GREEN3,
                   padding: EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),

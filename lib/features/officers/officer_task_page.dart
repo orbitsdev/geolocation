@@ -9,6 +9,7 @@ import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/officers/alltasks/task_main.dart';
 import 'package:geolocation/features/task/controller/task_controller.dart';
 import 'package:geolocation/features/task/model/task.dart';
+import 'package:geolocation/features/task/widget/shimmer_task_card2.dart';
 import 'package:geolocation/features/task/widget/task_card2.dart';
 import 'package:get/get.dart';
 import 'package:sliver_tools/sliver_tools.dart';
@@ -118,7 +119,7 @@ void initState() {
                                   colors: [Palette.GREEN2, Palette.GREEN3],
                                 ).createShader(bounds),
                                 child: FaIcon(
-                                  FontAwesomeIcons.wallet,
+                                  FontAwesomeIcons.listOl,
                                   color: Palette.GRAY1,
                                 ),
                               )),
@@ -134,7 +135,7 @@ void initState() {
                                   colors: [Palette.GREEN2, Palette.GREEN3],
                                 ).createShader(bounds),
                                 child: FaIcon(
-                                  FontAwesomeIcons.box,
+                                  FontAwesomeIcons.penToSquare,
                                    color: Palette.GRAY1,
                                 ),
                               )),
@@ -151,7 +152,7 @@ void initState() {
                                   colors: [Palette.GREEN2, Palette.GREEN3],
                                 ).createShader(bounds),
                                 child: FaIcon(
-                                  FontAwesomeIcons.truck,
+                                  FontAwesomeIcons.fileLines,
                                    color: Palette.GRAY1,
                                 ),
                               )),
@@ -181,7 +182,14 @@ void initState() {
           GetBuilder<TaskController>(builder: (taskcontroller) {
             return MultiSliver(children: [
               if (taskcontroller.isLoading.value == true)
-                ToSliver(child: LinearProgressIndicator()),
+                SliverAlignedGrid.count(
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                  itemCount: 10,
+                  crossAxisCount: 1,
+                  itemBuilder: (context, index) {
+                    return ShimmerTaskCard2();
+                  }),
               SliverAlignedGrid.count(
                   crossAxisSpacing: 8,
                   mainAxisSpacing: 8,
@@ -195,9 +203,14 @@ void initState() {
                   }),
 
                    if (taskcontroller.isScrollLoading.value)
-                    ToSliver(
-                      child: Center(child: CircularProgressIndicator()),
-                    ),
+                    SliverAlignedGrid.count(
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                  itemCount: 10,
+                  crossAxisCount: 1,
+                  itemBuilder: (context, index) {
+                    return ShimmerTaskCard2();
+                  }),
             ]);
           }),
 

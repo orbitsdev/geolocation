@@ -237,12 +237,19 @@ class CollectionController extends GetxController {
       Modal.errorDialog(failure: failure);
     },
     (success) {
+      
+      
       Get.back(); // Close the loading dialog
       isLoading(false);
       update();
       clearForm();
-      loadData();
-      Get.offNamedUntil('/collections', (route) => route.isFirst);
+     if(AuthController.controller.user.value.defaultPosition?.grantAccess == true){
+              Get.offNamedUntil('/collections', (route) => route.isFirst);
+                loadData();
+        }{
+              Get.offNamedUntil('/home-officer', (route) => route.isFirst);
+              EventController.controller.loadAllPageData();
+        }
       
       Modal.success(message: 'Collection updated successfully');
     },

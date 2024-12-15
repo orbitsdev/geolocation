@@ -114,4 +114,7 @@ class Collection {
     final formatter = NumberFormat('#,##0'); // Adjust format as needed
     return totalAmount != null ? formatter.format(totalAmount) : '0.00';
   }
+  bool owner(int? positionId) {
+    return councilPosition?.id == positionId;
+  }
 }

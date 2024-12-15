@@ -5,14 +5,18 @@ import 'package:geolocation/core/globalwidget/sliver_gap.dart';
 import 'package:geolocation/core/globalwidget/to_sliver.dart';
 import 'package:geolocation/core/modal/modal.dart';
 import 'package:geolocation/core/theme/palette.dart';
+import 'package:geolocation/features/attendance/make_attendace_page.dart';
 import 'package:geolocation/features/event/controller/event_controller.dart';
+import 'package:geolocation/features/event/model/event.dart';
 import 'package:geolocation/features/event/widgets/event_card2.dart';
 import 'package:geolocation/features/event/widgets/event_card3.dart';
+import 'package:geolocation/features/event/widgets/shimmer_event_card.dart';
 import 'package:geolocation/features/officers/controller/officer_controller.dart';
 import 'package:geolocation/features/post/controller/post_controller.dart';
 import 'package:geolocation/features/post/create_or_edit_post_page.dart';
 import 'package:geolocation/features/post/post_details_page.dart';
 import 'package:geolocation/features/post/widget/post_card.dart';
+import 'package:geolocation/features/post/widget/shimmer_post_card.dart';
 import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:sliver_tools/sliver_tools.dart';
@@ -76,10 +80,20 @@ class _OfficerAllPageState extends State<OfficerAllPage> {
           ),
         ),
         SliverGap(8),
-        if (econtroller.isLoading.value)
+        if (econtroller.isLoading.value == true)
           ToSliver(
-            child: LinearProgressIndicator(),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            height: 240, // Matches the EventCard3 height with padding
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: 10,
+              itemBuilder: (context, index) {
+                return ShimmerEventCard3();
+              },
+            ),
           ),
+        ),
         ToSliver(
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -88,20 +102,45 @@ class _OfficerAllPageState extends State<OfficerAllPage> {
               scrollDirection: Axis.horizontal,
               itemCount: econtroller.events.length,
               itemBuilder: (context, index) {
+                Event event  =  econtroller.events[index];
                 return EventCard3(
-                  event: econtroller.events[index],
+                  event: event,
                   onView: ()  async {
+
+                    Modal.showEventActionModal(
+  onViewEvent: () async {
+   
                      Get.back();
 
                                         bool canProceed = await econtroller
                                             .checkLocationServicesAndPermissions();
                                         if (canProceed) {
-                                          econtroller.viewEvent(econtroller.events[index]);
+                                          econtroller.viewEvent(event);
                                         } else {
                                           Modal.showToast(
                                               msg:
                                                   'Location services are disabled or unavailable. Please enable location services to proceed.');
                                         }
+  },
+  onViewAttendance: () {
+    // Navigate to View Attendance Page
+    // Get.to(() => ViewAttendancePage(), transition: Transition.cupertino);
+  },
+  onMakeAttendance: () async {
+    bool canProceed = await econtroller
+                                            .checkLocationServicesAndPermissions();
+                                        if (canProceed) {
+                                              Get.to(()=>  MakeAttendancePage(), arguments: {'event': event}, transition: Transition.cupertino);
+                                        } else {
+                                          Modal.showToast(
+                                              msg:
+                                                  'Location services are disabled or unavailable. Please enable location services to proceed.');
+                                        }
+    // Navigate to Make Attendance Page
+    // Get.to(() => MakeAttendancePage(), transition: Transition.cupertino);
+  },
+);
+
                   },
                 );
               },
@@ -121,7 +160,14 @@ class _OfficerAllPageState extends State<OfficerAllPage> {
           GetBuilder<PostController>(builder: (postcontroller) {
             return MultiSliver(children: [
               if (postcontroller.isLoading.value == true)
-                ToSliver(child: LinearProgressIndicator()),
+                SliverAlignedGrid.count(
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                  itemCount: 10,
+                  crossAxisCount: 1,
+                  itemBuilder: (context, index) {
+                    return ShimmerPostCard();
+                  }),
               SliverAlignedGrid.count(
                   crossAxisSpacing: 8,
                   mainAxisSpacing: 8,
@@ -129,24 +175,32 @@ class _OfficerAllPageState extends State<OfficerAllPage> {
                   crossAxisCount: 1,
                   itemBuilder: (context, index) {
                     Post post = postcontroller.posts[index];
-                    return PostCard(
-                      onView: (){
-                      Get.to(()=>  PostDetailsPage(post: post,), transition: Transition.cupertino);
-                      },
-                      onEdit: () {
-                        postcontroller.selectItemAndNavigateToUpdatePage(post);
-                      },
-                      onDelete: () {
-                        postcontroller.delete(post.id as int);
-                      },
-                      post: post,
+                    return RippleContainer(
+                      onTap: ()=> Get.to(()=>  PostDetailsPage(post: post,), transition: Transition.cupertino),
+                      child: PostCard(
+                        onView: (){
+                       
+                        },
+                        onEdit: () {
+                          postcontroller.selectItemAndNavigateToUpdatePage(post);
+                        },
+                        onDelete: () {
+                          postcontroller.delete(post.id as int);
+                        },
+                        post: post,
+                      ),
                     );
                   }),
 
                    if (postcontroller.isScrollLoading.value)
-                    ToSliver(
-                      child: Center(child: CircularProgressIndicator()),
-                    ),
+                    SliverAlignedGrid.count(
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                  itemCount: 10,
+                  crossAxisCount: 1,
+                  itemBuilder: (context, index) {
+                    return ShimmerPostCard();
+                  }),
             ]);
           }),
 

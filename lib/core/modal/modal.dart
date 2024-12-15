@@ -936,6 +936,93 @@ static void showCreationModal() {
     isScrollControlled: true,
   );
 }
+
+
+static void showEventActionModal({
+  required VoidCallback onViewEvent,
+  required VoidCallback onViewAttendance,
+  required VoidCallback onMakeAttendance,
+}) {
+  Get.bottomSheet(
+    Container(
+      padding: const EdgeInsets.all(16.0),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Text(
+            'Choose Action',
+            style: Get.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16),
+
+          // View Event Details
+          ListTile(
+            leading: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.blue.shade50,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(Icons.event, color: Colors.blue.shade700),
+            ),
+            title: const Text('View Event'),
+            subtitle: const Text('See the event details and information.'),
+            onTap: () {
+              Get.back(); // Close the modal
+              onViewEvent();
+            },
+          ),
+          const Divider(),
+
+          // View Attendance
+          ListTile(
+            leading: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.orange.shade50,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(Icons.people, color: Colors.orange.shade700),
+            ),
+            title: const Text('View Attendance'),
+            subtitle: const Text('Check attendance records of participants.'),
+            onTap: () {
+              Get.back(); // Close the modal
+              onViewAttendance();
+            },
+          ),
+          const Divider(),
+
+          // Make Attendance
+          ListTile(
+            leading: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.green.shade50,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(Icons.check_circle, color: Colors.green.shade700),
+            ),
+            title: const Text('Make Attendance'),
+            subtitle: const Text('Mark your attendance for the event.'),
+            onTap: () {
+              Get.back(); // Close the modal
+              onMakeAttendance();
+            },
+          ),
+        ],
+      ),
+    ),
+    isScrollControlled: true,
+  );
+}
+
 }
 
 

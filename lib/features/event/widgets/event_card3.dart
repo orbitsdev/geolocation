@@ -12,6 +12,7 @@ class EventCard3 extends StatelessWidget {
   final Event event;
   final VoidCallback onView;
   final double height;
+   double? width;
   final EdgeInsetsGeometry? margin;
 
   EventCard3({
@@ -20,6 +21,7 @@ class EventCard3 extends StatelessWidget {
     required this.onView,
     this.height = 240, // Height optimized for horizontal scrolling
     this.margin,
+    this.width,
   }) : super(key: key);
 
   @override
@@ -29,7 +31,7 @@ class EventCard3 extends StatelessWidget {
       child: Container(
         margin: margin ?? const EdgeInsets.only(right: 16),
         height: height,
-        width: 250, // Compact width for horizontal layout
+        width: width ??250, // Compact width for horizontal layout
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
           color: Colors.white,

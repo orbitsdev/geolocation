@@ -34,13 +34,21 @@ class AttendanceController extends GetxController {
 
   var selfiePath = ''.obs; // Observable for the selfie path
 
+
+ Position? currentPosition;  
+  LatLng? position;
   Rxn<Position> checkInPosition = Rxn<Position>();
   Rxn<Position> checkOutPosition = Rxn<Position>();
 
  var uploadProgress = 0.0.obs;
   GoogleMapController? _googleMapController;
   late StreamSubscription<Position> _positionStream;
-
+ CameraPosition? cameraPosition = CameraPosition(
+    bearing: 192.8334901395799,
+    target: LatLng(37.43296265331129, -122.08832357078792),
+    tilt: 59.440717697143555,
+    zoom: 19.151926040649414,
+  );
    // PAGE DATA
   var isPageLoading = false.obs;
   var isScrollLoading = false.obs;
@@ -68,7 +76,8 @@ class AttendanceController extends GetxController {
 
 
   Future<void> initializeData(Event event) async {
-    Modal.loading();
+   
+    // Modal.loading();
     isLoading(true); // Set loading to true
     update();
 
@@ -78,13 +87,15 @@ class AttendanceController extends GetxController {
 
     response.fold(
       (failure) {
-        Get.back();
+
+        // Get.back();
           isLoading(false); // Set loading to false once initialization is complete
          update();
         Modal.errorDialog(failure: failure); // Handle API failure
       },
       (success) async  {
-        Get.back();
+         await prepareMap();
+        // Get.back();
         isLoading(false);
          isWithinRadius(false);
           update();
@@ -156,6 +167,7 @@ void navigateToConfirmPage(Position position, {required bool isCheckIn}) {
 
   Get.to(
     () => const ConfirmAttendancePage(),
+    transition: Transition.cupertino,
     arguments: {
       'position': position,
       'isCheckIn': isCheckIn,
@@ -539,7 +551,15 @@ Future<void> takeAttendance(bool isCheckIn) async {
           checkOutPosition.value = null;
         }
         // Navigate back to the events page
-        Get.offNamedUntil('/events', (route) => route.isFirst);
+        // Get.offNamedUntil('/events', (route) => route.isFirst);
+
+        // if(AuthController.controller.user.value.defaultPosition?.grantAccess == true){
+        //       Get.offNamedUntil('/collections', (route) => route.isFirst);
+        //         loadData();
+        // }{
+        //       Get.offNamedUntil('/home-officer', (route) => route.isFirst);
+        //       EventController.controller.loadAllPageData();
+        // }
 Modal.success(message: isCheckIn 
     ? 'Check-In successful! Have a great day ahead.' 
     : 'Check-Out successful! See you next time.');
@@ -710,4 +730,155 @@ Future<void> loadData() async {
       update();
     });
   }
+
+  Future<bool> requestLocationPermision() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Test if location services are enabled.
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // Location services are not enabled don't continue
+      // accessing the position and request users of the
+      // App to enable the location services.
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // Permissions are denied, next time you could try
+        // requesting permissions again (this is also where
+        // Android's shouldShowRequestPermissionRationale
+        // returned true. According to Android guidelines
+        // your App should show an explanatory UI now.
+        return Future.error('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately.
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+    return serviceEnabled;
+  }
+
+  Future<void> prepareMap() async {
+  var localPermission = await requestLocationPermision();
+  if (localPermission) {
+    try {
+      currentPosition = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      position = LatLng(currentPosition!.latitude, currentPosition!.longitude);
+      cameraPosition = CameraPosition(
+          target: position as LatLng, zoom: 16.999, tilt: 40, bearing: -1000);
+      if (currentPosition != null) {
+        isMapReady(true);
+      } else {
+        isMapReady(false);
+        Modal.showToast(msg: 'Failed to get current location.');
+      }
+    } catch (e) {
+      isMapReady(false);
+      Modal.errorDialog(message: 'Error accessing GPS: $e');
+    }
+  } else {
+    isMapReady(false);
+    Modal.showToast(msg: 'Location permissions are required to load the map.');
+  }
+  update();
+}
+
+ Future<void> loadAttendance() async {
+   needRevisionIsLoading(true);
+   needRevisionPage(1);
+   needRevisionPerPage(20);
+   needRevisionLastTotalValue(0);
+   needRevisionTasks.clear();
+    update();
+    
+    var officerId =  AuthController.controller.user.value.defaultPosition?.id;
+    Map<String, dynamic> data = {
+      'page':needRevisionPage,
+      'per_page':needRevisionPerPage,
+      'status': Task.STATUS_NEED_REVISION,
+     
+    };
+
+  
+  
+    var response = await ApiService.getAuthenticatedResource('tasks/council-tasks/${officerId}', queryParameters: data);
+    response.fold((failed) {
+     needRevisionIsLoading(false);
+      update();
+      Modal.errorDialog(failure: failed);
+    }, (success) {
+      var data = success.data;  
+
+     
+      print(data);
+
+      
+      List<Task> newData = (data['data'] as List<dynamic>)
+          .map((task) => Task.fromMap(task))
+          .toList();
+     needRevisionTasks(newData);
+     needRevisionPage.value++;
+     needRevisionLastTotalValue.value = data['pagination']['total'];
+     needRevisionHasData.value =needRevisionTasks.length < lastTotalValue.value;
+     needRevisionIsLoading(false);
+      update();
+      
+    });
+  }
+
+  void loadAttendanceOnSCroll() async {
+    if (needRevisionIsScrollLoading.value) return;
+
+   needRevisionIsScrollLoading(true);
+    update();
+
+   
+    var officerId =  AuthController.controller.user.value.defaultPosition?.id;
+    Map<String, dynamic> data = {
+       'page': rejectPage,
+      'per_page': rejectPerPage,
+      'status': Task.STATUS_NEED_REVISION,
+     
+    };
+    
+   
+    var response = await ApiService.getAuthenticatedResource('tasks/council-tasks/${officerId}',
+        queryParameters: data);
+    response.fold((failed) {
+     needRevisionIsScrollLoading(false);
+      update();
+      Modal.errorDialog(failure: failed);
+    }, (success) {
+     needRevisionIsScrollLoading(false);
+      update();
+
+      var data = success.data;
+      if (completedLastTotalValue.value != data['pagination']['total']) {
+        loadTask();
+        return;
+      }
+
+      if (completedTasks.length == data['pagination']['total']) {
+        return;
+      }
+
+      List<Task> newData = (data['data'] as List<dynamic>)
+          .map((task) => Task.fromMap(task))
+          .toList();
+     needRevisionTasks.addAll(newData);
+      page.value++;
+     needRevisionLastTotalValue.value = data['pagination']['total'];
+      hasData.value =needRevisionTasks.length <needRevisionLastTotalValue.value;
+      update();
+    });
+  }
+
 }

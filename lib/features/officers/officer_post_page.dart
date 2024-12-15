@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:geolocation/core/globalwidget/ripple_container.dart';
 import 'package:geolocation/core/globalwidget/sliver_gap.dart';
 import 'package:geolocation/core/globalwidget/to_sliver.dart';
 import 'package:geolocation/features/post/controller/post_controller.dart';
@@ -7,6 +8,7 @@ import 'package:geolocation/features/post/create_or_edit_post_page.dart';
 import 'package:geolocation/features/post/model/post.dart';
 import 'package:geolocation/features/post/post_details_page.dart';
 import 'package:geolocation/features/post/widget/post_card.dart';
+import 'package:geolocation/features/post/widget/shimmer_post_card.dart';
 import 'package:get/get.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
@@ -52,7 +54,15 @@ class _OfficerPostPageState extends State<OfficerPostPage> {
           GetBuilder<PostController>(builder: (postcontroller) {
             return MultiSliver(children: [
               if (postcontroller.isLoading.value == true)
-                ToSliver(child: LinearProgressIndicator()),
+              
+                    SliverAlignedGrid.count(
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                  itemCount: 10,
+                  crossAxisCount: 1,
+                  itemBuilder: (context, index) {
+                    return ShimmerPostCard();
+                  }),
               SliverAlignedGrid.count(
                   crossAxisSpacing: 8,
                   mainAxisSpacing: 8,
@@ -60,25 +70,33 @@ class _OfficerPostPageState extends State<OfficerPostPage> {
                   crossAxisCount: 1,
                   itemBuilder: (context, index) {
                     Post post = postcontroller.posts[index];
-                    return PostCard(
-                      onView: (){
-                      Get.to(()=>  PostDetailsPage(post: post,), transition: Transition.cupertino);
-                      },
-                      onEdit: () {
-                        postcontroller.selectItemAndNavigateToUpdatePage(post);
-                      },
-                      onDelete: () {
-                        postcontroller.delete(post.id as int);
-                      },
-                    
-                      post: post,
+                    return RippleContainer(
+                      onTap: ()=> Get.to(()=>  PostDetailsPage(post: post,), transition: Transition.cupertino),
+                      child: PostCard(
+                        onView: (){
+                        // Get.to(()=>  PostDetailsPage(post: post,), transition: Transition.cupertino);
+                        },
+                        onEdit: () {
+                          postcontroller.selectItemAndNavigateToUpdatePage(post);
+                        },
+                        onDelete: () {
+                          postcontroller.delete(post.id as int);
+                        },
+                      
+                        post: post,
+                      ),
                     );
                   }),
 
                    if (postcontroller.isScrollLoading.value)
-                    ToSliver(
-                      child: Center(child: CircularProgressIndicator()),
-                    ),
+                      SliverAlignedGrid.count(
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                  itemCount: 10,
+                  crossAxisCount: 1,
+                  itemBuilder: (context, index) {
+                    return ShimmerPostCard();
+                  }),
             ]);
           }),
 

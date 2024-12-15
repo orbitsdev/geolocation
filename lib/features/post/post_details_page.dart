@@ -1,209 +1,223 @@
 import 'package:flutter/material.dart';
-import 'package:geolocation/features/auth/model/council_position.dart';
-import 'package:geolocation/features/councils/model/council.dart';
+import 'package:gap/gap.dart';
+import 'package:geolocation/core/theme/palette.dart';
+import 'package:geolocation/features/auth/controller/auth_controller.dart';
+import 'package:geolocation/features/collections/model/collection.dart';
+import 'package:geolocation/features/post/widget/collection_chart_widget.dart';
+import 'package:get/get.dart';
+import 'package:geolocation/core/globalwidget/images/online_image.dart';
+import 'package:geolocation/core/globalwidget/images/online_image_full_screen_display.dart';
+import 'package:geolocation/core/globalwidget/preview_image.dart';
+import 'package:geolocation/core/globalwidget/preview_video.dart';
 import 'package:geolocation/features/file/model/media_file.dart';
 import 'package:geolocation/features/post/model/post.dart';
-import 'package:geolocation/features/post/model/related_model.dart';
+import 'package:geolocation/features/video/online_video_player.dart';
 
 class PostDetailsPage extends StatelessWidget {
   final Post post;
+ 
 
-  const PostDetailsPage({Key? key, required this.post}) : super(key: key);
+  const PostDetailsPage({
+    Key? key,
+    required this.post,
+   
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Palette.FBG,
       appBar: AppBar(
-        title: Text(post.title ?? "Post Details"),
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: const Text('Post Details'),
       ),
-      body: SingleChildScrollView(
+      body: Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    decoration: BoxDecoration(
+       borderRadius: BorderRadius.circular(12)
+    ),
+      child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Post Title and Description
-            Text(
-              post.title ?? "No Title",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 8),
-            Text(
-              post.description ?? "No Description",
-              style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-            ),
-            SizedBox(height: 16),
-
-            // Post Content
-            Text(
-              post.content ?? "No Content Available",
-              style: TextStyle(fontSize: 14, color: Colors.black87),
-            ),
-            SizedBox(height: 16),
-
-            // Created and Updated At
-            _buildInfoRow("Created At:", post.createdAt ?? "N/A"),
-            _buildInfoRow("Updated At:", post.updatedAt ?? "N/A"),
-            SizedBox(height: 16),
-
-            // Publish Status
-            _buildInfoRow(
-              "Published:",
-              post.isPublish == true ? "Yes" : "No",
-            ),
-
-            SizedBox(height: 20),
-            Divider(),
-
-            // Media Section
-            if (post.media != null && post.media!.isNotEmpty) ...[
+            _buildHeader(),
+            const Gap(12),
+            if (post.content != null && post.content!.isNotEmpty)
               Text(
-                "Media Files:",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                post.content!,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.black87,
+                  height: 1.5,
+                ),
               ),
-              SizedBox(height: 8),
-              _buildMediaGrid(post.media!),
-              SizedBox(height: 20),
-              Divider(),
-            ],
-
-            // Council Section
-            if (post.council != null) ...[
-              Text(
-                "Council:",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 8),
-              _buildCouncilSection(post.council!),
-              SizedBox(height: 20),
-              Divider(),
-            ],
-
-            // Council Position Section
-            if (post.councilPosition != null) ...[
-              Text(
-                "Council Position:",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 8),
-              _buildCouncilPositionSection(post.councilPosition!),
-              SizedBox(height: 20),
-              Divider(),
-            ],
-
-            // Related Model Section
-            if (post.relatedModel != null) ...[
-              Text(
-                "Related Model:",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 8),
-              _buildRelatedModelSection(post.relatedModel!),
-            ],
+            const Gap(12),
+            if (post.media != null && post.media!.isNotEmpty)
+              _buildMediaLayout(post.media!),
+            const Gap(12),
+            if (post.relatedModel != null &&
+                post.relatedModel!.type == 'Collection' &&
+                post.relatedModel!.data is Collection)
+              _buildCollection(post.relatedModel!.data as Collection),
           ],
         ),
       ),
+    ),
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        children: [
-          Text(
-            label,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+  Widget _buildHeader() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          height: 50,
+          width: 50,
+          child: OnlineImage(
+            imageUrl: post.councilPosition?.image ?? '',
+            borderRadius: BorderRadius.circular(40),
           ),
-          SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              value,
-              style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+        ),
+        const Gap(12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                post.title ?? 'Untitled Post',
+                style: Get.textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              const Gap(4),
+              Text(
+                post.createdAt ?? 'Just now',
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+            ],
+          ),
+        ),
+       
+      ],
+    );
+  }
+
+  Widget _buildMediaLayout(List<MediaFile> mediaFiles) {
+    int mediaCount = mediaFiles.length;
+
+    // Handle different media layout patterns
+    if (mediaCount == 1) {
+      return _buildSingleMedia(mediaFiles[0]);
+    } else if (mediaCount == 2) {
+      return Row(
+        children: mediaFiles.map((file) {
+          return Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: _buildMedia(file),
             ),
+          );
+        }).toList(),
+      );
+    } else if (mediaCount == 3) {
+      return Column(
+        children: [
+          _buildSingleMedia(mediaFiles[0]),
+          const Gap(8),
+          Row(
+            children: mediaFiles.sublist(1).map((file) {
+              return Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: _buildMedia(file),
+                ),
+              );
+            }).toList(),
           ),
         ],
-      ),
+      );
+    } else if (mediaCount == 4) {
+      return GridView.builder(
+        physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 4,
+          mainAxisSpacing: 4,
+        ),
+        itemCount: 4,
+        itemBuilder: (context, index) {
+          return _buildMedia(mediaFiles[index]);
+        },
+      );
+    } else if (mediaCount == 5 || mediaCount == 6) {
+      return Column(
+        children: [
+          Row(
+            children: mediaFiles.sublist(0, 2).map((file) {
+              return Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: _buildMedia(file),
+                ),
+              );
+            }).toList(),
+          ),
+          const Gap(8),
+          Row(
+            children: mediaFiles.sublist(2, mediaCount > 5 ? 5 : mediaCount).map((file) {
+              return Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: _buildMedia(file),
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      );
+    } else {
+      return Container(); // Fallback (optional)
+    }
+  }
+
+  Widget _buildSingleMedia(MediaFile file) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: _buildMedia(file),
     );
   }
 
-  Widget _buildMediaGrid(List<MediaFile> mediaList) {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
-        childAspectRatio: 1,
-      ),
-      itemCount: mediaList.length,
-      itemBuilder: (context, index) {
-        final media = mediaList[index];
-        return Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            color: Colors.grey[200],
-          ),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.insert_drive_file,
-                  size: 40,
-                  color: Colors.blueAccent,
-                ),
-                SizedBox(height: 8),
-                Text(
-                  media.file_name ?? "File",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 12),
-                ),
-              ],
-            ),
-          ),
-        );
+  Widget _buildMedia(MediaFile file) {
+    return GestureDetector(
+      onTap: () {
+        if (MediaFile.imageFormats.contains(file.extension)) {
+          Get.to(() => OnlineImageFullScreenDisplay(imageUrl: file.url ?? ''));
+        } else if (MediaFile.videoFormats.contains(file.extension)) {
+          Get.to(() => OnlineVideoPlayer(url: file.url ?? ''));
+        }
       },
+      child: MediaFile.imageFormats.contains(file.extension)
+          ? PreviewImage(url: file.url ?? '')
+          : MediaFile.videoFormats.contains(file.extension)
+              ? PreviewVideo(file: file)
+              : Center(
+                  child: Icon(Icons.file_present, size: 40, color: Colors.grey),
+                ),
     );
   }
 
-  Widget _buildCouncilSection(Council council) {
-    return ListTile(
-      title: Text(council.name ?? "Council Name"),
-      subtitle: Text(council.isActive == true ? "Active" : "Inactive"),
-      trailing: Text(
-        "ID: ${council.id ?? 'N/A'}",
-        style: TextStyle(fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-
-  Widget _buildCouncilPositionSection(CouncilPosition position) {
-    return ListTile(
-      leading: position.image != null
-          ? CircleAvatar(
-              backgroundImage: NetworkImage(position.image!),
-            )
-          : CircleAvatar(
-              child: Icon(Icons.person),
-            ),
-      title: Text(position.fullName ?? "No Name"),
-      subtitle: Text(position.position ?? "No Position"),
-      trailing: Text(
-        position.isLogin == true ? "Logged In" : "Offline",
-        style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-            color: position.isLogin == true ? Colors.green : Colors.red),
-      ),
-    );
-  }
-
-  Widget _buildRelatedModelSection(RelatedModel model) {
-    return ListTile(
-      title: Text("Type: ${model.type ?? "Unknown"}"),
-      subtitle: Text("ID: ${model.id ?? "N/A"}"),
+  Widget _buildCollection(Collection collection) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+       
+        CollectionChartWidget(collection: collection),
+        Gap(24),
+      ],
     );
   }
 }

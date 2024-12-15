@@ -56,7 +56,7 @@ class _OfficerHomePageState extends State<OfficerHomePage> with SingleTickerProv
   @override
   void initState() {
     super.initState();
-    tabController = TabController(length: tabs.length, vsync: this,initialIndex: 1);
+    tabController = TabController(length: tabs.length, vsync: this,initialIndex: 0);
     
     tabController.addListener(() {
     switch (tabController.index) {

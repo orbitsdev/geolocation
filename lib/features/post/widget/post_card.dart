@@ -99,9 +99,7 @@ class PostCard extends StatelessWidget {
           icon: const Icon(Icons.more_vert),
           onSelected: (value) {
             switch(value){
-              case 'view':
-              onView();
-              break;
+            
               case 'edit':
               onEdit();
               break;
@@ -119,13 +117,13 @@ class PostCard extends StatelessWidget {
             // }
           },
           itemBuilder: (context) => [
-            const PopupMenuItem(
-              value: 'view',
-              child: ListTile(
-                leading: Icon(Icons.remove_red_eye),
-                title: Text('View'),
-              ),
-            ),
+            // const PopupMenuItem(
+            //   value: 'view',
+            //   child: ListTile(
+            //     leading: Icon(Icons.remove_red_eye),
+            //     title: Text('View'),
+            //   ),
+            // ),
            if(post.owner(AuthController.controller.user.value.defaultPosition?.id)) PopupMenuItem(
               value: 'edit',
               child: ListTile(
