@@ -14,10 +14,10 @@ class RoleMiddleware extends GetMiddleware {
 
  
     if (user.hasAnyRole([Role.ADMIN])) {
-      return route == '/home-main' ? null : const RouteSettings(name: '/home-main');
+      return route == '/dashboard' ? null : const RouteSettings(name: '/dashboard');
     }
     if (user.hasAccess()) {
-      return route == '/home-main' ? null : const RouteSettings(name: '/home-main');
+      return route == '/dashboard' ? null : const RouteSettings(name: '/dashboard');
     }
 
     

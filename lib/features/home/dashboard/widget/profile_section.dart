@@ -10,6 +10,7 @@ import 'package:geolocation/features/notification/controller/notification_contro
 import 'package:geolocation/features/notification/notification_page.dart';
 import 'package:geolocation/features/settings/profile_page.dart';
 import 'package:get/get.dart';
+import 'package:heroicons/heroicons.dart';
 
 class ProfileSection extends StatefulWidget {
   const ProfileSection({Key? key}) : super(key: key);
@@ -42,75 +43,95 @@ class _ProfileSectionState extends State<ProfileSection> {
           child: Container(
             padding: const EdgeInsets.all(16),
             width: double.infinity, // Constrain the width to prevent unbounded errors
-            decoration: const BoxDecoration(
-              color: Colors.white,
+            decoration:  BoxDecoration(
+              // color: Colors.white,
+              // gradient: LinearGradient(colors: [
+              //   Palette.FGREEN1,
+              //   Palette.FGREEN2,
+              // ])
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
+            child: Column(
               children: [
+                  Container(height: 24,),
                 Row(
-                  mainAxisSize: MainAxisSize.min, // Prevent infinite width issues
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    RippleContainer(
-                      onTap: () => Get.to(() =>  ProfilePage()),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(40),
+                    Row(
+                      mainAxisSize: MainAxisSize.min, // Prevent infinite width issues
+                      children: [
+                       
+                        const Gap(16),
+                        Flexible(
+                          fit: FlexFit.loose, // Avoid forcing infinite width
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                fullName,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: Get.textTheme.titleLarge?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  // color: Palette.BLACK,
+                                ),
+                              ),
+                              Text(
+                                position,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: Get.textTheme.bodySmall?.copyWith(
+                                   color: Colors.white,
+                                  // color: Palette.BLACK,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        height: 60,
-                        width: 60,
-                        child: OnlineImage(
-                          imageUrl: authController.user.value.image ?? '',
-                          borderRadius: BorderRadius.circular(60),
-                        ),
-                      ),
+                      ],
                     ),
-                    const Gap(16),
-                    Flexible(
-                      fit: FlexFit.loose, // Avoid forcing infinite width
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            fullName,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: Get.textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Palette.BLACK,
+                    
+                    Row(
+                      children: [
+                        GetBuilder<NotificationController>(
+                          builder: (notificationController) {
+                            final unreadCount = notificationController.notifications
+                                    .where((notification) => notification.read_at == null)
+                                    .length;
+                                        
+                            return NotificationBadgeGlobal(
+                              iconSize: 34, 
+                              color: Colors.white,
+                              value: unreadCount,
+                              action: () {
+                                Get.to(
+                                  () =>  NotificationPage(),
+                                  transition: Transition.cupertino,
+                                );
+                              },
+                            );
+                          },
+                        ),
+                         RippleContainer(
+                          onTap: () => Get.to(() =>  ProfilePage()),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(40),
+                            ),
+                            height: 40,
+                           width: 40,
+                            child: OnlineImage(
+                              imageUrl: authController.user.value.image ?? '',
+                              borderRadius: BorderRadius.circular(60),
                             ),
                           ),
-                          Text(
-                            position,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: Get.textTheme.bodySmall?.copyWith(
-                              color: Palette.BLACK,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                        Gap(16),
+                      ],
                     ),
+                    
                   ],
-                ),
-                GetBuilder<NotificationController>(
-                  builder: (notificationController) {
-                    final unreadCount = notificationController.notifications
-                            .where((notification) => notification.read_at == null)
-                            .length ??
-                        0;
-
-                    return NotificationBadgeGlobal(
-                      value: unreadCount,
-                      action: () {
-                        Get.to(
-                          () =>  NotificationPage(),
-                          transition: Transition.cupertino,
-                        );
-                      },
-                    );
-                  },
                 ),
               ],
             ),

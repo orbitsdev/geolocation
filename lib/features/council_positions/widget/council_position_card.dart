@@ -26,17 +26,17 @@ class CouncilPositionCard extends StatelessWidget {
         return Stack(
         children: [
           Container(
-          
+
             decoration: BoxDecoration(
               color: Colors.white,
-           
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 8.0,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+            boxShadow: [
+      BoxShadow(
+        color: Colors.black,
+        blurRadius: 10,
+        spreadRadius: 8,
+        offset: Offset(0, 4),
+      ),
+    ],
             ),
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -51,7 +51,7 @@ class CouncilPositionCard extends StatelessWidget {
                         onTap: () => Get.to(() => OnlineImageFullScreenDisplay(imageUrl: position.image!)),
                         child: CircleAvatar(
                           radius: 25,
-                          backgroundColor: Colors.grey[200],
+                          backgroundColor: Palette.lightText,
                           child: OnlineImage(
                             imageUrl: position.image ?? '',
                             borderRadius: BorderRadius.circular(30),
@@ -71,7 +71,7 @@ class CouncilPositionCard extends StatelessWidget {
                                         fontWeight: FontWeight.bold
                                       )),
                                        if(position.userId == AuthController.controller.user.value.id)TextSpan(text: ' (You)',style: Get.textTheme.bodySmall?.copyWith(
-                                        color: Palette.ACTIVE
+                                        color: Palette.card2
                                       )),
                                   ])),
                                 ),
@@ -85,7 +85,7 @@ class CouncilPositionCard extends StatelessWidget {
                               position.position ?? 'Position not available',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.grey[600],
+                                color: Palette.lightText,
                               ),
                             ),
                           ],
@@ -186,7 +186,7 @@ class CouncilPositionCard extends StatelessWidget {
                                         fontWeight: FontWeight.bold
                                       )),
                                        if(position.userId == AuthController.controller.user.value.id)TextSpan(text: ' (You)',style: Get.textTheme.bodySmall?.copyWith(
-                                        color: Palette.ACTIVE
+                                        color:Palette.card3,
                                       )),
                                   ])),
                                 ),
@@ -230,7 +230,7 @@ class CouncilPositionCard extends StatelessWidget {
             top: 8,
             right: 8,
             child:Text('(Authorize)',style: Get.textTheme.bodySmall?.copyWith(
-              color: Colors.grey
+               color:Palette.lightText,
             ),))
         ],
       ),
@@ -253,9 +253,9 @@ class CouncilPositionCard extends StatelessWidget {
         ),
         Text(
           label,
-          style: const TextStyle(
+          style:  TextStyle(
             fontSize: 12,
-            color: Colors.grey,
+            color:Palette.lightText,
           ),
         ),
       ],

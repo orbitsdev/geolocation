@@ -24,13 +24,16 @@ class OverAllCard extends StatelessWidget {
       width: Get.size.width,
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
+        
         borderRadius: BorderRadius.circular(12),
         gradient: LinearGradient(
           colors: [
             // GamePalette.darkBackground,
-            Palette.PRIMARY,
-            Palette.PRIMARY
+            // Palette.FGREEN1,
+            // Palette.FGREEN1
             // GamePalette.tealGreen,
+            Colors.white,
+            Colors.white,
           ],
           begin: Alignment.bottomRight,
           end: Alignment.topLeft,
@@ -58,21 +61,22 @@ class OverAllCard extends StatelessWidget {
           // Title Section
           Text(
             title,
-            style: Get.textTheme.bodyLarge?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: GamePalette.textWhite,
+            style: Get.textTheme.bodyMedium?.copyWith(
+              // fontWeight: FontWeight.w600,
+              color: Palette.lightText,
+              // color: GamePalette.textWhite,
             ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
           // Count Section
           isLoading == true
-              ? CircularLoading()
+              ? CircularLoading(color: Palette.card1,)
               : Text(
                   '${count}',
                   style: Get.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: GamePalette.textWhite,
+                    color: Palette.text,
                   ),
                 ),
         ],

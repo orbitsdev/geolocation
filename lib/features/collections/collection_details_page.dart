@@ -159,7 +159,7 @@ import 'package:get/get.dart';
 class CollectionDetailsPage extends StatelessWidget {
   final Collection collection;
 
-  const CollectionDetailsPage({
+const CollectionDetailsPage({
     Key? key,
     required this.collection,
   }) : super(key: key);

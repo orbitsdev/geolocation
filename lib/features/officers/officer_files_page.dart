@@ -33,7 +33,7 @@ class _OfficerFilesPageState extends State<OfficerFilesPage> {
     newScrollController.addListener(() async {
       if (newScrollController.position.pixels >=
           newScrollController.position.maxScrollExtent - 200) {
-        mediaController.loadMediaOnScroll();
+          mediaController.loadMediaOnScroll();
       }
     });
       });
@@ -56,7 +56,7 @@ class _OfficerFilesPageState extends State<OfficerFilesPage> {
                 shrinkWrap: true,
                 physics: const AlwaysScrollableScrollPhysics(),
                 slivers: [
-                 SliverGap(8),
+                 SliverGap(24),
 controller.isLoading.value
     ? SliverAlignedGrid.count(
          crossAxisCount: 3,

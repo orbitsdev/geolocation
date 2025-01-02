@@ -14,7 +14,11 @@ class CouncilMemberProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      backgroundColor: Palette.bg,
+       appBar: AppBar(
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+),
       body: Obx(
         ()=>  RefreshIndicator(
           triggerMode: RefreshIndicatorTriggerMode.anywhere,
@@ -38,8 +42,8 @@ class CouncilMemberProfilePage extends StatelessWidget {
                      RippleContainer(onTap: ()=> Get.to(()=>  OnlineImageFullScreenDisplay(imageUrl:'${positionController.selectedMember.value.image}')),
           
                        child: Container(
-                        height: 80,
-                        width: 80,
+                        height: 60,
+                        width: 60,
                         
                         child: OnlineImage(imageUrl: '${positionController.selectedMember.value.image}', borderRadius: BorderRadius.circular(100),),),
                      ),
@@ -51,15 +55,15 @@ class CouncilMemberProfilePage extends StatelessWidget {
                             Text(
                               '${positionController.selectedMember.value.fullName}',
                               maxLines: 3,
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
+                              style: Get.textTheme.titleLarge?.copyWith(
+                                color: Palette.text,
+                                
                               ),
                             ),
                             Text(
                                                            '${positionController.selectedMember.value.email}',
-                              style:Get.textTheme.bodyLarge?.copyWith(
-                                color: Colors.grey[600],
+                              style:Get.textTheme.bodyMedium?.copyWith(
+                                color: Palette.lightText,
                               ),
                             ),
 
@@ -67,10 +71,10 @@ class CouncilMemberProfilePage extends StatelessWidget {
                               
                               text: TextSpan(text:'',children: [
                               TextSpan(text: '${positionController.selectedMember.value.position}',style: Get.textTheme.titleMedium?.copyWith(
-                                color: Colors.green
+                                color: Palette.card3,
                               )),
                               TextSpan(text: ' (${positionController.selectedMember.value.councilName})',style: Get.textTheme.titleMedium?.copyWith(
-                                color: Colors.green
+                                color: Palette.card3,
                               )),
                             ])),
                             // Text(
@@ -181,7 +185,7 @@ class CouncilMemberProfilePage extends StatelessWidget {
         child: Container(
          margin: EdgeInsets.symmetric(horizontal: 8),
           decoration: BoxDecoration(
-           color: Palette.LIGH_BACKGROUND_GREEN,
+           color: Colors.white,
              borderRadius: BorderRadius.circular(12),
           ),
           child: Padding(

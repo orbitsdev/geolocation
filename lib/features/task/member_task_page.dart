@@ -26,7 +26,7 @@ class MemberTaskPage extends StatefulWidget {
 }
 
 class _MemberTaskPageState extends State<MemberTaskPage> {
-  var taskController = Get.find<TaskController>();
+  var taskController = Get.put(TaskController());
   final ScrollController scrollController = ScrollController();
 
   @override
@@ -51,9 +51,11 @@ class _MemberTaskPageState extends State<MemberTaskPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Palette.LIGHT_BACKGROUND,
+      backgroundColor: Palette.bg,
       appBar:
-          AppBar(backgroundColor: Colors.white, title: Text('Tasks'), actions: [
+          AppBar(
+            surfaceTintColor: Colors.transparent,
+            backgroundColor: Colors.white, title: Text('Tasks'), actions: [
         TextButton.icon(
           onPressed: () {
             Get.to(() => CreatedOrEditPage(), transition: Transition.cupertino);
@@ -68,145 +70,93 @@ class _MemberTaskPageState extends State<MemberTaskPage> {
       body: RefreshIndicator(
         triggerMode: RefreshIndicatorTriggerMode.anywhere,
         onRefresh: () => taskController.loadTask(),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: GetBuilder<TaskController>(builder: (controller) {
-            return CustomScrollView(
-              controller: scrollController,
-              shrinkWrap: true,
-              physics: const AlwaysScrollableScrollPhysics(),
-              slivers: [
-                SliverGap(8),
-                controller.isLoading.value
-                    ? ToSliver(
-                        child: Center(child: CircularProgressIndicator()))
-                    : controller.tasks.isNotEmpty
-                        ? SliverAlignedGrid.count(
-                            crossAxisSpacing: 8,
-                            mainAxisSpacing: 16,
-                            itemCount: controller.tasks.length,
-                            // childCount: sampleProducts.length,
-                            crossAxisCount: 1,
-                            itemBuilder: (context, index) {
-                              Task task = controller.tasks[index];
-                              return Slidable(
-  key: Key(task.id.toString()),
-  endActionPane: ActionPane(
-    motion: const DrawerMotion(),
-    extentRatio: 0.5, // Adjust the ratio for more space
-    children: [
-      // Update Action
-      SlidableAction(
-      
-        onPressed: (context) {
-          if (task.id != null) {
-            Get.to(
-              () => CreatedOrEditPage(
-                isEditMode: true,
-                task: task,
+        child: GetBuilder<TaskController>(builder: (controller) {
+          return CustomScrollView(
+            controller: scrollController,
+            shrinkWrap: true,
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: [
+              SliverGap(8),
+              controller.isLoading.value
+                  ? ToSliver(
+                      child: Center(child: CircularProgressIndicator()))
+                  : controller.tasks.isNotEmpty
+                      ? SliverAlignedGrid.count(
+                          crossAxisSpacing: 8,
+                          mainAxisSpacing: 16,
+                          itemCount: controller.tasks.length,
+                          // childCount: sampleProducts.length,
+                          crossAxisCount: 1,
+                          itemBuilder: (context, index) {
+                            Task task = controller.tasks[index];
+                            return Slidable(
+          key: Key(task.id.toString()),
+          endActionPane: ActionPane(
+            motion: const DrawerMotion(),
+            extentRatio: 0.5, // Adjust the ratio for more space
+            children: [
+              // Update Action
+              SlidableAction(
+              
+                onPressed: (context) {
+        if (task.id != null) {
+          Get.to(
+            () => CreatedOrEditPage(
+              isEditMode: true,
+              task: task,
+            ),
+            transition: Transition.cupertino,
+          );
+        }
+                },
+                backgroundColor: Colors.green,
+                foregroundColor: Colors.white,
+                icon: Icons.edit,
+                label: 'Update',
+                autoClose: true,
               ),
-              transition: Transition.cupertino,
-            );
-          }
-        },
-        backgroundColor: Colors.green,
-        foregroundColor: Colors.white,
-        icon: Icons.edit,
-        label: 'Update',
-        autoClose: true,
-      ),
-
-      // Delete Action
-      SlidableAction(
-      
-        onPressed: (context) {
-          if (task.id != null) {
-            Modal.confirmation(
-              titleText: "Confirm Delete",
-              contentText: "Are you sure you want to delete this task? This action cannot be undone.",
-              onConfirm: () {
-                controller.deleteTask(task.id!);
-              },
-              onCancel: () {
-                Get.back();
-              },
-            );
-          }
-        },
-        backgroundColor: Colors.red,
-        foregroundColor: Colors.white,
-        icon: Icons.delete,
-        label: 'Delete',
-        autoClose: true,
-      ),
-    ],
-  ),
-  child: RippleContainer(
-    onTap: () {
-      taskController.selectTaskAndNavigateToFullDetails(task);
-    },
-    child: TaskCard2(task: task),
-  ),
-);
-
-                            })
-                        : ToSliver(child: Container()),
-                if (controller.isScrollLoading.value)
-                  ToSliver(
-                      child: const Center(child: CircularProgressIndicator())),
-              ],
-            );
-          }),
-
-          //   ListView(
-          //     children: [
-          //       RippleContainer(
-          //         child: AdminTaskCard(
-          //           title: 'Design Website Banner',
-          //           description: 'Create a promotional banner for the homepage.',
-          //           status: 'In Progress',
-          //           dueDate: 'Sep 15, 2024',
-          //           officerName: 'Jane Smith',
-          //           officerImageUrl: 'https://i.pravatar.cc/150?img=5',
-          //           officerPosition: 'Marketing Officer',
-          //           attachedFiles: exampleFiles ,
-          //         ),
-          //       ),
-          //       AdminTaskCard(
-          //   title: 'Design Website Banner',
-          //   description: 'Create a promotional banner for the homepage.',
-          //   status: 'In Progress',
-          //   dueDate: 'Sep 15, 2024',
-          //   officerName: 'Jane Smith',
-          //   officerImageUrl: 'https://i.pravatar.cc/150?img=5',
-          //   officerPosition: 'Marketing Officer',
-          //    attachedFiles: exampleFiles ,
-          // ),
-          //       AdminTaskCard(
-          //   title: 'Design Website Banner',
-          //   description: 'Create a promotional banner for the homepage.',
-          //   status: 'In Progress',
-          //   dueDate: 'Sep 15, 2024',
-          //   officerName: 'Jane Smith',
-          //   officerImageUrl: 'https://i.pravatar.cc/150?img=5',
-          //   officerPosition: 'Marketing Officer',
-          //    attachedFiles: exampleFiles ,
-
-          // ),
-          //       AdminTaskCard(
-          //   title: 'Design Website Banner',
-          //   description: 'Create a promotional banner for the homepage.',
-          //   status: 'In Progress',
-          //   dueDate: 'Sep 15, 2024',
-          //   officerName: 'Jane Smith',
-          //   officerImageUrl: 'https://i.pravatar.cc/150?img=5',
-          //   officerPosition: 'Marketing Officer',
-          //    attachedFiles: exampleFiles ,
-          // ),
-
-          //     ],
-          //   ),
-        ),
+        
+              // Delete Action
+              SlidableAction(
+              
+                onPressed: (context) {
+        if (task.id != null) {
+          Modal.confirmation(
+            titleText: "Confirm Delete",
+            contentText: "Are you sure you want to delete this task? This action cannot be undone.",
+            onConfirm: () {
+              controller.deleteTask(task.id!);
+            },
+            onCancel: () {
+              Get.back();
+            },
+          );
+        }
+                },
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+                icon: Icons.delete,
+                label: 'Delete',
+                autoClose: true,
+              ),
+            ],
+          ),
+          child: RippleContainer(
+            onTap: () {
+              taskController.selectTaskAndNavigateToFullDetails(task);
+            },
+            child: TaskCard2(task: task),
+          ),
+        );
+        
+                          })
+                      : ToSliver(child: Container()),
+              if (controller.isScrollLoading.value)
+                ToSliver(
+                    child: const Center(child: CircularProgressIndicator())),
+            ],
+          );
+        }),
       ),
     );
   }

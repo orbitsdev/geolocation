@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:geolocation/core/globalcontroller/modal_controller.dart';
 import 'package:geolocation/core/bindings/app_binding.dart';
 import 'package:geolocation/core/bindings/global_binding.dart';
@@ -9,6 +10,7 @@ import 'package:geolocation/core/modal/modal.dart';
 import 'package:geolocation/core/services/firebase_service.dart';
 import 'package:geolocation/core/services/notificaiton_service.dart';
 import 'package:geolocation/core/theme/app_theme.dart';
+import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:geolocation/features/auth/middleware/auth_middleware.dart';
 import 'package:geolocation/features/auth/middleware/guest_middleware.dart';
@@ -19,12 +21,14 @@ import 'package:geolocation/features/event/event_page.dart';
 import 'package:geolocation/features/globalpage/forbidden_page.dart';
 import 'package:geolocation/features/home/admin_home_main_page.dart';
 import 'package:geolocation/features/home/all_tab.dart';
+import 'package:geolocation/features/home/dashboard/dashboard_page.dart';
 import 'package:geolocation/features/home/middleware/full_access_middleware.dart';
 import 'package:geolocation/features/home/middleware/role_middleware.dart';
 import 'package:geolocation/features/map/sample_map.dart';
 import 'package:geolocation/features/council_positions/pages/council_member_position_list_page.dart';
 import 'package:geolocation/features/notification/notification_page.dart';
 import 'package:geolocation/features/officers/alltasks/task_main.dart';
+import 'package:geolocation/features/officers/officer_files_page.dart';
 import 'package:geolocation/features/playground/login_page_test.dart';
 import 'package:geolocation/features/playground/modal_test_page.dart';
 import 'package:geolocation/features/playground/officer_home_page.dart';
@@ -131,6 +135,12 @@ class _GeoLocationAppState extends State<GeoLocationApp>  with WidgetsBindingObs
   }
   @override
   Widget build(BuildContext context) { 
+
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Palette.card3 ,// Change this to your desired color
+      statusBarIconBrightness: Brightness.light, // For light icons
+      statusBarBrightness: Brightness.dark, // For iOS
+    ));
     return GetMaterialApp(
       theme: AppTheme.UI,
       debugShowCheckedModeBanner: false,
@@ -141,8 +151,9 @@ class _GeoLocationAppState extends State<GeoLocationApp>  with WidgetsBindingObs
         GetPage(name: '/login', page: () => LoginPage(), middlewares:[GuestMiddleware()]),
         GetPage(name: '/sign-up', page: () => SignupPage(),middlewares:[GuestMiddleware()]),
         GetPage(name: '/login-selection', page: () => LoginSelectionPage(), middlewares: []),
+        GetPage(name: '/dashboard', page: () => DashboardPage(), middlewares: [AuthMiddleware(),RoleMiddleware()]),
         
-        GetPage(name: '/home-main', page: () => AdminHomeMainPage(), middlewares: [AuthMiddleware(), RoleMiddleware()]),
+        // GetPage(name: '/home-main', page: () => AdminHomeMainPage(), middlewares: [AuthMiddleware(), RoleMiddleware()]),
         GetPage(name: '/home-officer', page: () => OfficerHomePage(), middlewares: [AuthMiddleware()]),
 
         GetPage(name: '/councils', page: () => CouncilListPage(), middlewares: []),
@@ -155,6 +166,7 @@ class _GeoLocationAppState extends State<GeoLocationApp>  with WidgetsBindingObs
 
         GetPage(name: '/notifications', page: () => NotificationPage(), middlewares: []),
         GetPage(name: '/posts', page: () => PostPage(), middlewares: []),
+        GetPage(name: '/files', page: () => OfficerFilesPage(), middlewares: []),
         
 
 

@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
+import 'package:geolocation/core/globalwidget/custom_app_bar_with_bg.dart';
 import 'package:geolocation/core/globalwidget/ripple_container.dart';
+import 'package:geolocation/core/globalwidget/to_sliver.dart';
 import 'package:geolocation/features/collections/controller/collection_controller.dart';
 import 'package:geolocation/features/event/controller/event_controller.dart';
+import 'package:geolocation/features/files/controller/media_controller.dart';
 import 'package:geolocation/features/home/dashboard/widget/over_all_card.dart';
 import 'package:geolocation/features/home/dashboard/widget/profile_section.dart';
+import 'package:geolocation/features/post/controller/post_controller.dart';
 import 'package:get/get.dart';
 import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
@@ -47,6 +51,9 @@ class _DashboardPageState extends State<DashboardPage> {
         TaskController.controller.loadTask(),
         EventController.controller.loadEvents(),
         CollectionController.controller.loadData(),
+        PostController.controller.loadData(),
+        MediaController.controller.loadMediaResources(),
+
       ]);
       }
     }
@@ -55,20 +62,21 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Palette.FBG,
-      body: SafeArea(
-        child: RefreshIndicator(
-          onRefresh: loadData,
-          child: CustomScrollView(
-            physics:  const AlwaysScrollableScrollPhysics(),
-            controller: scrollController,
-            slivers: [
-              ProfileSection(),
-              SliverGap(24),
-              // _buildDashboardTitle(),
-              _buildGridContent(),
-            ],
-          ),
+      
+      backgroundColor: Palette.card3,
+      body: RefreshIndicator(
+        onRefresh: loadData,
+        child: CustomScrollView(
+          physics:  const AlwaysScrollableScrollPhysics(),
+          controller: scrollController,
+          slivers: [
+
+            ProfileSection(),
+            // CustomAppBarWithBg(),
+            SliverGap(24),
+            // _buildDashboardTitle(),
+            _buildGridContent(),
+          ],
         ),
       ),
     );
@@ -121,7 +129,7 @@ class _DashboardPageState extends State<DashboardPage> {
       if (user.hasAccess()) {
         gridItems.addAll([
           _buildGridItem(
-            icon: FontAwesomeIcons.tasks,
+            icon: FontAwesomeIcons.userGroup,
             title: 'Members',
             count: positionController.councilMembers.length.toString(),
             isLoading: positionController.isPageLoading.value,
@@ -145,7 +153,7 @@ class _DashboardPageState extends State<DashboardPage> {
             onTap: () => Get.toNamed('/events'),
           ),
             _buildGridItem(
-            icon: FontAwesomeIcons.solidFolder,
+            icon: FontAwesomeIcons.coins,
             title: 'Collections',
             count: CollectionController.controller.collections.length.toString(),
             isLoading: CollectionController.controller.isPageLoading.value,
@@ -153,16 +161,19 @@ class _DashboardPageState extends State<DashboardPage> {
           ),
           _buildGridItem(
             icon: FontAwesomeIcons.bullhorn,
-            title: 'Posts',
-            count: '58',
+           title: 'Posts',
+            count: PostController.controller.posts.length.toString(),
+            isLoading: PostController.controller.isPageLoading.value,
             onTap: () => Get.toNamed('/posts'),
           ),
         
         
           _buildGridItem(
             icon: FontAwesomeIcons.folderOpen,
-            title: 'Files',
-            count: '87',
+             
+           title: 'Files',
+            count: MediaController.controller.mediaResources.length.toString(),
+            isLoading: MediaController.controller.isLoading.value,
             onTap: () => Get.toNamed('/files'),
           ),
         ]);
@@ -197,7 +208,7 @@ class _DashboardPageState extends State<DashboardPage> {
     return RippleContainer(
       onTap: onTap,
       child: OverAllCard(
-        icon: FaIcon(icon, size: 34, color: Colors.white),
+        icon: FaIcon(icon, size: 34, color:   Palette.card2,),
         title: title,
         count: count,
         isLoading: isLoading,

@@ -30,9 +30,11 @@ class CreateOrEditCouncilMemberPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        surfaceTintColor: Colors.transparent,
+        backgroundColor: Colors.white,
         title: Text(
           isEditMode ? 'Edit Member' : 'Add New Member',
-          style: Get.textTheme.titleMedium?.copyWith(color: Palette.PRIMARY),
+          // style: Get.textTheme.titleMedium?.copyWith(color: Palette.GREEN3),
         ),
       ),
       body: SingleChildScrollView(
@@ -55,8 +57,8 @@ class CreateOrEditCouncilMemberPage extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Palette.LIGHT_BACKGROUND,
-                      border: Border.all(width: 0.5, color: Palette.PRIMARY),
+                      color: Palette.bg,
+                      border: Border.all(width: 0.5, color: Palette.text),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
@@ -65,21 +67,21 @@ class CreateOrEditCouncilMemberPage extends StatelessWidget {
                             ? ClipOval(
                                 child: Image.network(
                                   controller.chosenUser.value!.image ?? '',
-                                  width: 50,
-                                  height: 50,
+                                  width: 40,
+                                  height: 40,
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) {
-                                    return const CircleAvatar(
+                                    return  CircleAvatar(
                                       radius: 25,
-                                      backgroundColor: Colors.grey,
+                                      backgroundColor: Palette.lightText,
                                       child: Icon(Icons.person, color: Colors.white),
                                     );
                                   },
                                 ),
                               )
-                            : const CircleAvatar(
+                            :  CircleAvatar(
                                 radius: 25,
-                                backgroundColor: Colors.grey,
+                                backgroundColor: Palette.lightText,
                                 child: Icon(Icons.person, color: Colors.white),
                               ),
                         const SizedBox(width: 16),
@@ -96,7 +98,7 @@ class CreateOrEditCouncilMemberPage extends StatelessWidget {
                                   : Text(
                                       'Select User',
                                       style: Get.textTheme.bodyMedium?.copyWith(
-                                        color: Colors.grey,
+                                        color: Palette.lightText,
                                       ),
                                     ),
                               const SizedBox(height: 4),
@@ -104,7 +106,7 @@ class CreateOrEditCouncilMemberPage extends StatelessWidget {
                                   ? Text(
                                       controller.chosenUser.value!.email ?? '',
                                       style: Get.textTheme.bodySmall?.copyWith(
-                                        color: Colors.grey,
+                                        color: Palette.lightText,
                                       ),
                                       overflow: TextOverflow.ellipsis,
                                     )
@@ -129,32 +131,34 @@ class CreateOrEditCouncilMemberPage extends StatelessWidget {
                 if (controller.positionOptions.isEmpty) {
                   return const Center(child: Text('No available positions found.'));
                 }
-                return FormBuilderDropdown<String>(
-                  dropdownColor: Colors.white,
-                  style: Get.textTheme.bodyMedium?.copyWith(),
-                  name: 'position',
-                  initialValue: position?.position ?? '',
-                  decoration: InputDecoration(
-                    labelText: 'Select Position',
-                    filled: true,
-                    fillColor: Palette.LIGHT_BACKGROUND,
-                    contentPadding:
-                        const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(width: 0.1, color: Palette.PRIMARY),
-                      borderRadius: BorderRadius.circular(12),
+                return SizedBox(
+                  child: FormBuilderDropdown<String>(
+                    dropdownColor: Colors.white,
+                    style: Get.textTheme.bodyMedium?.copyWith(),
+                    name: 'position',
+                    initialValue: position?.position ?? '',
+                    decoration: InputDecoration(
+                      labelText: 'Select Position',
+                      filled: true,
+                      fillColor: Palette.LIGHT_BACKGROUND,
+                      contentPadding:
+                          const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(width: 0.1, color: Palette.lightText),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
+                    validator: FormBuilderValidators.required(),
+                    items: controller.positionOptions.map((position) {
+                      return DropdownMenuItem(
+                        value: position.name,
+                        child: Text(position.name!),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      print('Selected position: $value');
+                    },
                   ),
-                  validator: FormBuilderValidators.required(),
-                  items: controller.positionOptions.map((position) {
-                    return DropdownMenuItem(
-                      value: position.name,
-                      child: Text(position.name!),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    print('Selected position: $value');
-                  },
                 );
               }),
               const Gap(16),
@@ -172,7 +176,7 @@ class CreateOrEditCouncilMemberPage extends StatelessWidget {
                     filled: true,
                     fillColor: Palette.LIGHT_BACKGROUND,
                     contentPadding:
-                        const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                        const EdgeInsets.symmetric(vertical: 2, horizontal: 16),
                     border: OutlineInputBorder(
                       borderSide: BorderSide(width: 0.1, color: Palette.PRIMARY),
                       borderRadius: BorderRadius.circular(12),
@@ -195,7 +199,7 @@ class CreateOrEditCouncilMemberPage extends StatelessWidget {
               width: Get.size.width,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Palette.PRIMARY,
+                  backgroundColor: Palette.card2,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),

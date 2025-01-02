@@ -253,7 +253,7 @@ Future<void> updateProfile() async {
         //  await fetchUserFromStorage();
         await loadTokenAndUser();
         await AuthController.controller.updateDeviceToken();
-        Get.offAllNamed('/home-main');
+        Get.offAllNamed('/dashboard');
       },
     );
 
@@ -290,7 +290,7 @@ Future<void> updateProfile() async {
           await SecureStorage().writeSecureData('user', jsonEncode(data['user']));
           await loadTokenAndUser();
            await AuthController.controller.updateDeviceToken();
-          Get.offAllNamed('/home-main');
+          Get.offAllNamed('/dashboard');
         },
       );
       isSignupLoading(false);
@@ -523,7 +523,7 @@ Future<void> updateProfile() async {
         Modal.success(
           message: 'Position switched successfully',
           onDismiss: () {
-            Get.offAllNamed('/home-main'); // Navigate to the main page
+            Get.offAllNamed('/dashboard'); // Navigate to the main page
           },
         );
       } catch (e) {

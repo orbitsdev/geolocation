@@ -11,12 +11,21 @@ class NotificationBadgeGlobal extends StatelessWidget {
   final VoidCallback action;
    Color? badgeColor; 
    Color? textColor; 
+   Color? color; 
+   double? width;
+   double? height;
+   double? iconSize;
+   
    NotificationBadgeGlobal({
     Key? key,
     required this.value,
     required this.action,
     this.badgeColor,
     this.textColor,
+    this.color,
+    this.width,
+    this.height,
+    this.iconSize,
   }) : super(key: key);
   @override
   Widget build(BuildContext context){
@@ -24,11 +33,11 @@ class NotificationBadgeGlobal extends StatelessWidget {
                                   onTap:  action,
                                   child: Container(
                                     decoration: BoxDecoration(
-                                      color: Palette.LIGH_BACKGROUND,
+                                      // color: Palette.LIGH_BACKGROUND,
                                       borderRadius: BorderRadius.circular(60),
                                     ),
                                     child: SizedBox(
-                                      height: 60,
+                                      height:60,
                                       width: 60,
                                       child: Stack(
                                         clipBehavior:
@@ -36,8 +45,11 @@ class NotificationBadgeGlobal extends StatelessWidget {
                                         children: [
                                           Center(
                                             child: HeroIcon(
+                                              size: iconSize ?? 24,
+                                              // style:HeroIconStyle.solid,
                                               HeroIcons.bell,
-                                              color: Palette.BLACK,
+                                              color: color ?? Palette.BLACK,
+                                              // color: Palette.BLACK,
                                             ),
                                           ),
                                           if (value > 0)
@@ -55,7 +67,7 @@ class NotificationBadgeGlobal extends StatelessWidget {
                                                   minWidth: 14,
                                                   minHeight: 14,
                                                 ),
-                                                child:Text( value > 0 ? '$value': '',
+                                                child:Text( value > 0 ? '$value': '0',
   style: Get.textTheme.bodySmall?.copyWith(
     color: Colors.white,
     fontWeight: FontWeight.bold,

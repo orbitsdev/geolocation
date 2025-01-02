@@ -69,4 +69,17 @@ static Color  FBGPRIMARY = Color(0xff3EB075);
     static Color GREEN0 = Color(0xffDCF5D4);
     static Color FGREEN1 = Color(0xff0ba360);
     static Color FGREEN2 = Color(0xff3cba92);
+
+
+
+    // new theme
+    static Color  text =Colors.black;
+    static Color  lightText = Color(0xff666666);
+    static Color  orange = Color(0xffE97522);
+    static Color  lightOrange = Color(0xffFFF5EE);
+    static Color  bg = Color(0xffFBFBFB);
+    // static Color  bg = Color(0xffF9F9F9);
+    static Color  card1 = Color(0xff00A644);
+    static Color  card2 = Color(0xff0CAF57);
+    static Color  card3 = Color(0xff00431E);
 }

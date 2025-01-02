@@ -9,7 +9,7 @@ class AuthMiddleware extends GetMiddleware {
     var authController = Get.find<AuthController>();
 
     if (authController.token.value.isEmpty == true) {
-      return RouteSettings(name: '/login');
+      return RouteSettings(name: '/dashboard');
     }
 
     return null;
