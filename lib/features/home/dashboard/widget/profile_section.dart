@@ -10,7 +10,6 @@ import 'package:geolocation/features/notification/controller/notification_contro
 import 'package:geolocation/features/notification/notification_page.dart';
 import 'package:geolocation/features/settings/profile_page.dart';
 import 'package:get/get.dart';
-import 'package:heroicons/heroicons.dart';
 
 class ProfileSection extends StatefulWidget {
   const ProfileSection({Key? key}) : super(key: key);
@@ -42,28 +41,25 @@ class _ProfileSectionState extends State<ProfileSection> {
         return ToSliver(
           child: Container(
             padding: const EdgeInsets.all(16),
-            width: double.infinity, // Constrain the width to prevent unbounded errors
-            decoration:  BoxDecoration(
-              // color: Colors.white,
-              // gradient: LinearGradient(colors: [
-              //   Palette.FGREEN1,
-              //   Palette.FGREEN2,
-              // ])
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.white, // Light background
+              borderRadius: BorderRadius.circular(12),
             ),
             child: Column(
               children: [
-                  Container(height: 24,),
+                const SizedBox(height: 24),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+                    // Profile Section
                     Row(
-                      mainAxisSize: MainAxisSize.min, // Prevent infinite width issues
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                       
                         const Gap(16),
                         Flexible(
-                          fit: FlexFit.loose, // Avoid forcing infinite width
+                          fit: FlexFit.loose,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -73,8 +69,7 @@ class _ProfileSectionState extends State<ProfileSection> {
                                 overflow: TextOverflow.ellipsis,
                                 style: Get.textTheme.titleLarge?.copyWith(
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  // color: Palette.BLACK,
+                                  color: Palette.deYork900, // Dark green text
                                 ),
                               ),
                               Text(
@@ -82,8 +77,7 @@ class _ProfileSectionState extends State<ProfileSection> {
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: Get.textTheme.bodySmall?.copyWith(
-                                   color: Colors.white,
-                                  // color: Palette.BLACK,
+                                  color: Palette.deYork700, // Mid-tone green
                                 ),
                               ),
                             ],
@@ -91,46 +85,46 @@ class _ProfileSectionState extends State<ProfileSection> {
                         ),
                       ],
                     ),
-                    
+                    // Notification and Profile Section
                     Row(
                       children: [
                         GetBuilder<NotificationController>(
                           builder: (notificationController) {
                             final unreadCount = notificationController.notifications
-                                    .where((notification) => notification.read_at == null)
-                                    .length;
-                                        
+                                .where((notification) => notification.read_at == null)
+                                .length;
+
                             return NotificationBadgeGlobal(
-                              iconSize: 34, 
-                              color: Colors.white,
+                              iconSize: 34,
+                              color: Palette.deYork600, // Icon color
                               value: unreadCount,
                               action: () {
                                 Get.to(
-                                  () =>  NotificationPage(),
+                                  () => NotificationPage(),
                                   transition: Transition.cupertino,
                                 );
                               },
                             );
                           },
                         ),
-                         RippleContainer(
-                          onTap: () => Get.to(() =>  ProfilePage()),
+                        RippleContainer(
+                          onTap: () => Get.to(() => ProfilePage()),
                           child: Container(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(40),
+                              color: Palette.deYork200, // Background for profile image
                             ),
                             height: 40,
-                           width: 40,
+                            width: 40,
                             child: OnlineImage(
                               imageUrl: authController.user.value.image ?? '',
                               borderRadius: BorderRadius.circular(60),
                             ),
                           ),
                         ),
-                        Gap(16),
+                        const Gap(16),
                       ],
                     ),
-                    
                   ],
                 ),
               ],

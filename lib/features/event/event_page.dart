@@ -12,6 +12,8 @@ import 'package:geolocation/features/event/controller/event_controller.dart';
 import 'package:geolocation/features/event/create_event_page.dart';
 import 'package:geolocation/features/event/model/event.dart';
 import 'package:geolocation/features/event/widgets/event_card.dart';
+import 'package:geolocation/features/event/widgets/event_card2.dart';
+import 'package:geolocation/features/event/widgets/event_card3.dart';
 import 'package:get/get.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
@@ -96,9 +98,12 @@ class _EventPageState extends State<EventPage> {
                               crossAxisCount: 1,
                               itemBuilder: (context, index) {
                                 Event event = controller.events[index];
-                                return RippleContainer(
-                                  onTap: () {
-                                    Modal.showEventOptions(
+                                return EventCard3(
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 0),
+                                  width: Get.size.width,
+                                  event: event, onView: (){ 
+                                     Modal.showEventOptions(
                                       event: event,
                                       onViewDetails: () async {
                                         Get.back();
@@ -118,7 +123,7 @@ class _EventPageState extends State<EventPage> {
                                       },
                                       onViewAttendance: () {
                                         if (event.id != null) {
-                                          Get.back();
+                                          // Get.back();
                                           // AttendanceController.controller
                                           //     .selectAndNavigateToAttendanceRecord(
                                           //         event);
@@ -149,9 +154,7 @@ class _EventPageState extends State<EventPage> {
                                         }
                                       },
                                     );
-                                  },
-                                  child: EventCard(event: event),
-                                );
+                                },);
                               },
                             )
                           : ToSliver(

@@ -173,4 +173,8 @@ class CouncilPosition {
     return 'CouncilPosition(id: $id, councilId: $councilId, councilName: $councilName, userId: $userId, fullName: $fullName, image: $image,email: $email, position: $position, isLogin: $isLogin, grantAccess: $grantAccess, totalToDoTasks: $totalToDoTasks, totalInProgressTasks: $totalInProgressTasks, totalCompletedTasks: $totalCompletedTasks, totalNeedsRevision: $totalNeedsRevision, totalRejected: $totalRejected)';
   }
 
+
+   bool owner(int? positionId) {
+    return id == positionId;
+  }
 }

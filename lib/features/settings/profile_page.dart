@@ -15,19 +15,24 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Palette.gray100,
       appBar: AppBar(
-        
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back, color: Palette.gray900),
           onPressed: () {
             Get.back();
           },
         ),
-        title: const Text("Profile"),
+        title: Text(
+          "Profile",
+          style: TextStyle(
+            color: Palette.gray900,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Palette.FBG
-      
+        backgroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -38,39 +43,55 @@ class ProfilePage extends StatelessWidget {
               final defaultPosition = user.defaultPosition;
 
               return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Gap(20),
+                  Gap(20),
+
                   // User Details Section
                   _buildUserDetails(user),
 
-                  const Gap(20),
-                  Divider(color: Colors.grey.shade300, thickness: 1),
-
+               
                   // Council Details Section
-                  if (defaultPosition != null) _buildCouncilDetailsCard(defaultPosition),
+                  if (defaultPosition != null)
+                    _buildCouncilDetailsCard(defaultPosition),
 
-                  const Gap(10),
-             
-
+               
                   // Action Buttons Section
-                  if((controller.user.value.councilPositions ??[]).isNotEmpty)_buildActionButtons(controller),
-                   const Gap(10),
-    
+                  if ((controller.user.value.councilPositions ?? []).isNotEmpty)
+                    _buildActionButtons(controller),
 
-        // Edit Profile and Log Out Buttons
-       
-        _buildListTile(
-          icon: Icons.logout,
-          
-          title: "Log Out",
-          onTap: () {
-            controller.logout();
-          },
-        ),
+               
+                  // Log Out Button
+                  _buildListTile(
+                    icon: Icons.logout,
+                    title: "Log Out",
+                    color: Palette.deYork700,
+                    onTap: () {
+                      controller.logout();
+                    },
+                  ),
                 ],
               );
             },
+          ),
+          
+        ),
+        
+      ),
+      bottomNavigationBar: BottomAppBar(
+        color: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          child: Center(
+            child: Text(
+              "Geolocation v1.0.0",
+              style: TextStyle(
+                color: Palette.gray600,
+                fontSize: 12,
+              ),
+            ),
           ),
         ),
       ),
@@ -79,131 +100,159 @@ class ProfilePage extends StatelessWidget {
 
   // User Details Section
   Widget _buildUserDetails(User user) {
-    return Center(
-  child: Column(
-    children: [
-      SizedBox(
-        height: 100,
-        width: 100,
-        child: Stack(
-          children: [
-            // User Image
-            ClipOval(
-              child: OnlineImage(imageUrl: '${user.image}'),
-            ),
-            // Edit Icon
-            Positioned(
-              bottom: 0,
-              right: 0,
-              child: GestureDetector(
-                onTap: () {
-            Get.to(()=>  EditProfilePage());
-          },
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Palette.GREEN3, // Background color for the icon
-                    shape: BoxShape.circle,
-                  ),
-                  padding: const EdgeInsets.all(4),
-                  child: const Icon(
-                    Icons.edit,
-                    size: 20,
-                    color: Colors.white,
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(topLeft: Radius.circular(16), topRight: Radius.circular(16)),
+        boxShadow: [
+          BoxShadow(
+            color: Palette.gray300.withOpacity(0.3),
+            blurRadius: 8,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(20.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Stack(
+            children: [
+              Container(
+                  width: 100,
+                  height: 100,
+                child: OnlineImage(
+                  borderRadius: BorderRadius.circular(100),
+                  imageUrl: user.image ?? '',
+                
+                  fit: BoxFit.cover,
+                ),
+              ),
+              Positioned(
+                bottom: 0,
+                right: 0,
+                child: GestureDetector(
+                  onTap: () {
+                    Get.to(() => EditProfilePage());
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Palette.deYork600,
+                      shape: BoxShape.circle,
+                    ),
+                    padding: const EdgeInsets.all(6),
+                    child: Icon(
+                      Icons.edit,
+                      size: 20,
+                      color: Palette.gray50,
+                    ),
                   ),
                 ),
               ),
+            ],
+          ),
+          Gap(16),
+          Text(
+            user.fullName ?? 'N/A',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Palette.gray900,
             ),
-          ],
-        ),
+          ),
+          Text(
+            user.email ?? 'N/A',
+            style: TextStyle(
+              fontSize: 16,
+              color: Palette.gray600,
+            ),
+          ),
+        ],
       ),
-      const Gap(10),
-      Text(
-        "${user.fullName}",
-        style: const TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      Text(
-        "${user.email}",
-        style: const TextStyle(
-          fontSize: 16,
-          color: Colors.grey,
-        ),
-      ),
-    ],
-  ),
-);
-
+    );
   }
 
   // Council Details Card Section
   Widget _buildCouncilDetailsCard(CouncilPosition defaultPosition) {
     return Container(
-     decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-     ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              defaultPosition.councilName ?? "No Council",
-              style:  TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Palette.GREEN3,
-              ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        // borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Palette.gray300.withOpacity(0.3),
+            blurRadius: 8,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            defaultPosition.councilName ?? "No Council",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Palette.deYork700,
             ),
-            Text(
-              defaultPosition.position ?? "No Position",
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.grey,
-              ),
+          ),
+          Gap(8),
+          Text(
+            defaultPosition.position ?? "No Position",
+            style: TextStyle(
+              fontSize: 14,
+              color: Palette.gray600,
             ),
-            Gap(8),
-            Divider(height: 16,)
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
   // Action Buttons Section
   Widget _buildActionButtons(AuthController controller) {
-    return Column(
-      children: [
-
-            Divider(color: Colors.grey.shade300, thickness: 1),
-        // Switch Position Button
-        TextButton.icon(
-          onPressed: () {
-            Get.to(()=> SwitchPositionPage());
-            // Add logic for switching position or account
-          },
-          icon: const Icon(
-            Icons.swap_horiz,
-            color: Colors.green,
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        // borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Palette.gray300.withOpacity(0.3),
+            blurRadius: 8,
+            offset: Offset(0, 4),
           ),
-          label: const Text(
-            "Switch Position",
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.green,
+        ],
+      ),
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          TextButton.icon(
+            onPressed: () {
+              Get.to(() => SwitchPositionPage());
+            },
+            icon: Icon(
+              Icons.swap_horiz,
+              color: Palette.deYork500,
+            ),
+            label: Text(
+              "Switch Position",
+              style: TextStyle(
+                fontSize: 16,
+                color: Palette.deYork500,
+              ),
+            ),
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              backgroundColor: Palette.deYork50,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
             ),
           ),
-          style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            backgroundColor: Colors.green.shade50,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-          ),
-        ),
-            Divider(color: Colors.grey.shade300, thickness: 1),
-      ],
+        ],
+      ),
     );
   }
 
@@ -211,24 +260,41 @@ class ProfilePage extends StatelessWidget {
   Widget _buildListTile({
     required IconData icon,
     required String title,
+    required Color color,
     required VoidCallback onTap,
   }) {
-    return ListTile(
-      leading: Container(
-        padding: EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: Palette.LIGHT_BACKGROUND,
-          borderRadius: BorderRadius.circular(40)
-          
-
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Palette.gray300.withOpacity(0.3),
+            blurRadius: 8,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      child: ListTile(
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Palette.gray200,
+            borderRadius: BorderRadius.circular(40),
+          ),
+          child: Icon(icon, color: Palette.gray900),
         ),
-        child: Icon(icon, color: Palette.TEXT_DARK,)),
-      title: Text(title, style: Get.textTheme.bodyLarge?.copyWith(
-        fontWeight: FontWeight.bold,
-        color: Palette.RED
-      
-      ),),
-      onTap: onTap,
+        title: Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: color,
+          ),
+        ),
+        onTap: onTap,
+      ),
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:geolocation/core/globalwidget/images/online_image.dart';
+import 'package:geolocation/core/theme/palette.dart';
 import 'package:get/get.dart';
 import 'package:geolocation/features/council_positions/controller/council_position_controller.dart';
 import 'package:geolocation/features/auth/model/available_user.dart';
@@ -44,7 +45,10 @@ class _AvailableUserSelectionPageState extends State<AvailableUserSelectionPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Palette.gray100, // Subtle gray background
       appBar: AppBar(
+        surfaceTintColor: Colors.transparent,
+        backgroundColor: Colors.white,
         title: const Text('Select User'),
         bottom: PreferredSize(
           preferredSize: Size(double.infinity, 60),
@@ -72,18 +76,30 @@ class _AvailableUserSelectionPageState extends State<AvailableUserSelectionPage>
           return const Center(child: Text('No users found.'));
         }
 
-        return ListView.builder(
+        return ListView.separated(
           itemCount: controller.filteredUsers.length,
+          separatorBuilder: (context, index) => Divider(
+            color: Palette.gray200, // Divider color for distinction
+            thickness: 0.5,
+            height: 1,
+          ),
           itemBuilder: (context, index) {
             final AvailableUser user = controller.filteredUsers[index];
             return ListTile(
+              tileColor: Colors.white,
               leading: Container(
                 width: 40,
                 height: 40,
                 child: OnlineImage(imageUrl: '${user.image}'),
               ),
-              title: Text('${user.firstName} ${user.lastName}'),
-              subtitle: Text(user.email ?? ''),
+              title: Text(
+                '${user.firstName} ${user.lastName}',
+                style: TextStyle(color: Palette.text),
+              ),
+              subtitle: Text(
+                user.email ?? '',
+                style: TextStyle(color: Palette.lightText),
+              ),
               onTap: () {
                 Get.back(result: user); // Return the selected user
               },

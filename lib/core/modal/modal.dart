@@ -10,6 +10,8 @@ import 'package:geolocation/core/globalwidget/images/local_lottie_image.dart';
 import 'package:geolocation/core/globalwidget/loading_widget.dart';
 import 'package:geolocation/core/globalwidget/ripple_container.dart';
 import 'package:geolocation/core/theme/palette.dart';
+import 'package:geolocation/features/auth/controller/auth_controller.dart';
+import 'package:geolocation/features/auth/model/council_position.dart';
 import 'package:geolocation/features/collections/create_or_edit_collection_page.dart';
 import 'package:geolocation/features/event/model/event.dart';
 import 'package:geolocation/features/post/create_or_edit_post_page.dart';
@@ -697,9 +699,166 @@ static Future<bool> confirmation2({
   }
 
 
+// static void showEventOptions({
+//   required Event event,
+
+//   required VoidCallback onViewDetails,
+//   required VoidCallback onViewAttendance,
+//   required VoidCallback onUpdateEvent,
+//   required VoidCallback onDeleteEvent,
+// }) {
+//   Get.bottomSheet(
+//     Container(
+//       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+//       decoration: BoxDecoration(
+//         color: Palette.BACKGROUND, // Use the correct background color
+//         borderRadius: const BorderRadius.only(
+//           topLeft: Radius.circular(16),
+//           topRight: Radius.circular(16),
+//         ),
+//         boxShadow: [
+//           BoxShadow(
+//             color: Colors.black.withOpacity(0.1),
+//             blurRadius: 10,
+//             offset: const Offset(0, -4),
+//           ),
+//         ],
+//       ),
+//       child: Column(
+//         mainAxisSize: MainAxisSize.min,
+//         children: [
+//           // Header with Close Button
+//           Row(
+//             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//             children: [
+//               Row(
+//                 children: [
+//                   Icon(
+//                     Icons.event,
+//                     size: 28,
+//                     color: Palette.TEXT_DARK, // Text dark color
+//                   ), // Event icon
+//                   const SizedBox(width: 8),
+//                   Text(
+//                     'Event Options',
+//                     style: TextStyle(
+//                       fontWeight: FontWeight.bold,
+//                       fontSize: 18,
+//                       color: Palette.TEXT_DARK,
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//               GestureDetector(
+//                 onTap: () => Get.back(),
+//                 child: Icon(
+//                   Icons.close,
+//                   color: Palette.LIGHT_TEXT, // Light text color for close button
+//                 ),
+//               ),
+//             ],
+//           ),
+//           const SizedBox(height: 16),
+
+//           _buildOption(
+//             icon: Icons.info_outline,
+//             text: 'View Event Details',
+//             onTap: onViewDetails,
+//             iconColor: Palette.DARK_PRIMARY,
+//           ),
+//           const SizedBox(height: 12),
+//           _buildOption(
+//             icon: Icons.access_time,
+//             text: 'View Attendance',
+//             onTap: onViewAttendance,
+//             iconColor: Palette.DARK_PRIMARY,
+//           ),
+//           const SizedBox(height: 12),
+//           _buildOption(
+//             icon: Icons.edit,
+//             text: 'Update Event',
+//             onTap: onUpdateEvent,
+//             iconColor: Palette.DARK_PRIMARY,
+//           ),
+//           const SizedBox(height: 12),
+//           _buildOption(
+//             icon: Icons.delete_outline,
+//             text: 'Delete Event',
+//             onTap: onDeleteEvent,
+//             iconColor: Palette.DARK_PRIMARY,
+//           ),
+//         ],
+//       ),
+//     ),
+//     isScrollControlled: true,
+//     backgroundColor: Colors.transparent,
+//   );
+// }
+
+// static Widget _buildOption({
+//   required IconData icon,
+//   required String text,
+//   required VoidCallback onTap,
+//    Color? iconColor,
+// }) {
+//   return RippleContainer(
+//     onTap: onTap,
+//     child: Row(
+//       children: [
+//         Icon(
+//           icon,
+//           size: 24,
+//           color: iconColor ?? null, // Use the correct color for the icon
+//         ),
+//         const SizedBox(width: 12),
+//         Text(
+//           text,
+//           style: TextStyle(
+//             fontSize: 16,
+//             fontWeight: FontWeight.w500,
+//             color: Palette.TEXT_DARK, // Text dark color for options
+//           ),
+//         ),
+//       ],
+//     ),
+//   );
+// }
+
+
+// //
+// static showCollectionMenu() {
+//   Get.bottomSheet(
+//     Wrap(
+//       children: [
+//         ListTile(
+//           leading: Icon(Icons.edit),
+//           title: Text('Edit Collection'),
+//           onTap: () {
+//             // Handle edit action
+//             Get.back(); // Close the bottom sheet
+//           },
+//         ),
+//         ListTile(
+//           leading: Icon(Icons.delete),
+//           title: Text('Delete Collection'),
+//           onTap: () {
+//             // Handle delete action
+//             Get.back(); // Close the bottom sheet
+//           },
+//         ),
+//       ],
+//     ),
+//     isScrollControlled: true,
+//     backgroundColor: Colors.white,
+//     shape: RoundedRectangleBorder(
+//       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+//     ),
+//   );
+// }
+
+
 static void showEventOptions({
   required Event event,
-
   required VoidCallback onViewDetails,
   required VoidCallback onViewAttendance,
   required VoidCallback onUpdateEvent,
@@ -707,13 +866,10 @@ static void showEventOptions({
 }) {
   Get.bottomSheet(
     Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Palette.BACKGROUND, // Use the correct background color
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(16),
-          topRight: Radius.circular(16),
-        ),
+        color: Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(16.0)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
@@ -724,66 +880,95 @@ static void showEventOptions({
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header with Close Button
+          // Header
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Icon(
-                    Icons.event,
-                    size: 28,
-                    color: Palette.TEXT_DARK, // Text dark color
-                  ), // Event icon
-                  const SizedBox(width: 8),
-                  Text(
-                    'Event Options',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                      color: Palette.TEXT_DARK,
-                    ),
-                  ),
-                ],
-              ),
-              GestureDetector(
-                onTap: () => Get.back(),
-                child: Icon(
-                  Icons.close,
-                  color: Palette.LIGHT_TEXT, // Light text color for close button
+              Text(
+                'Event Options',
+                style: Get.textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
                 ),
+              ),
+              IconButton(
+                icon: Icon(Icons.close, color: Palette.gray600),
+                onPressed: () => Get.back(),
               ),
             ],
           ),
           const SizedBox(height: 16),
 
-          _buildOption(
-            icon: Icons.info_outline,
-            text: 'View Event Details',
-            onTap: onViewDetails,
-            iconColor: Palette.DARK_PRIMARY,
+          // View Event Details
+          ListTile(
+            leading: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.blue.shade50,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(Icons.info_outline, color: Colors.blue.shade700),
+            ),
+            title: const Text('View Event Details'),
+            onTap: () {
+              Get.back(); // Close the modal
+              onViewDetails();
+            },
           ),
-          const SizedBox(height: 12),
-          _buildOption(
-            icon: Icons.access_time,
-            text: 'View Attendance',
-            onTap: onViewAttendance,
-            iconColor: Palette.DARK_PRIMARY,
+          const Divider(),
+
+          // View Attendance
+          ListTile(
+            leading: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.green.shade50,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(Icons.access_time, color: Colors.green.shade700),
+            ),
+            title: const Text('View Attendance'),
+            onTap: () {
+              Get.back(); // Close the modal
+              onViewAttendance();
+            },
           ),
-          const SizedBox(height: 12),
-          _buildOption(
-            icon: Icons.edit,
-            text: 'Update Event',
-            onTap: onUpdateEvent,
-            iconColor: Palette.DARK_PRIMARY,
+          const Divider(),
+
+          // Update Event
+          ListTile(
+            leading: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.orange.shade50,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(Icons.edit, color: Colors.orange.shade700),
+            ),
+            title: const Text('Update Event'),
+            onTap: () {
+              Get.back(); // Close the modal
+              onUpdateEvent();
+            },
           ),
-          const SizedBox(height: 12),
-          _buildOption(
-            icon: Icons.delete_outline,
-            text: 'Delete Event',
-            onTap: onDeleteEvent,
-            iconColor: Palette.DARK_PRIMARY,
+          const Divider(),
+
+          // Delete Event
+          ListTile(
+            leading: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.red.shade50,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(Icons.delete_outline, color: Colors.red.shade700),
+            ),
+            title: const Text('Delete Event'),
+            onTap: () {
+              Get.back(); // Close the modal
+              onDeleteEvent();
+            },
           ),
         ],
       ),
@@ -792,68 +977,6 @@ static void showEventOptions({
     backgroundColor: Colors.transparent,
   );
 }
-
-static Widget _buildOption({
-  required IconData icon,
-  required String text,
-  required VoidCallback onTap,
-   Color? iconColor,
-}) {
-  return RippleContainer(
-    onTap: onTap,
-    child: Row(
-      children: [
-        Icon(
-          icon,
-          size: 24,
-          color: iconColor ?? null, // Use the correct color for the icon
-        ),
-        const SizedBox(width: 12),
-        Text(
-          text,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            color: Palette.TEXT_DARK, // Text dark color for options
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
-
-//
-static showCollectionMenu() {
-  Get.bottomSheet(
-    Wrap(
-      children: [
-        ListTile(
-          leading: Icon(Icons.edit),
-          title: Text('Edit Collection'),
-          onTap: () {
-            // Handle edit action
-            Get.back(); // Close the bottom sheet
-          },
-        ),
-        ListTile(
-          leading: Icon(Icons.delete),
-          title: Text('Delete Collection'),
-          onTap: () {
-            // Handle delete action
-            Get.back(); // Close the bottom sheet
-          },
-        ),
-      ],
-    ),
-    isScrollControlled: true,
-    backgroundColor: Colors.white,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-    ),
-  );
-}
-
 
 
 static void showCreationModal() {
@@ -1023,6 +1146,98 @@ static void showEventActionModal({
   );
 }
 
+
+static void showMemberActionModal(
+   
+  {
+  required CouncilPosition position,
+    required VoidCallback onViewMember,
+    required VoidCallback onEditMember,
+    required VoidCallback onDeleteMember,
+  }) {
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(16.0),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            Text(
+              'Choose Action',
+              style: Get.textTheme.bodyLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // View Member
+            ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.blue.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(Icons.person, color: Colors.blue.shade700),
+              ),
+              title: const Text('View Member'),
+              subtitle: const Text('View the member profile and details.'),
+              onTap: () {
+                Get.back(); // Close the modal
+                onViewMember();
+              },
+            ),
+            const Divider(),
+
+            // Edit Member
+            // ListTile(
+            //   leading: Container(
+            //     padding: const EdgeInsets.all(8),
+            //     decoration: BoxDecoration(
+            //       color: Colors.orange.shade50,
+            //       borderRadius: BorderRadius.circular(8),
+            //     ),
+            //     child: Icon(Icons.edit, color: Colors.orange.shade700),
+            //   ),
+            //   title: const Text('Edit Member'),
+            //   subtitle: const Text('Modify member details and information.'),
+            //   onTap: () {
+            //     Get.back(); // Close the modal
+            //     onEditMember();
+            //   },
+            // ),
+            // const Divider(),
+
+            // Delete Member
+           if(!position.owner(AuthController.controller.user.value.defaultPosition?.id as int)&& position.grantAccess == false) ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(Icons.delete, color: Colors.red.shade700),
+              ),
+              title: const Text('Delete Member'),
+              subtitle: const Text(
+                'Remove this member permanently.',
+              ),
+              onTap: () {
+                Get.back(); // Close the modal
+                onDeleteMember();
+              },
+            ),
+          ],
+        ),
+      ),
+      isScrollControlled: true,
+    );
+  }
 }
 
 

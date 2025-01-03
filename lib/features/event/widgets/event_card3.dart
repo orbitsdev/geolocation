@@ -66,7 +66,7 @@ class EventCard3 extends StatelessWidget {
                     colors: [
                       // Palette.BLACK.withOpacity(0.7),
                       // Palette.GREEN3.withOpacity(0.1),
-                      Palette.PRIMARY.withOpacity(0.95), Palette.GREEN2.withOpacity(0.30)
+                      Palette.deYork900, Palette.deYork600.withOpacity(0.30)
                     ],
                     begin: Alignment.bottomCenter,
                     end: Alignment.topCenter,

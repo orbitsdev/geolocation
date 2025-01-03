@@ -59,10 +59,11 @@ class OfficerCard extends StatelessWidget {
               '(${officer.position})',
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.grey,
+                color: Palette.lightText,
               ),
               textAlign: TextAlign.center,
             ),
+            Gap(4),
              Text(
               '(${officer.email})',
               style: Get.textTheme.bodySmall,

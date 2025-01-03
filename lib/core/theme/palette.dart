@@ -82,4 +82,31 @@ static Color  FBGPRIMARY = Color(0xff3EB075);
     static Color  card1 = Color(0xff00A644);
     static Color  card2 = Color(0xff0CAF57);
     static Color  card3 = Color(0xff00431E);
+
+
+  static const Color gray50 = Color(0xFFFAFAFA);  // Very light gray
+  static const Color gray100 = Color(0xFFF5F5F5); // Light gray
+  static const Color gray200 = Color(0xFFEEEEEE); // Neutral gray
+  static const Color gray300 = Color(0xFFE0E0E0); // Soft gray
+  static const Color gray400 = Color(0xFFBDBDBD); // Mid-tone gray
+  static const Color gray500 = Color(0xFF9E9E9E); // Standard gray
+  static const Color gray600 = Color(0xFF757575); // Slightly darker gray
+  static const Color gray700 = Color(0xFF616161); // Dark gray
+  static const Color gray800 = Color(0xFF424242); // Very dark gray
+  static const Color gray900 = Color(0xFF212121); // Almost black
+  static const Color gray950 = Color(0xFF121212); // Deep black gray
+
+static Color deYork50 = Color(0xfff1f8f3);
+  static Color deYork100 = Color(0xffddeedf);
+  static Color deYork200 = Color(0xffbcdec2);
+  static Color deYork300 = Color(0xff7fbc8f);
+  static Color deYork400 = Color(0xff61a675);
+  static Color deYork500 = Color(0xff408958);
+  static Color deYork600 = Color(0xff2e6d45);
+  static Color deYork700 = Color(0xff255738);
+  static Color deYork800 = Color(0xff1f462e);
+  static Color deYork900 = Color(0xff1a3a26);
+  static Color deYork950 = Color(0xff0e2016);
+
+
 }

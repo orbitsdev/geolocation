@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:geolocation/core/globalwidget/circular_loading.dart';
-import 'package:geolocation/core/theme/game_pallete.dart';
 import 'package:geolocation/core/theme/palette.dart';
 import 'package:get/get.dart';
 
@@ -22,39 +21,20 @@ class OverAllCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: Get.size.width,
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        
         borderRadius: BorderRadius.circular(12),
-        gradient: LinearGradient(
-          colors: [
-            // GamePalette.darkBackground,
-            // Palette.FGREEN1,
-            // Palette.FGREEN1
-            // GamePalette.tealGreen,
-            Colors.white,
-            Colors.white,
-          ],
-          begin: Alignment.bottomRight,
-          end: Alignment.topLeft,
-        ),),
+        color: Colors.white, // Light green as primary background
+        border: Border.all(
+          color: Palette.deYork300, // Subtle border for emphasis
+          width:1,
+        ),
+      ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           // Icon Section
           Container(
-            // padding: const EdgeInsets.all(12),
-            // decoration: BoxDecoration(
-            //   shape: BoxShape.circle,
-            //   gradient: LinearGradient(
-            //     colors: [
-            //       GamePalette.tealGreen,
-            //       GamePalette.darkBackground,
-            //     ],
-            //     begin: Alignment.topLeft,
-            //     end: Alignment.bottomRight,
-            //   ),
-            // ),
             child: icon,
           ),
           const SizedBox(height: 8),
@@ -62,21 +42,22 @@ class OverAllCard extends StatelessWidget {
           Text(
             title,
             style: Get.textTheme.bodyMedium?.copyWith(
-              // fontWeight: FontWeight.w600,
-              color: Palette.lightText,
-              // color: GamePalette.textWhite,
+              fontWeight: FontWeight.w600,
+              color: Palette.deYork700, // Darker green for titles
             ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
           // Count Section
           isLoading == true
-              ? CircularLoading(color: Palette.card1,)
+              ? CircularLoading(
+                  color: Palette.deYork600, // Consistent loading spinner color
+                )
               : Text(
-                  '${count}',
+                  count,
                   style: Get.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: Palette.text,
+                    color: Palette.deYork900, // Emphasized dark green for count
                   ),
                 ),
         ],

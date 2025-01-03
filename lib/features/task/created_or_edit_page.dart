@@ -41,6 +41,8 @@ class CreatedOrEditPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
         title: const Text('Create Task'),
         leading: IconButton(
             onPressed: () {
@@ -319,7 +321,7 @@ class CreatedOrEditPage extends StatelessWidget {
               height: Get.size.height,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Palette.PRIMARY,
+                  backgroundColor: Palette.card2,
                   padding: EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),

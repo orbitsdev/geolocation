@@ -113,97 +113,16 @@ class TaskController extends GetxController {
   var completedTasks = <Task>[].obs;
 
 
-  // void showApprovalModal() {
-  //   Get.bottomSheet(
-  //     GetBuilder<AuthController>(
-  //       builder: (authcontroller) {
-  //         return Container(
-  //           padding: EdgeInsets.all(16.0),
-  //           decoration: BoxDecoration(
-  //             color: Colors.white,
-  //             borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
-  //           ),
-  //           child: authcontroller.user.value.hasAccess() ?  Column(
-  //                 mainAxisSize: MainAxisSize.min,
-  //                 crossAxisAlignment: CrossAxisAlignment.start,
-  //                 children: [
-  //                   Text(
-  //                     'Manage Task Status',
-  //                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-  //                   ),
-  //                   SizedBox(height: 12),
-  //                   if (selectedTask.value.status == Task.STATUS_COMPLETED && selectedTask.value.approvedByCouncilPosition == null)
-  //                     ListTile(
-  //                       leading: Icon(Icons.check, color: Colors.green),
-  //                       title: Text('Approve Task'),
-  //                       onTap: () => updateTaskStatus(Task.STATUS_COMPLETED),
-  //                     ),
-  //                   if (selectedTask.value.status != Task.STATUS_COMPLETED)
-  //                     ListTile(
-  //                       leading: Icon(Icons.check, color: Colors.green),
-  //                       title: Text('Mark as completed'),
-  //                       onTap: () => updateTaskStatus(Task.STATUS_COMPLETED),
-  //                     ),
-  //                   if (selectedTask.value.status != Task.STATUS_NEED_REVISION)
-  //                     ListTile(
-  //                       leading: Icon(Icons.edit, color: Colors.orange),
-  //                       title: Text('Needs Revision'),
-  //                       onTap: () {
-  //                         Get.back(); // Close the modal
-  //                         showRemarksModal(Task.STATUS_NEED_REVISION);
-  //                       },
-  //                     ),
-  //                   if (selectedTask.value.status != Task.STATUS_REJECTED)
-  //                     ListTile(
-  //                       leading: Icon(Icons.close, color: Colors.red),
-  //                       title: Text('Reject Task'),
-  //                       onTap: () {
-  //                         Get.back(); // Close the modal
-  //                         showRemarksModal(Task.STATUS_REJECTED);
-  //                       },
-  //                     ),
-  //                     if (selectedTask.value.status != Task.STATUS_COMPLETED && selectedTask.value.isTaskNotCompleteAndAssignedToCurrentOfficer())
-  //                     ListTile(
-  //                       leading: Icon(Icons.done, color: Colors.blue),
-  //                       title: Text('Mark as Done'),
-  //                       onTap: () => updateTaskStatus(Task.STATUS_COMPLETED),
-  //                     ),
-                                          
-  //                 ],
-  //               )
-  //             : Column(
-  //                 mainAxisSize: MainAxisSize.min,
-  //                 crossAxisAlignment: CrossAxisAlignment.start,
-  //                 children: [
-  //                   Text(
-  //                     'Task Actions',
-  //                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-  //                   ),
-  //                   SizedBox(height: 12),
-  //                   if (selectedTask.value.status != Task.STATUS_COMPLETED)
-  //                     ListTile(
-  //                       leading: Icon(Icons.done, color: Colors.blue),
-  //                       title: Text('Mark as Done'),
-  //                       onTap: () => updateTaskStatus(Task.STATUS_COMPLETED),
-  //                     ),
-  //                    if (selectedTask.value.status != Task.STATUS_TODO  && selectedTask.value.isTaskNotCompleteAndAssignedToCurrentOfficer())
-                   
-  //                     ListTile(
-  //                       leading: Icon(Icons.refresh, color: Colors.orange),
-  //                       title: Text('Resubmit Task'),
-  //                       onTap: () {
-  //                         Get.back(); // Close the modal
-  //                         showRemarksModal(Task.STATUS_RESUBMIT);
-  //                       },
-  //                     ),
-  //                 ],
-  //               ),
-  //         );
-  //       }
-  //     ),
-  //   );
-  // }
-
+  ///------------------------------------------------------------
+  /// By Officer
+  ///-----------------------------------------
+  ///
+var filteredTasks = <Task>[].obs; // For filtered tasks
+var isFilteredLoading = false.obs; // Loading state for filtered tasks
+var isFilteredScrollLoading = false.obs; // Scroll loading for filtered tasks
+var filteredPage = 1.obs; // Current page for filtered tasks
+var filteredPerPage = 20.obs; // Tasks per page for filtered tasks
+var hasMoreFilteredData = true.obs; // Indicates if more filtered tasks are available
 
 void showApprovalModal() {
   Get.bottomSheet(
@@ -1665,4 +1584,98 @@ Widget _buildListTile({
       update();
     });
   }
+
+  Future<void> fetchFilteredTasks({
+  required int councilPositionId,
+  String? status,
+}) async {
+  isFilteredLoading(true);
+  filteredPage(1); // Reset to the first page
+  hasMoreFilteredData(true);
+  filteredTasks.clear(); // Clear current tasks
+  update();
+
+  Map<String, dynamic> queryParams = {
+    'page': filteredPage.value,
+    'per_page': filteredPerPage.value,
+    if (status != null) 'status': status,
+  };
+
+  try {
+    final response = await ApiService.getAuthenticatedResource(
+      'tasks/council-position/$councilPositionId',
+      queryParameters: queryParams,
+    );
+
+    response.fold(
+      (failure) {
+        isFilteredLoading(false);
+        update();
+        Modal.errorDialog(failure: failure);
+      },
+      (success) {
+        final fetchedTasks = (success.data['data'] as List)
+            .map((task) => Task.fromMap(task))
+            .toList();
+
+        filteredTasks.assignAll(fetchedTasks);
+        hasMoreFilteredData(filteredTasks.length < success.data['pagination']['total']);
+        isFilteredLoading(false);
+        update();
+      },
+    );
+  } catch (e) {
+    isFilteredLoading(false);
+    update();
+    Modal.errorDialog(message: 'Failed to fetch tasks: $e');
+  }
+}
+
+Future<void> fetchFilteredTasksOnScroll({
+  required int councilPositionId,
+  String? status,
+}) async {
+  if (isFilteredScrollLoading.value || !hasMoreFilteredData.value) return;
+
+  isFilteredScrollLoading(true);
+  update();
+
+  Map<String, dynamic> queryParams = {
+    'page': filteredPage.value,
+    'per_page': filteredPerPage.value,
+    if (status != null) 'status': status,
+  };
+
+  try {
+    final response = await ApiService.getAuthenticatedResource(
+      'tasks/council-position/$councilPositionId',
+      queryParameters: queryParams,
+    );
+
+    response.fold(
+      (failure) {
+        isFilteredScrollLoading(false);
+        update();
+        Modal.errorDialog(failure: failure);
+      },
+      (success) {
+        final fetchedTasks = (success.data['data'] as List)
+            .map((task) => Task.fromMap(task))
+            .toList();
+
+        filteredTasks.addAll(fetchedTasks);
+        hasMoreFilteredData(filteredTasks.length < success.data['pagination']['total']);
+        filteredPage.value++; // Increment page
+        isFilteredScrollLoading(false);
+        update();
+      },
+    );
+  } catch (e) {
+    isFilteredScrollLoading(false);
+    update();
+    Modal.errorDialog(message: 'Failed to load tasks on scroll: $e');
+  }
+}
+
+
 }

@@ -51,7 +51,7 @@ class _MemberTaskPageState extends State<MemberTaskPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Palette.bg,
+      backgroundColor: Palette.gray100, // Subtle gray background
       appBar:
           AppBar(
             surfaceTintColor: Colors.transparent,

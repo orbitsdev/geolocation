@@ -63,14 +63,14 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       
-      backgroundColor: Palette.card3,
+      backgroundColor: Colors.white,
       body: RefreshIndicator(
         onRefresh: loadData,
         child: CustomScrollView(
           physics:  const AlwaysScrollableScrollPhysics(),
           controller: scrollController,
           slivers: [
-
+            SliverGap(16),
             ProfileSection(),
             // CustomAppBarWithBg(),
             SliverGap(24),
@@ -208,10 +208,11 @@ class _DashboardPageState extends State<DashboardPage> {
     return RippleContainer(
       onTap: onTap,
       child: OverAllCard(
-        icon: FaIcon(icon, size: 34, color:   Palette.card2,),
+        icon: FaIcon(icon, size: 32, color:  Palette.deYork600,),
         title: title,
         count: count,
         isLoading: isLoading,
+       
       ),
     );
   }
