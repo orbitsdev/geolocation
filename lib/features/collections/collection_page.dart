@@ -46,7 +46,10 @@ class _CollectionPageState extends State<CollectionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Palette.FBG,
       appBar: AppBar(
+        surfaceTintColor: Colors.transparent,
+        backgroundColor: Colors.white,
         title: const Text(
           'Collections',
           style: TextStyle(
@@ -55,7 +58,6 @@ class _CollectionPageState extends State<CollectionPage> {
             color: Colors.black87,
           ),
         ),
-        backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
           IconButton(
@@ -81,7 +83,7 @@ class _CollectionPageState extends State<CollectionPage> {
                 physics: const AlwaysScrollableScrollPhysics(),
                 slivers: [
                   // Add spacing at the top
-                  SliverToBoxAdapter(child: const SizedBox(height: 8)),
+                  // SliverToBoxAdapter(child: const SizedBox(height: 8)),
 
                   // Main content
                   controller.isPageLoading.value

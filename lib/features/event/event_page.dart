@@ -106,7 +106,7 @@ class _EventPageState extends State<EventPage> {
                                      Modal.showEventOptions(
                                       event: event,
                                       onViewDetails: () async {
-                                        Get.back();
+                                      
 
                                         bool canProceed = await controller
                                             .checkLocationServicesAndPermissions();
@@ -123,6 +123,8 @@ class _EventPageState extends State<EventPage> {
                                       },
                                       onViewAttendance: () {
                                         if (event.id != null) {
+
+                                          AttendanceController.controller.navigateToEventAttendancePage(event: event);
                                           // Get.back();
                                           // AttendanceController.controller
                                           //     .selectAndNavigateToAttendanceRecord(
@@ -131,7 +133,7 @@ class _EventPageState extends State<EventPage> {
                                       },
                                       onUpdateEvent: () async  {
                                         if (event.id != null)   {
-                                          Get.back();
+                                       
                                             bool canProceed = await controller
                                             .checkLocationServicesAndPermissions();
                                         if (canProceed) {
@@ -148,7 +150,7 @@ class _EventPageState extends State<EventPage> {
                                       },
                                       onDeleteEvent: () {
                                         if (event.id != null) {
-                                          Get.back();
+                                        
 
                                           controller.delete(event.id!);
                                         }

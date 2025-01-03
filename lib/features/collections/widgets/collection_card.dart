@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:geolocation/core/helpers/formmater.dart';
 import 'package:geolocation/core/theme/palette.dart';
+import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:geolocation/features/collections/model/collection.dart';
 import 'package:geolocation/features/collections/model/collection_item.dart';
 import 'package:get/get.dart';
@@ -104,9 +105,13 @@ class CollectionCard extends StatelessWidget {
           icon: const Icon(Icons.more_vert),
           onSelected: (value) {
             if (value == 'edit') {
+              
               onEdit();
+
             } else if (value == 'delete') {
+              
               onDelete();
+
             }
           },
           itemBuilder: (context) => [
@@ -117,7 +122,7 @@ class CollectionCard extends StatelessWidget {
                 title: Text('Edit'),
               ),
             ),
-            const PopupMenuItem(
+           if(collection.ownerOrAdmin(AuthController.controller.user.value.defaultPosition?.id,AuthController.controller.user.value.defaultPosition?.grantAccess as bool )) const PopupMenuItem(
               value: 'delete',
               child: ListTile(
                 leading: Icon(Icons.delete),
@@ -184,15 +189,56 @@ class CollectionCard extends StatelessWidget {
       return PieChartSectionData(
         color: _getColor(index),
         value: data[index],
-        title: '$percentage%',
+        title: '${labels[index]}',
         titleStyle: const TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.bold,
           color: Colors.white,
         ),
+          badgeWidget: _buildBadge(labels[index], data[index], percentage),
+      badgePositionPercentageOffset: 1.2,
       );
     });
   }
+
+  Widget _buildBadge(String label, double value, String percentage) {
+  return Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Text(
+        '$percentage%',
+        style: const TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
+          color: Colors.black,
+        ),
+      ),
+      // Text(
+      //   label,
+      //   style: const TextStyle(
+      //     fontSize: 10,
+      //     color: Colors.black,
+      //   ),
+      // ),
+      Gap(4),
+      Container(
+        decoration: BoxDecoration(
+        color: Colors.pink,
+        borderRadius: BorderRadius.circular(8)
+
+        ),
+        padding: EdgeInsets.all(2),
+        child: Text(
+          '₱ ${formatNumber(value)}',
+          style: const TextStyle(
+            fontSize: 10,
+            color: Colors.white,
+          ),
+        ),
+      ),
+    ],
+  );
+}
 
   /// Chart Titles
   FlTitlesData _buildChartTitles(List<String> labels) {

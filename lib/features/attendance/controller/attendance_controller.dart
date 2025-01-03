@@ -13,6 +13,7 @@ import 'package:geolocation/features/attendance/event_attendance_list_page.dart'
 import 'package:geolocation/features/attendance/make_attendace_page.dart';
 import 'package:geolocation/features/attendance/model/attendance.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
+import 'package:geolocation/features/event/event_attendance_page.dart';
 import 'package:geolocation/features/event/model/event.dart';
 import 'package:geolocation/features/event/model/event_attendance.dart';
 import 'package:get/get.dart';
@@ -58,6 +59,18 @@ class AttendanceController extends GetxController {
   var hasData = false.obs;
   var attendances = <Attendance>[].obs;
   var selectedItem = EventAttendance().obs;
+
+  // ATTENDANCE RECORD
+
+var isLoadingEventAttendance = false.obs;
+var isScrollLoadingEventAttendance = false.obs;
+var eventAttendancePage = 1.obs;
+var eventAttendancePerPage = 20.obs;
+var eventAttendanceLastTotal = 0.obs;
+var hasMoreEventAttendance = false.obs;
+var eventAttendanceList = <Attendance>[].obs;
+
+
 
   //for viewing
   var selectedEvent = Event().obs;
@@ -612,124 +625,7 @@ Future<void> testLoad(Event item) async {
     },
   );
 }
-// Future<void> loadData() async {
 
-
-//   isPageLoading(true);
-//   page(1);
-//   perPage(20);
-//   lastTotalValue(0);
-//   attendances.clear();
-//   update();
-
-//   var eventId = selectedEvent.value.id;
-//   var councilId = selectedEvent.value.council?.id;
-
-//   // Debug the eventId and councilId
-//   print("Event ID: $eventId");
-//   print("Council ID: $councilId");
-
-//   if (eventId == null || councilId == null) {
-//     isPageLoading(false);
-//     Modal.errorDialog(message: "Event ID or Council ID is null.");
-//     return;
-//   }
-
-//   var endpoint = '/councils/$councilId/events/$eventId/attendance-record';
-//   // var endpoint = '/councils/28/events/8/attendance-record';
-
-//   Map<String, dynamic> queryParameters = {
-//     'page': page.value,
-//     'perPage': perPage.value,
-//   };
-
-//   var response = await ApiService.getAuthenticatedResource(
-//     endpoint,
-//     queryParameters: queryParameters,
-//   );
-
-//   response.fold(
-//     (failure) {
-//       isPageLoading(false);
-//       update();
-//       Modal.errorDialog(failure: failure);
-//     },
-//     (success) {
-//       print('------------------- ATTENDA RECORD');
-//       print(success.data['data'][0]['check_out_coordinates']);
-//       print('-------------------');
-//       var data = success.data;
-
-      
-
-//       List<EventAttendance> newData = (data['data'] as List<dynamic>)
-//           .map((record) => EventAttendance.fromMap(record))
-//           .toList();
-
-//       attendances(newData);
-//       page.value++;
-//       lastTotalValue.value = data['pagination']['total'];
-//       hasData.value = attendances.length < lastTotalValue.value;
-//       isPageLoading(false);
-//       update();
-//     },
-//   );
-// }
-
-
-
-
-  
-  // void loadOnScroll() async {
-  //   if (isScrollLoading.value) return;
-
-  //   isScrollLoading(true);
-  //   update();
-   
-  
-  // var eventId = selectedItem.value.id;
-  // var councilId = selectedItem.value.council?.id;
-
-  
-  // var endpoint = '/councils/$councilId/events/$eventId/attendance-record';
-
-   
-  //   Map<String, dynamic> queryParameters = {
-  //     'page': page.value,
-  //     'perPage': perPage.value,
-  //   };
-
-
-  //   var response = await ApiService.getAuthenticatedResource(endpoint,
-  //       queryParameters: queryParameters);
-  //   response.fold((failed) {
-  //     isScrollLoading(false);
-  //     update();
-  //     Modal.errorDialog(failure: failed);
-  //   }, (success) {
-  //     isScrollLoading(false);
-  //     update();
-
-  //     var data = success.data;
-  //     if (lastTotalValue.value != data['pagination']['total']) {
-  //       loadData();
-  //       return;
-  //     }
-
-  //     if (attendance.length == data['pagination']['total']) {
-  //       return;
-  //     }
-
-  //     List<Attendance> newData = (data['data'] as List<dynamic>)
-  //         .map((task) => Attendance.fromMap(task))
-  //         .toList();
-  //     attendance.addAll(newData);
-  //     page.value++;
-  //     lastTotalValue.value = data['pagination']['total'];
-  //     hasData.value = attendance.length < lastTotalValue.value;
-  //     update();
-  //   });
-  // }
 
   Future<bool> requestLocationPermision() async {
     bool serviceEnabled;
@@ -964,5 +860,107 @@ Future<void> testLoad(Event item) async {
       update();
     });
   }
+
+
+  Future<void> loadEventAttendance(int eventId) async {
+  isLoadingEventAttendance(true);
+  eventAttendancePage(1);
+  eventAttendancePerPage(20);
+  eventAttendanceLastTotal(0);
+  eventAttendanceList.clear();
+  update();
+
+  Map<String, dynamic> params = {
+    'page': eventAttendancePage.value,
+    'perPage': eventAttendancePerPage.value,
+  };
+
+  var response = await ApiService.getAuthenticatedResource(
+    'councils/events/$eventId/attendances', // Fetch event-specific attendance
+    queryParameters: params,
+  );
+
+  response.fold((failure) {
+    isLoadingEventAttendance(false);
+    update();
+    Modal.errorDialog(failure: failure);
+  }, (success) {
+
+     try {
+    // Extract and map the response
+    var data = success.data;
+
+    // Map each item in the 'data' array to an Attendance object
+    List<Attendance> fetchedData = (data['data'] as List<dynamic>)
+        .map((item) => Attendance.fromMap(item))
+        .toList();
+
+    // Debugging: Print the first item's JSON for verification
+    print('First Attendance Parsed: ${fetchedData.first.toJson()}');
+
+    // Update the controller variables with the new data
+    eventAttendanceList(fetchedData);
+    eventAttendancePage.value++;
+    eventAttendanceLastTotal.value = data['pagination']['total'];
+    hasMoreEventAttendance.value =
+        eventAttendanceList.length < eventAttendanceLastTotal.value;
+    isLoadingEventAttendance(false);
+    update();
+  } catch (e) {
+    print('Error parsing attendance data: $e');
+    isLoadingEventAttendance(false);
+    update();
+  }
+
+   
+
+  
+  });
+}
+
+
+void loadEventAttendanceOnScroll(int eventId) async {
+  if (isScrollLoadingEventAttendance.value || !hasMoreEventAttendance.value) return;
+
+  isScrollLoadingEventAttendance(true);
+  update();
+
+  Map<String, dynamic> params = {
+    'page': eventAttendancePage.value,
+    'perPage': eventAttendancePerPage.value,
+  };
+
+  var response = await ApiService.getAuthenticatedResource(
+    'councils/events/$eventId/attendances', // Fetch event-specific attendance
+    queryParameters: params,
+  );
+
+  response.fold((failure) {
+    isScrollLoadingEventAttendance(false);
+    update();
+    Modal.errorDialog(failure: failure);
+  }, (success) {
+    var data = success.data;
+    List<Attendance> fetchedData = (data['data'] as List<dynamic>)
+        .map((item) => Attendance.fromJson(item))
+        .toList();
+    eventAttendanceList.addAll(fetchedData);
+    eventAttendancePage.value++;
+    eventAttendanceLastTotal.value = data['pagination']['total'];
+    hasMoreEventAttendance.value =
+        eventAttendanceList.length < eventAttendanceLastTotal.value;
+    isScrollLoadingEventAttendance(false);
+    update();
+  });
+}
+
+
+  void navigateToEventAttendancePage({required Event event}) {
+  Get.to(
+    () => EventAttendancePage(eventId: event.id as int ) ,
+    transition: Transition.cupertino,
+    arguments: event, // Pass the full event object if needed
+  );
+}
 
 }

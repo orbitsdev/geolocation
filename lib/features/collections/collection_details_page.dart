@@ -240,10 +240,10 @@ const CollectionDetailsPage({
           const Gap(8),
           Text(
             'Total Amount: ₱${collection.formattedTotalAmount()}',
-            style: const TextStyle(
+            style:  TextStyle(
               fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.green,
+              // fontWeight: FontWeight.bold,
+              color: Palette.card1,
             ),
           ),
           if (collection.description != null) ...[
@@ -261,7 +261,7 @@ const CollectionDetailsPage({
               collection.description!,
               style:  TextStyle(
                 fontSize: 14,
-                color: Colors.grey[700],
+                color: Palette.lightText,
               ),
             ),
           ],
@@ -378,7 +378,7 @@ const CollectionDetailsPage({
             style:  TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.bold,
-               color: Palette.GREEN3,
+               color: Palette.card1,
             ),
           ),
         ],
@@ -425,7 +425,7 @@ const CollectionDetailsPage({
             style:  TextStyle(
               fontSize: 14,
               // fontWeight: FontWeight.bold,
-              color: Palette.GREEN3,
+              color: Palette.card1,
             ),
           ),
         ],

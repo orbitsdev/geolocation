@@ -26,7 +26,8 @@ class CollectionChartWidget extends StatelessWidget {
       );
     }
 
-    return SizedBox(
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 64),
       height: 200,
       child: SizedBox(
             height: 200,
@@ -208,7 +209,7 @@ List<PieChartSectionData> _buildPieChartSections(List<double> data, List<String>
     return PieChartSectionData(
       color: _getColor(index),
       value: data[index],
-      title: labels[index],
+      title: '${labels[index]}',
       radius: 60, // Adjusted for better spacing
       titleStyle: const TextStyle(
         fontSize: 12,

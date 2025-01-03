@@ -117,4 +117,7 @@ class Collection {
   bool owner(int? positionId) {
     return councilPosition?.id == positionId;
   }
+  bool ownerOrAdmin(int? positionId, bool grant_access) {
+    return (councilPosition?.id == positionId || grant_access == true);
+  }
 }

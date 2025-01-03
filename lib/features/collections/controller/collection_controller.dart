@@ -223,7 +223,7 @@ class CollectionController extends GetxController {
   print('--- Update Collection Request ---');
   print(requestData);
   print('--------------------------------');
-
+  
   var response = await ApiService.putAuthenticatedResource(
     '/collections/$collectionId',
     requestData,
@@ -243,10 +243,17 @@ class CollectionController extends GetxController {
       isLoading(false);
       update();
       clearForm();
+
+      print('-- Update Collection Response --');
+      print((AuthController.controller.user.value.defaultPosition?.grantAccess == true));
+      print('-------------------------------');
+
      if(AuthController.controller.user.value.defaultPosition?.grantAccess == true){
               Get.offNamedUntil('/collections', (route) => route.isFirst);
                 loadData();
-        }{
+
+                // return;
+        }else{
               Get.offNamedUntil('/home-officer', (route) => route.isFirst);
               EventController.controller.loadAllPageData();
         }
