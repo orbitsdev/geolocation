@@ -118,60 +118,125 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
                         // Event Details Section
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0 ,vertical: 16),
-                           decoration: BoxDecoration(
-                    color: Palette.LIGHT_BACKGROUND,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                        width: 0.2, color: Palette.PRIMARY.withOpacity(0.80))),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Description Section
-                              Text(
-                                'About Event',
-                                style: Get.textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              SizedBox(height: 8),
-                              Text(
-                                controller.selectedItem.value.description ?? 'No description available.',
-                                style: Get.textTheme.bodyMedium,
-                              ),
-                              SizedBox(height: 24),
-                                                    
-                              // Start Date and End Date Section
-                              Row(
-                                children: [
-                                  Icon(Icons.calendar_today, size: 34, color: Palette.PRIMARY),
-                                  SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      '${controller.selectedItem.value.startTime ?? 'Start Time'} - ${controller.selectedItem.value.endTime ?? 'End Time'}',
-                                      style: Get.textTheme.bodyMedium,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 16),
-                                                    
-                              // Map Location Section
-                              Row(
-                                children: [
-                                  Icon(Icons.location_on, size: 34, color: Palette.PRIMARY),
-                                  SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      controller.selectedItem.value.mapLocation ?? 'Location not available',
-                                      style: Get.textTheme.bodyMedium,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
+  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16),
+  decoration: BoxDecoration(
+    color: Colors.white,
+    borderRadius: BorderRadius.circular(8),
+   
+  ),
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      // About Event Section
+      Text(
+        'About Event',
+        style: Get.textTheme.titleMedium?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: Palette.gray900,
+        ),
+      ),
+      const SizedBox(height: 8),
+      Text(
+        controller.selectedItem.value.description ?? 'No description available.',
+        style: Get.textTheme.bodyMedium?.copyWith(
+          color: Palette.gray700,
+        ),
+      ),
+      const SizedBox(height: 24),
+
+      // Event Timing Section
+      Row(
+        children: [
+          Icon(Icons.calendar_today, size: 34, color: Palette.PRIMARY),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              '${controller.selectedItem.value.startTime ?? 'Start Time'} - ${controller.selectedItem.value.endTime ?? 'End Time'}',
+              style: Get.textTheme.bodyMedium?.copyWith(
+                color: Palette.gray800,
+              ),
+            ),
+          ),
+        ],
+      ),
+      const SizedBox(height: 16),
+
+      // Location Section
+      Row(
+        children: [
+          Icon(Icons.location_on, size: 34, color: Palette.PRIMARY),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              controller.selectedItem.value.mapLocation ?? 'Location not available.',
+              style: Get.textTheme.bodyMedium?.copyWith(
+                color: Palette.gray800,
+              ),
+            ),
+          ),
+        ],
+      ),
+      const SizedBox(height: 16),
+
+      // Publish Event Status
+      Row(
+        children: [
+          Icon(Icons.public, size: 34, color: Palette.deYork600),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              controller.selectedItem.value.isPublish == true
+                  ? 'This event is published.'
+                  : 'This event is not published.',
+              style: Get.textTheme.bodyMedium?.copyWith(
+                color: Palette.gray800,
+              ),
+            ),
+          ),
+        ],
+      ),
+      const SizedBox(height: 16),
+
+      // Active Event Status
+      Row(
+        children: [
+          Icon(Icons.check_circle, size: 34, color: Palette.deYork500),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              controller.selectedItem.value.isActive == true
+                  ? 'This event is active.'
+                  : 'This event is inactive.',
+              style: Get.textTheme.bodyMedium?.copyWith(
+                color: Palette.gray800,
+              ),
+            ),
+          ),
+        ],
+      ),
+      const SizedBox(height: 16),
+
+      // Restrict Event Status
+      Row(
+        children: [
+          Icon(Icons.lock, size: 34, color: Palette.RED),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              controller.selectedItem.value.restrictEvent == true
+                  ? 'This event is restricted.'
+                  : 'This event is not restricted.',
+              style: Get.textTheme.bodyMedium?.copyWith(
+                color: Palette.gray800,
+              ),
+            ),
+          ),
+        ],
+      ),
+    ],
+  ),
+),
+
                       Gap(Get.size.height * 0.10),
                       ],
                     ),

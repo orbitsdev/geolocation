@@ -1123,7 +1123,7 @@ static void showEventActionModal({
           const Divider(),
 
           // Make Attendance
-          ListTile(
+           ListTile(
             leading: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(

@@ -57,7 +57,7 @@ class _OfficerHomePageState extends State<OfficerHomePage> with SingleTickerProv
   @override
   void initState() {
     super.initState();
-    tabController = TabController(length: tabs.length, vsync: this,initialIndex: 6);
+    tabController = TabController(length: tabs.length, vsync: this,initialIndex: 3);
     
     tabController.addListener(() {
     switch (tabController.index) {
@@ -127,7 +127,7 @@ class _OfficerHomePageState extends State<OfficerHomePage> with SingleTickerProv
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Palette.FBG,
       body: RefreshIndicator(
         triggerMode: RefreshIndicatorTriggerMode.anywhere,
         onRefresh:refreshCurrentTab,
@@ -135,7 +135,6 @@ class _OfficerHomePageState extends State<OfficerHomePage> with SingleTickerProv
           controller: newScrollController,
           physics: const  NeverScrollableScrollPhysics(),
           slivers: [
-           SliverGap(16),
             OfficerProfileSection(),
           SliverToBoxAdapter(
   child: Container(
@@ -165,13 +164,13 @@ class _OfficerHomePageState extends State<OfficerHomePage> with SingleTickerProv
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
               decoration: BoxDecoration(
-                color: Colors.grey.shade200,
+                color: Palette.gray100,
                 borderRadius: BorderRadius.circular(24.0),
               ),
               child: Text(
                 "Collection|Announcement",
                 style: TextStyle(
-                  color: Colors.grey.shade600,
+                  color: Palette.lightText,
                   fontSize: 14.0,
                 ),
               ),
@@ -189,7 +188,7 @@ class _OfficerHomePageState extends State<OfficerHomePage> with SingleTickerProv
           child: Container(
             padding: const EdgeInsets.all(10.0),
             decoration: BoxDecoration(
-              color: Palette.GREEN3,
+              color: Palette.card2,
               shape: BoxShape.circle,
             ),
             child: const Icon(
@@ -267,9 +266,9 @@ class _OfficerHomePageState extends State<OfficerHomePage> with SingleTickerProv
               //     )),
               controller: tabController,
               indicatorSize: TabBarIndicatorSize.label,
-              indicatorColor: Palette.GREEN3,
+              indicatorColor: Palette.card3,
               isScrollable: true,
-              labelColor: Palette.GREEN3,
+              labelColor: Palette.card3,
               
               tabAlignment: TabAlignment.start,
               unselectedLabelStyle: Get.textTheme.bodyMedium!.copyWith(

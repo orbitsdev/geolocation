@@ -451,37 +451,85 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 
                   Gap(16),
                 Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                 Divider(color: Colors.grey.shade300),
+                Text(
+              'Publish Event',
+              style: Get.textTheme.bodyMedium?.copyWith(color: Palette.LIGHT_TEXT),
+                ),
+               // add short description explain what publish event means fix my sentence
+                Text(
+                'Publish this to enable to see in the post section',
+                style: Get.textTheme.bodySmall?.copyWith(color: Palette.LIGHT_TEXT),
+                ),
+
+                Tooltip(
+              message: 'Enable this to publish the event immediately.',
+              child: FormBuilderSwitch(
+              name: 'is_publish',
+              title: const Text('Publish Event'),
+              initialValue:isEditMode == false ? true : null, // Default to true
+              decoration: const InputDecoration(border: InputBorder.none),
+              ),
+                ),
+              ],
+              ),
+
+              Divider(color: Colors.grey.shade300),
+
               Text(
-          'Publish Event',
-          style: Get.textTheme.bodyMedium?.copyWith(color: Palette.LIGHT_TEXT),
-              ),
-             
-              Tooltip(
-          message: 'Enable this to publish the event immediately.',
-          child: FormBuilderSwitch(
-            name: 'is_publish',
-            title: const Text('Publish Event'),
-            initialValue: true, // Default to true
+            'Activate Event',
+            style: Get.textTheme.bodyMedium?.copyWith(color: Palette.LIGHT_TEXT),
+          ),
+          Text(
+            'Enable this option to activate the event. An inactive event will not appear for users.',
+            style: Get.textTheme.bodySmall?.copyWith(color: Palette.LIGHT_TEXT),
+          ),
+          Tooltip(
+            message: 'Enable this to activate the event.',
+            child: FormBuilderSwitch(
+            name: 'is_active',
+            title: const Text('Activate Event'),
+            initialValue:isEditMode == false ? true : null, // Default value
             decoration: const InputDecoration(border: InputBorder.none),
-          ),
-              ),
-            ],
+            ),
           ),
           
-          
+          Divider(color: Colors.grey.shade300),
+
+          // Restrict Event
+          Text(
+            'Restrict Event',
+            style: Get.textTheme.bodyMedium?.copyWith(color: Palette.LIGHT_TEXT),
+          ),
+          Text(
+            'Enable this option to enforce strict attendance rules based on time and location.',
+            style: Get.textTheme.bodySmall?.copyWith(color: Palette.LIGHT_TEXT),
+          ),
+          Tooltip(
+            message: 'Enable this to restrict the event for geolocation and time-based attendance.',
+            child: FormBuilderSwitch(
+            name: 'restrict_event',
+            title: const Text('Restrict Event'),
+            initialValue:isEditMode == false ?  false : null, // Default value
+            decoration: const InputDecoration(border: InputBorder.none),
+            ),
+          ),
+              
+              
                   // Google Map for Location
                   Text(
-                    'Event Location',
-                    style: Get.textTheme.bodyMedium
-                        ?.copyWith(color: Palette.LIGHT_TEXT),
+                  'Event Location',
+                  style: Get.textTheme.bodyMedium
+                    ?.copyWith(color: Palette.LIGHT_TEXT),
                   ),
-          
+              
                   Gap(Get.size.height * 0.05),
+
                 ],
-              ),
+                ),
             ),
           );
         }

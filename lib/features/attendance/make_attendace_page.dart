@@ -12,215 +12,6 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocation/features/attendance/controller/attendance_controller.dart';
 
-// class MakeAttendancePage extends StatefulWidget {
-//   const MakeAttendancePage({Key? key}) : super(key: key);
-
-//   @override
-//   State<MakeAttendancePage> createState() => _MakeAttendancePageState();
-// }
-
-// class _MakeAttendancePageState extends State<MakeAttendancePage> {
-//   var controller = Get.find<AttendanceController>();
-//   @override
-//   void initState() {
-//     // TODO: implement initState
-//     super.initState();
-//     // controller.prepareMap();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final arguments = Get.arguments;
-//     final event = arguments?['event'] as Event;
-
-//     final AttendanceController controller = Get.put(AttendanceController());
-//     WidgetsBinding.instance.addPostFrameCallback((_) {
-//       controller.initializeData(event);
-//     });
-
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: const Text('Mark Attendance'),
-//         centerTitle: true,
-//       ),
-//       body:  GetBuilder<AttendanceController>(builder: (controller) {
-//           if(controller.isLoading.value){
-//             return Center(child: MapLoading());
-//           }
-//           if(controller.isLoading.value == false && controller.isMapReady.value == false){
-//               return Container(child: Column(children: [
-//                 Text('Somethint whent wrong pelac hcej ytou locaiton orn itner citon')
-//               ],),);
-//           }
-
-         
-//          return RefreshIndicator(
-//           triggerMode: RefreshIndicatorTriggerMode.anywhere,
-//           onRefresh: () => controller.refreshEventDetails(),
-//           child: Stack(
-//             children: [
-//               GetBuilder<AttendanceController>(builder: (attendanceController) {
-//                 return GoogleMap(
-//                   padding: EdgeInsets.only(bottom: Get.size.height / 3),
-//                   onMapCreated: (GoogleMapController mapController) {
-//                     attendanceController.onMapCreated(mapController);
-//                     attendanceController.moveCamera();
-//                     attendanceController.startListeningToPosition();
-//                   },
-//                   initialCameraPosition: attendanceController.initialPosition,
-//                   myLocationEnabled: true,
-//                   myLocationButtonEnabled: true,
-//                   markers: attendanceController.markers.toSet(),
-//                   circles: attendanceController.geofenceCircles.toSet(),
-//                 );
-//               }),
-//               Positioned(
-//                 bottom: 20,
-//                 left: 12,
-//                 right: 12,
-//                 child: GetBuilder<AttendanceController>(
-//                   builder: (attendanceController) {
-//                     return Container(
-//                       padding: const EdgeInsets.all(16),
-//                       decoration: BoxDecoration(
-//                         borderRadius: BorderRadius.circular(8),
-//                         color: Colors.white,
-//                       ),
-//                       child: SingleChildScrollView(
-//                         child: Column(
-//                           crossAxisAlignment: CrossAxisAlignment.start,
-//                           children: [
-//                             // Event Title
-//                             Text(
-//                               attendanceController.selectedItem.value.title ??
-//                                   'Event',
-//                               style: Get.textTheme.titleLarge,
-//                             ),
-//                             const Gap(16),
-//                             // Event Details
-//                             RippleContainer(
-//                               onTap: () => attendanceController.moveCamera(),
-//                               child: Column(
-//                                 children: [
-//                                   Row(
-//                                     children: [
-//                                       Icon(Icons.calendar_today,
-//                                           size: 34, color: Palette.PRIMARY),
-//                                       const Gap(8),
-//                                       Expanded(
-//                                         child: Text(
-//                                           '${attendanceController.selectedItem.value.startTime ?? ''} - ${attendanceController.selectedItem.value.endTime ?? ''}',
-//                                           style: Get.textTheme.bodyMedium,
-//                                         ),
-//                                       ),
-//                                     ],
-//                                   ),
-//                                   const Gap(4),
-//                                   Row(
-//                                     children: [
-//                                       Icon(Icons.location_on,
-//                                           size: 34, color: Palette.PRIMARY),
-//                                       const Gap(8),
-//                                       Expanded(
-//                                         child: Text(
-//                                           attendanceController.selectedItem
-//                                                   .value.mapLocation ??
-//                                               'Location not available',
-//                                           style: Get.textTheme.bodyMedium,
-//                                           overflow: TextOverflow.ellipsis,
-//                                         ),
-//                                       ),
-//                                     ],
-//                                   ),
-//                                 ],
-//                               ),
-//                             ),
-//                             const Gap(12),
-//                             // Check-In TimeCard
-//                             if (attendanceController.selectedItem.value
-//                                         .attendance?.checkInTime !=
-//                                     null ||
-//                                 attendanceController.selectedItem.value
-//                                         .attendance?.checkOutTime !=
-//                                     null)
-//                               TimeCard(
-//                                 attendance: attendanceController.selectedItem
-//                                     .value.attendance as Attendance,
-//                               ),
-//                             const Gap(12),
-//                             // Check-Out TimeCard
-
-//                             const Gap(12),
-//                             // Check-In Button
-//                             if (attendanceController.selectedItem.value
-//                                     .attendance?.checkInTime ==
-//                                 null)
-//                               SizedBox(
-//                                 width: Get.size.width,
-//                                 child: ElevatedButton(
-//                                   style: ElevatedButton.styleFrom(
-//                                     backgroundColor: Palette.PRIMARY,
-//                                     padding: const EdgeInsets.symmetric(
-//                                         vertical: 16),
-//                                     shape: RoundedRectangleBorder(
-//                                       borderRadius: BorderRadius.circular(12),
-//                                     ),
-//                                   ),
-//                                   onPressed:
-//                                       attendanceController.isWithinRadius.value
-//                                           ? attendanceController.checkIn
-//                                           : null,
-//                                   child: Text(
-//                                     'Check In',
-//                                     style: Get.textTheme.bodyLarge
-//                                         ?.copyWith(color: Colors.white),
-//                                   ),
-//                                 ),
-//                               ),
-//                             const Gap(12),
-//                             // Check-Out Button
-//                             if (attendanceController.selectedItem.value
-//                                     .attendance?.checkOutTime ==
-//                                 null)
-//                               SizedBox(
-//                                 width: Get.size.width,
-//                                 child: ElevatedButton(
-//                                   style: ElevatedButton.styleFrom(
-//                                     backgroundColor: Colors.red,
-//                                     padding: const EdgeInsets.symmetric(
-//                                         vertical: 16),
-//                                     shape: RoundedRectangleBorder(
-//                                       borderRadius: BorderRadius.circular(12),
-//                                     ),
-//                                   ),
-//                                   onPressed:
-//                                       attendanceController.isWithinRadius.value
-//                                           ? attendanceController.checkOut
-//                                           : null,
-//                                   child: Text(
-//                                     'Check Out',
-//                                     style: Get.textTheme.bodyLarge
-//                                         ?.copyWith(color: Colors.white),
-//                                   ),
-//                                 ),
-//                               ),
-//                           ],
-//                         ),
-//                       ),
-//                     );
-//                   },
-//                 ),
-//               ),
-//             ],
-//           ),
-//         );
-//       }),
-     
-//     );
-//   }
-// }
-
-
 class MakeAttendancePage extends StatefulWidget {
   const MakeAttendancePage({Key? key}) : super(key: key);
 
@@ -245,52 +36,21 @@ class _MakeAttendancePageState extends State<MakeAttendancePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mark Attendance'),
+        title: const Text('Event Details'),
         centerTitle: true,
+        elevation: 0,
+        backgroundColor: Palette.gray50,
+        foregroundColor: Palette.gray900,
       ),
       body: GetBuilder<AttendanceController>(builder: (controller) {
-        // Show loading indicator while loading
         if (controller.isLoading.value) {
           return  Center(child: MapLoading());
         }
 
-        // Show message if the map is not ready
         if (!controller.isMapReady.value) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.error, size: 64, color: Colors.red),
-                const Gap(16),
-                Text(
-                  'Unable to load the map.',
-                  style: Get.textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const Gap(8),
-                Text(
-                  'Please ensure that location services are enabled and you have a stable internet connection.',
-                  style: Get.textTheme.bodyMedium?.copyWith(color: Colors.grey),
-                  textAlign: TextAlign.center,
-                ),
-                const Gap(24),
-                ElevatedButton.icon(
-                  onPressed: () => controller.refreshEventDetails(),
-                  icon: const Icon(Icons.refresh),
-                  label: const Text('Retry'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Palette.PRIMARY,
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  ),
-                ),
-              ],
-            ),
-          );
+          return _buildErrorState(controller);
         }
 
-        // Show the map and UI if everything is ready
         return RefreshIndicator(
           triggerMode: RefreshIndicatorTriggerMode.anywhere,
           onRefresh: () => controller.refreshEventDetails(),
@@ -312,8 +72,15 @@ class _MakeAttendancePageState extends State<MakeAttendancePage> {
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    color: Palette.gray50,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Palette.gray300.withOpacity(0.5),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
                   child: _buildEventDetails(controller),
                 ),
@@ -325,14 +92,61 @@ class _MakeAttendancePageState extends State<MakeAttendancePage> {
     );
   }
 
+  Widget _buildErrorState(AttendanceController controller) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.error, size: 64, color: Palette.RED),
+          const Gap(16),
+          Text(
+            'Unable to load the map.',
+            style: Get.textTheme.bodyLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: Palette.gray900,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const Gap(8),
+          Text(
+            'Ensure location services are enabled and your internet connection is stable.',
+            style: Get.textTheme.bodyMedium?.copyWith(color: Palette.gray600),
+            textAlign: TextAlign.center,
+          ),
+          const Gap(24),
+          ElevatedButton.icon(
+            onPressed: () => controller.refreshEventDetails(),
+            icon: const Icon(Icons.refresh),
+            label: const Text('Retry'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Palette.deYork500,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildEventDetails(AttendanceController controller) {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            controller.selectedItem.value.title ?? 'Event',
-            style: Get.textTheme.titleLarge,
+            controller.selectedItem.value.title ?? 'Event Title',
+            style: Get.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: Palette.gray900,
+            ),
+          ),
+          const Gap(8),
+          Text(
+            controller.selectedItem.value.description ?? 'No description available.',
+            style: Get.textTheme.bodyMedium?.copyWith(color: Palette.gray700),
           ),
           const Gap(16),
           RippleContainer(
@@ -341,12 +155,12 @@ class _MakeAttendancePageState extends State<MakeAttendancePage> {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.calendar_today, size: 34, color: Palette.PRIMARY),
+                    Icon(Icons.calendar_today, size: 34, color: Palette.deYork600),
                     const Gap(8),
                     Expanded(
                       child: Text(
                         '${controller.selectedItem.value.startTime ?? ''} - ${controller.selectedItem.value.endTime ?? ''}',
-                        style: Get.textTheme.bodyMedium,
+                        style: Get.textTheme.bodyMedium?.copyWith(color: Palette.gray800),
                       ),
                     ),
                   ],
@@ -354,12 +168,12 @@ class _MakeAttendancePageState extends State<MakeAttendancePage> {
                 const Gap(4),
                 Row(
                   children: [
-                    Icon(Icons.location_on, size: 34, color: Palette.PRIMARY),
+                    Icon(Icons.location_on, size: 34, color: Palette.deYork600),
                     const Gap(8),
                     Expanded(
                       child: Text(
                         controller.selectedItem.value.mapLocation ?? 'Location not available',
-                        style: Get.textTheme.bodyMedium,
+                        style: Get.textTheme.bodyMedium?.copyWith(color: Palette.gray800),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -374,10 +188,10 @@ class _MakeAttendancePageState extends State<MakeAttendancePage> {
             TimeCard(attendance: controller.selectedItem.value.attendance as Attendance),
           const Gap(12),
           if (controller.selectedItem.value.attendance?.checkInTime == null)
-            _buildAttendanceButton('Check In', Palette.GREEN3, controller.checkIn, controller.isWithinRadius.value),
+            _buildAttendanceButton('Mark Attendance', Palette.deYork600, controller.checkIn, controller.isWithinRadius.value),
           const Gap(12),
           if (controller.selectedItem.value.attendance?.checkOutTime == null)
-            _buildAttendanceButton('Check Out', Colors.red, controller.checkOut, controller.isWithinRadius.value),
+            _buildAttendanceButton('Complete Attendance', Palette.deYork600, controller.checkOut, controller.isWithinRadius.value),
         ],
       ),
     );

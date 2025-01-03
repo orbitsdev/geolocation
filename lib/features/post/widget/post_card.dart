@@ -29,10 +29,19 @@ class PostCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 4,
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 8, ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -68,11 +77,12 @@ class PostCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          height: 50,
+           height: 50,
           width: 50,
           child: OnlineImage(
             imageUrl: post.councilPosition?.image ?? '',
             borderRadius: BorderRadius.circular(40),
+           
           ),
         ),
         const Gap(12),
@@ -98,46 +108,26 @@ class PostCard extends StatelessWidget {
         PopupMenuButton<String>(
           icon: const Icon(Icons.more_vert),
           onSelected: (value) {
-            switch(value){
-            
-              case 'edit':
-              onEdit();
-              break;
-              case 'delete':
-                            onDelete();
-
-              break;
-              default:
-              
-            }
-            // if (value == 'edit') {
-            //   onEdit();
-            // } else if (value == 'delete') {
-            //   onDelete();
-            // }
+            if (value == 'edit') onEdit();
+            if (value == 'delete') onDelete();
           },
           itemBuilder: (context) => [
-            // const PopupMenuItem(
-            //   value: 'view',
-            //   child: ListTile(
-            //     leading: Icon(Icons.remove_red_eye),
-            //     title: Text('View'),
-            //   ),
-            // ),
-           if(post.owner(AuthController.controller.user.value.defaultPosition?.id)) PopupMenuItem(
-              value: 'edit',
-              child: ListTile(
-                leading: Icon(Icons.edit),
-                title: Text('Edit'),
+            if (post.owner(AuthController.controller.user.value.defaultPosition?.id))
+              const PopupMenuItem(
+                value: 'edit',
+                child: ListTile(
+                  leading: Icon(Icons.edit),
+                  title: Text('Edit'),
+                ),
               ),
-            ),
-               if(post.owner(AuthController.controller.user.value.defaultPosition?.id)) const PopupMenuItem(
-              value: 'delete',
-              child: ListTile(
-                leading: Icon(Icons.delete),
-                title: Text('Delete'),
+            if (post.owner(AuthController.controller.user.value.defaultPosition?.id))
+              const PopupMenuItem(
+                value: 'delete',
+                child: ListTile(
+                  leading: Icon(Icons.delete),
+                  title: Text('Delete'),
+                ),
               ),
-            ),
           ],
         ),
       ],
@@ -147,7 +137,6 @@ class PostCard extends StatelessWidget {
   Widget _buildMediaLayout(List<MediaFile> mediaFiles) {
     int mediaCount = mediaFiles.length;
 
-    // Handle different media layout patterns
     if (mediaCount == 1) {
       return _buildSingleMedia(mediaFiles[0]);
     } else if (mediaCount == 2) {
@@ -161,24 +150,7 @@ class PostCard extends StatelessWidget {
           );
         }).toList(),
       );
-    } else if (mediaCount == 3) {
-      return Column(
-        children: [
-          _buildSingleMedia(mediaFiles[0]),
-          const Gap(8),
-          Row(
-            children: mediaFiles.sublist(1).map((file) {
-              return Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: _buildMedia(file),
-                ),
-              );
-            }).toList(),
-          ),
-        ],
-      );
-    } else if (mediaCount == 4) {
+    } else {
       return GridView.builder(
         physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: true,
@@ -187,39 +159,11 @@ class PostCard extends StatelessWidget {
           crossAxisSpacing: 4,
           mainAxisSpacing: 4,
         ),
-        itemCount: 4,
+        itemCount: mediaCount,
         itemBuilder: (context, index) {
           return _buildMedia(mediaFiles[index]);
         },
       );
-    } else if (mediaCount == 5 || mediaCount == 6) {
-      return Column(
-        children: [
-          Row(
-            children: mediaFiles.sublist(0, 2).map((file) {
-              return Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: _buildMedia(file),
-                ),
-              );
-            }).toList(),
-          ),
-          const Gap(8),
-          Row(
-            children: mediaFiles.sublist(2, mediaCount > 5 ? 5 : mediaCount).map((file) {
-              return Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: _buildMedia(file),
-                ),
-              );
-            }).toList(),
-          ),
-        ],
-      );
-    } else {
-      return Container(); // Fallback (optional)
     }
   }
 
@@ -243,7 +187,7 @@ class PostCard extends StatelessWidget {
           ? PreviewImage(url: file.url ?? '')
           : MediaFile.videoFormats.contains(file.extension)
               ? PreviewVideo(file: file)
-              : Center(
+              : const Center(
                   child: Icon(Icons.file_present, size: 40, color: Colors.grey),
                 ),
     );
@@ -253,9 +197,8 @@ class PostCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-       
         CollectionChartWidget(collection: collection),
-        Gap(24),
+        const Gap(24),
       ],
     );
   }

@@ -235,7 +235,7 @@ Future<void> createPost() async {
              if(AuthController.controller.user.value.defaultPosition?.grantAccess == true){
               Get.offNamedUntil('/posts', (route) => route.isFirst);
                await loadData();
-        }{
+        }else{
               Get.offNamedUntil('/home-officer', (route) => route.isFirst);
              await  eventController.loadAllPageData();
         }

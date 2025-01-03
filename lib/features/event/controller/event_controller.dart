@@ -208,6 +208,9 @@ final DateFormat readableDateFormat = DateFormat('EEEE, MMMM d, yyyy, h:mm a');
       'start_time': startTime,
       'end_time': endTime,
       'is_publish': selectedItem.value.isPublish ?? false,
+      'is_active': selectedItem.value.isActive ?? false,
+      'restrict_event': selectedItem.value.restrictEvent ?? false,
+      
     });
 
     moveCamera(eventOldLocation); // Move the camera to the selected event's location
@@ -432,6 +435,8 @@ markers.clear();
         'map_location': selectedLocationDetails.value,
         'place_id': placeId.value,
         'is_publish': eventData['is_publish'] ?? true,
+        'is_active': eventData['is_active'] ?? true,
+        'restrict_event': eventData['restrict_event'] ?? false,
         'start_time': (eventData['start_time'] as DateTime) .toIso8601String(), // Convert DateTime to String
         'end_time': (eventData['end_time'] as DateTime).toIso8601String(),
       };
@@ -614,6 +619,8 @@ void updateEvent() async {
       'map_location': selectedLocationDetails.value,
       'place_id': placeId.value,
       'is_publish': eventData['is_publish'] ?? true,
+      'is_active': eventData['is_active'] ,
+      'restrict_event': eventData['restrict_event'] ?? true,
       'start_time': (eventData['start_time'] as DateTime).toIso8601String(),
       'end_time': (eventData['end_time'] as DateTime).toIso8601String(),
     };

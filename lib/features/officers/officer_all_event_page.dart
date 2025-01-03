@@ -103,8 +103,11 @@ controller.isLoading.value
                                   }
                                 },
                                 onViewAttendance: () {
-                                  // Navigate to View Attendance Page
-                                  // Get.to(() => ViewAttendancePage(), transition: Transition.cupertino);
+                                  if (event.id != null) {
+
+                                          AttendanceController.controller.navigateToEventAttendancePage(event: event);
+                                         
+                                        }
                                 },
                                 onMakeAttendance: () async {
                                   bool canProceed = await controller

@@ -83,7 +83,7 @@ void initState() {
                               Text(
                                 'View All',
                                 style: Get.textTheme.bodyMedium!.copyWith(
-                                  color: Palette.GREEN2,
+                                  color: Palette.card3,
                                   
                                 ),
                               ),
@@ -120,7 +120,7 @@ void initState() {
                                 shaderCallback: (Rect bounds) => LinearGradient(
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight,
-                                  colors: [Palette.GREEN2, Palette.GREEN3],
+                                  colors: [Palette.card2, Palette.card3],
                                 ).createShader(bounds),
                                 child: FaIcon(
                                   FontAwesomeIcons.listOl,
@@ -136,7 +136,7 @@ void initState() {
                                 shaderCallback: (Rect bounds) => LinearGradient(
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight,
-                                  colors: [Palette.GREEN2, Palette.GREEN3],
+                                  colors: [Palette.card2, Palette.card3],
                                 ).createShader(bounds),
                                 child: FaIcon(
                                   FontAwesomeIcons.penToSquare,
@@ -153,7 +153,7 @@ void initState() {
                                 shaderCallback: (Rect bounds) => LinearGradient(
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight,
-                                  colors: [Palette.GREEN2, Palette.GREEN3],
+                                  colors: [Palette.card2, Palette.card3],
                                 ).createShader(bounds),
                                 child: FaIcon(
                                   FontAwesomeIcons.fileLines,

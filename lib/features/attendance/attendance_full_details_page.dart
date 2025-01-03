@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:geolocation/core/globalwidget/images/online_image.dart';
+import 'package:geolocation/core/globalwidget/images/online_image_full_screen_display.dart';
+import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/attendance/model/attendance.dart';
+import 'package:get/get.dart';
 
 class AttendanceFullDetailsPage extends StatelessWidget {
   final Attendance attendance;
@@ -15,6 +18,8 @@ class AttendanceFullDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
         backgroundColor: Colors.white,
         title: const Text('Attendance Details'),
         centerTitle: true,
@@ -28,17 +33,20 @@ class AttendanceFullDetailsPage extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(40),
+                GestureDetector(
+                  onTap: () {
+                    Get.to(() => OnlineImageFullScreenDisplay(imageUrl: attendance.councilPosition?.image ?? ''));
+                },
                   child: SizedBox(
                     height: 80,
                     width: 80,
                     child: attendance.councilPosition?.image != null
                         ? OnlineImage(
+                                  borderRadius: BorderRadius.circular(40),
                             imageUrl: attendance.councilPosition!.image!,
                             fit: BoxFit.cover,
                           )
-                        : const Icon(Icons.account_circle, size: 80, color: Colors.grey),
+                        :  Icon(Icons.account_circle, size: 80, color: Palette.lightText),
                   ),
                 ),
                 const Gap(12),
@@ -53,7 +61,7 @@ class AttendanceFullDetailsPage extends StatelessWidget {
                       const Gap(4),
                       Text(
                         attendance.councilPosition?.position ?? 'No Position',
-                        style: const TextStyle(fontSize: 16, color: Colors.grey),
+                        style:  TextStyle(fontSize: 16, color: Palette.lightText),
                       ),
                     ],
                   ),
@@ -74,8 +82,8 @@ class AttendanceFullDetailsPage extends StatelessWidget {
             // Attendance Timing
             _buildSectionTitle('Attendance Timing'),
             const Gap(8),
-            _buildDetailRow('Check-In Time:', attendance.checkInTime ?? 'N/A'),
-            _buildDetailRow('Check-Out Time:', attendance.checkOutTime ?? 'N/A'),
+            _buildDetailRow('Time in:', attendance.checkInTime ?? 'N/A'),
+            _buildDetailRow('Time out', attendance.checkOutTime ?? 'N/A'),
 
             const Gap(16),
 
@@ -83,13 +91,13 @@ class AttendanceFullDetailsPage extends StatelessWidget {
             _buildSectionTitle('Location Coordinates'),
             const Gap(8),
             _buildDetailRow(
-              'Check-In Coordinates:',
+              'In Coordinates:',
               attendance.checkInCoordinates != null
                   ? '${attendance.checkInCoordinates!['latitude']}, ${attendance.checkInCoordinates!['longitude']}'
                   : 'N/A',
             ),
             _buildDetailRow(
-              'Check-Out Coordinates:',
+              'Out Coordinates:',
               attendance.checkOutCoordinates != null
                   ? '${attendance.checkOutCoordinates!['latitude']}, ${attendance.checkOutCoordinates!['longitude']}'
                   : 'N/A',
@@ -109,12 +117,7 @@ class AttendanceFullDetailsPage extends StatelessWidget {
             const Gap(16),
 
             // Additional Notes
-            _buildSectionTitle('Notes'),
-            const Gap(8),
-            Text(
-              attendance.notes ?? 'No additional notes.',
-              style: const TextStyle(fontSize: 14, color: Colors.black54),
-            ),
+           
           ],
         ),
       ),
@@ -179,12 +182,17 @@ class AttendanceFullDetailsPage extends StatelessWidget {
           ),
         ),
         const Gap(8),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: SizedBox(
-            height: 200,
-            width: double.infinity,
-            child: OnlineImage(imageUrl: imageUrl, fit: BoxFit.cover),
+        GestureDetector(
+          onTap: (){
+            Get.to(() => OnlineImageFullScreenDisplay(imageUrl: imageUrl));
+          },
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: SizedBox(
+              height: 200,
+              width: double.infinity,
+              child: OnlineImage(imageUrl: imageUrl, fit: BoxFit.cover),
+            ),
           ),
         ),
       ],

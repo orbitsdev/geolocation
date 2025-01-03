@@ -13,6 +13,7 @@ import 'package:geolocation/features/attendance/event_attendance_list_page.dart'
 import 'package:geolocation/features/attendance/make_attendace_page.dart';
 import 'package:geolocation/features/attendance/model/attendance.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
+import 'package:geolocation/features/event/controller/event_controller.dart';
 import 'package:geolocation/features/event/event_attendance_page.dart';
 import 'package:geolocation/features/event/model/event.dart';
 import 'package:geolocation/features/event/model/event_attendance.dart';
@@ -95,20 +96,24 @@ var eventAttendanceList = <Attendance>[].obs;
     update();
 
     var response = await ApiService.getAuthenticatedResource(
-      '/councils/${event.council?.id}/events/${event.id}/attendance',
+      'councils/events/${event.id}/show'
+      // '/councils/${event.council?.id}/events/${event.id}/attendance',
     );
 
     response.fold(
       (failure) {
 
-        // Get.back();
+
           isLoading(false); // Set loading to false once initialization is complete
          update();
         Modal.errorDialog(failure: failure); // Handle API failure
       },
       (success) async  {
+        print('------------------- EVENT ATTENDANCE');
+        print(success.data['data']);
+        print('-------------------');
          await prepareMap();
-        // Get.back();
+       
         isLoading(false);
          isWithinRadius(false);
           update();
@@ -566,13 +571,13 @@ Future<void> takeAttendance(bool isCheckIn) async {
         // Navigate back to the events page
         // Get.offNamedUntil('/events', (route) => route.isFirst);
 
-        // if(AuthController.controller.user.value.defaultPosition?.grantAccess == true){
-        //       Get.offNamedUntil('/collections', (route) => route.isFirst);
-        //         loadData();
-        // }{
-        //       Get.offNamedUntil('/home-officer', (route) => route.isFirst);
-        //       EventController.controller.loadAllPageData();
-        // }
+        if(AuthController.controller.user.value.defaultPosition?.grantAccess == true){
+              Get.offNamedUntil('/events', (route) => route.isFirst);
+                EventController.controller.loadEvents();
+        }else{
+              Get.offNamedUntil('/home-officer', (route) => route.isFirst);
+              EventController.controller.loadAllPageData();
+        }
 Modal.success(message: isCheckIn 
     ? 'Check-In successful! Have a great day ahead.' 
     : 'Check-Out successful! See you next time.');
@@ -962,5 +967,8 @@ void loadEventAttendanceOnScroll(int eventId) async {
     arguments: event, // Pass the full event object if needed
   );
 }
+
+
+
 
 }

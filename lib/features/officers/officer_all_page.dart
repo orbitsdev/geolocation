@@ -5,6 +5,7 @@ import 'package:geolocation/core/globalwidget/sliver_gap.dart';
 import 'package:geolocation/core/globalwidget/to_sliver.dart';
 import 'package:geolocation/core/modal/modal.dart';
 import 'package:geolocation/core/theme/palette.dart';
+import 'package:geolocation/features/attendance/controller/attendance_controller.dart';
 import 'package:geolocation/features/attendance/make_attendace_page.dart';
 import 'package:geolocation/features/event/controller/event_controller.dart';
 import 'package:geolocation/features/event/model/event.dart';
@@ -120,8 +121,14 @@ class _OfficerAllPageState extends State<OfficerAllPage> {
                                   }
                                 },
                                 onViewAttendance: () {
-                                  // Navigate to View Attendance Page
-                                  // Get.to(() => ViewAttendancePage(), transition: Transition.cupertino);
+                                  if (event.id != null) {
+
+                                          AttendanceController.controller.navigateToEventAttendancePage(event: event);
+                                          // Get.back();
+                                          // AttendanceController.controller
+                                          //     .selectAndNavigateToAttendanceRecord(
+                                          //         event);
+                                        }
                                 },
                                 onMakeAttendance: () async {
                                   bool canProceed = await econtroller
@@ -163,7 +170,7 @@ class _OfficerAllPageState extends State<OfficerAllPage> {
                     }),
               SliverAlignedGrid.count(
                   crossAxisSpacing: 8,
-                  mainAxisSpacing: 8,
+                  mainAxisSpacing: 16,
                   itemCount: postcontroller.posts.length,
                   crossAxisCount: 1,
                   itemBuilder: (context, index) {

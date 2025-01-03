@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geolocation/core/theme/palette.dart';
 import 'package:heroicons/heroicons.dart';
 
 class NotificationGlobal extends StatelessWidget {
@@ -6,13 +7,15 @@ class NotificationGlobal extends StatelessWidget {
   final VoidCallback action;
   final Color? badgeColor;
   final Color? textColor;
+  double? size;
 
-  const NotificationGlobal({
+   NotificationGlobal({
     Key? key,
     required this.value,
     required this.action,
     this.badgeColor,
     this.textColor,
+    this.size,
   }) : super(key: key);
 
   @override
@@ -23,7 +26,7 @@ class NotificationGlobal extends StatelessWidget {
         // Notification Icon
         IconButton(
           onPressed: action,
-          icon: HeroIcon(HeroIcons.bell),
+          icon: HeroIcon(HeroIcons.bell,size: size ??34,),
         ),
 
         // Badge (only visible when value > 0)
@@ -32,8 +35,9 @@ class NotificationGlobal extends StatelessWidget {
             right: 6,
             top: 6,
             child: Container(
+              padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: badgeColor ?? Colors.red, // Default badge color
+                color: badgeColor ?? Palette.RED, // Default badge color
                 borderRadius: BorderRadius.circular(20),
               ),
               constraints: const BoxConstraints(
@@ -46,7 +50,7 @@ class NotificationGlobal extends StatelessWidget {
                   style: TextStyle(
                     color: textColor ?? Colors.white, // Default text color
                     fontWeight: FontWeight.bold,
-                    fontSize: 10,
+                    fontSize: 12,
                   ),
                   textAlign: TextAlign.center,
                 ),

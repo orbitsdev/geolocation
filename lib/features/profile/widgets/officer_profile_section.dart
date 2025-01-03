@@ -14,72 +14,97 @@ class OfficerProfileSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<AuthController>(builder: (controller) {
+    return GetBuilder<AuthController>(
+      builder: (authController) {
+        // Load notifications after the widget is rendered
         WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (Get.isRegistered<NotificationController>()) {
-        NotificationController.controller.loadNotifications();
-      }
-    });
-      return SliverAppBar(
-            automaticallyImplyLeading: false,
-            flexibleSpace: FlexibleSpaceBar(
-              titlePadding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              title: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Flexible(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          '${controller.user.value.fullName}',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          '${controller.user.value.defaultPosition?.position}',
-                          style:  TextStyle(
-                            fontSize: 14,
-                            color: Palette.GREEN3,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      GetBuilder<NotificationController>(
-                        builder: (notificationController) {
+          if (Get.isRegistered<NotificationController>()) {
+            NotificationController.controller.loadNotifications();
+          }
+        });
 
-                          final unreadCount = notificationController.notifications.where((notification) => notification.read_at == null).length;
-                          return NotificationGlobal(
-                            value: unreadCount, // Badge value
-                            action: () {
-                              Get.to(()=>  NotificationPage(), transition: Transition.cupertino);
-                            },
-                            badgeColor: Palette.GREEN3,
-                            textColor: Colors.white,
-                          );
-                        }
-                      ),
-                      const SizedBox(width: 8),
-                      RippleContainer(
-                        onTap: ()=> Get.to(()=> ProfilePage(), transition: Transition.cupertino),
-                        child: Container(
-                          height: 45,
-                          width: 45,
-                          child: OnlineImage(
-                            imageUrl: controller.user.value.image ?? '',
-                            borderRadius: BorderRadius.circular(45),
-                          ),
+        final user = authController.user.value;
+        final position = user.defaultPosition?.position ?? 'N/A';
+
+        return SliverAppBar(
+          automaticallyImplyLeading: false,
+          surfaceTintColor: Colors.transparent,
+          backgroundColor: Colors.white,
+          flexibleSpace: FlexibleSpaceBar(
+            titlePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // User Information Section
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        user.fullName ?? 'Unknown User',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Palette.gray900,
                         ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        position,
+                        style:  TextStyle(
+                          fontSize: 14,
+                          color: Palette.card3,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
-                  )])));
-    });
+                  ),
+                ),
+
+                // Notification and Profile Picture Section
+                Row(
+                  children: [
+                    // Notification Icon with Badge
+                    GetBuilder<NotificationController>(
+                      builder: (notificationController) {
+                        final unreadCount = notificationController.notifications
+                            .where((notification) => notification.read_at == null)
+                            .length;
+
+                        return NotificationGlobal(
+                          value: unreadCount, // Badge value
+                          action: () {
+                            Get.to(() => NotificationPage(), transition: Transition.cupertino);
+                          },
+                          // badgeColor: Palette.GREEN3,
+                          textColor: Colors.white,
+                        );
+                      },
+                    ),
+                    const SizedBox(width: 8),
+
+                    // Profile Picture
+                    RippleContainer(
+                      onTap: () => Get.to(() => const ProfilePage(), transition: Transition.cupertino),
+                      child: Container(
+                         height: 45,
+                        width: 45,
+                        child: OnlineImage(
+                          borderRadius: BorderRadius.circular(45),
+                          imageUrl: user.image ?? '',
+                        
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 }
