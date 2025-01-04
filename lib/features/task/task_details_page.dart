@@ -10,6 +10,7 @@ import 'package:geolocation/core/globalwidget/preview_file_card.dart';
 import 'package:geolocation/core/globalwidget/progress_bar_submit.dart';
 import 'package:geolocation/core/globalwidget/thumbnail_helper.dart';
 import 'package:geolocation/core/globalwidget/to_sliver.dart';
+import 'package:geolocation/core/modal/modal.dart';
 import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:geolocation/features/task/model/task.dart';
@@ -18,6 +19,7 @@ import 'package:geolocation/features/task/widget/staus_widget.dart';
 import 'package:get/get.dart';
 import 'package:geolocation/features/task/controller/task_controller.dart';
 import 'package:gradient_elevated_button/gradient_elevated_button.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class TaskDetailsPage extends StatelessWidget {
   @override
@@ -365,11 +367,34 @@ class TaskDetailsPage extends StatelessWidget {
                             children: [
                               GestureDetector(
                                 onTap: () {
-                                  taskController.fullScreenDisplay(
+                                  // taskController.fullScreenDisplay(
+                                  //   taskController.selectedTask.value.media ??
+                                  //       [],
+                                  //   file,
+                                  // );
+
+
+                                  
+
+Modal.showFileActionTaskModal(
+  onView: () {
+     taskController.fullScreenDisplay(
                                     taskController.selectedTask.value.media ??
                                         [],
                                     file,
                                   );
+    
+  },
+  onDownload: () async {
+    // Trigger the browser download
+    final Uri fileUri = Uri.parse(file.url!);
+
+    if (await canLaunchUrl(fileUri)) {
+      await launchUrl(fileUri, mode: LaunchMode.externalApplication);
+    } else {
+      Get.snackbar('Error', 'Could not open the download link.');
+    }
+  },);
                                 },
                                 child: MediaFileCard(file: file),
                               ),

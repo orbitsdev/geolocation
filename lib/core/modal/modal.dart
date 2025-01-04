@@ -14,6 +14,7 @@ import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:geolocation/features/auth/model/council_position.dart';
 import 'package:geolocation/features/collections/create_or_edit_collection_page.dart';
 import 'package:geolocation/features/event/model/event.dart';
+import 'package:geolocation/features/file/model/media_file.dart';
 import 'package:geolocation/features/files/model/media_resource.dart';
 import 'package:geolocation/features/post/create_or_edit_post_page.dart';
 import 'package:get/get.dart';
@@ -856,14 +857,13 @@ static Future<bool> confirmation2({
 //     ),
 //   );
 // }
-
-
 static void showEventOptions({
   required Event event,
   required VoidCallback onViewDetails,
   required VoidCallback onViewAttendance,
   required VoidCallback onUpdateEvent,
   required VoidCallback onDeleteEvent,
+  required VoidCallback onDownloadAttendance, // Add this new callback
 }) {
   Get.bottomSheet(
     Container(
@@ -917,7 +917,7 @@ static void showEventOptions({
               onViewDetails();
             },
           ),
-          const Divider(),
+          Divider(color: Palette.gray200,),
 
           // View Attendance
           ListTile(
@@ -935,7 +935,7 @@ static void showEventOptions({
               onViewAttendance();
             },
           ),
-          const Divider(),
+          Divider(color: Palette.gray200,),
 
           // Update Event
           ListTile(
@@ -953,7 +953,7 @@ static void showEventOptions({
               onUpdateEvent();
             },
           ),
-          const Divider(),
+          Divider(color: Palette.gray200,),
 
           // Delete Event
           ListTile(
@@ -971,6 +971,24 @@ static void showEventOptions({
               onDeleteEvent();
             },
           ),
+          Divider(color: Palette.gray200,),
+
+          // Download Attendance
+          ListTile(
+            leading: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.purple.shade50,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(Icons.download, color: Colors.purple.shade700),
+            ),
+            title: const Text('Download Attendance'),
+            onTap: () {
+              Get.back(); // Close the modal
+              onDownloadAttendance();
+            },
+          ),
         ],
       ),
     ),
@@ -978,6 +996,7 @@ static void showEventOptions({
     backgroundColor: Colors.transparent,
   );
 }
+
 
 
 static void showCreationModal() {
@@ -1258,7 +1277,49 @@ static void showFileActionModal({
         children: [
           // View Option
           ListTile(
-            leading: Icon(Icons.visibility, color: Colors.blue),
+            leading: Icon(Icons.visibility, color: Palette.deYork500),
+            title: const Text('View'),
+            onTap: () {
+              Get.back(); // Close modal
+            onView();
+            },
+          ),
+          const Divider(),
+
+          // Download Option
+          ListTile(
+            leading: Icon(Icons.download, color: Palette.deYork500),
+            title: const Text('Download'),
+            onTap: () {
+              Get.back(); // Close modal
+              onDownload();
+            },
+          ),
+        ],
+      ),
+    ),
+    isScrollControlled: true,
+  );
+}
+
+static void showFileActionTaskModal({
+  required VoidCallback onView,
+  required VoidCallback onDownload,
+}) {
+  Get.bottomSheet(
+    Container(
+      padding: const EdgeInsets.all(16.0),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // View Option
+          ListTile(
+            leading: Icon(Icons.visibility, color: Palette.deYork500),
             title: const Text('View File'),
             onTap: () {
               Get.back(); // Close modal
@@ -1269,7 +1330,7 @@ static void showFileActionModal({
 
           // Download Option
           ListTile(
-            leading: Icon(Icons.download, color: Colors.green),
+            leading: Icon(Icons.download, color: Palette.deYork500),
             title: const Text('Download File'),
             onTap: () {
               Get.back(); // Close modal

@@ -14,6 +14,7 @@ import 'package:geolocation/features/event/model/event.dart';
 import 'package:geolocation/features/event/widgets/event_card.dart';
 import 'package:geolocation/features/event/widgets/event_card2.dart';
 import 'package:geolocation/features/event/widgets/event_card3.dart';
+import 'package:geolocation/features/reports/report_controller.dart';
 import 'package:get/get.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
@@ -154,6 +155,9 @@ class _EventPageState extends State<EventPage> {
 
                                           controller.delete(event.id!);
                                         }
+                                      },
+                                      onDownloadAttendance: () async {
+                                          await ReportController.controller.exportEventAttendance(event.id!);
                                       },
                                     );
                                 },);

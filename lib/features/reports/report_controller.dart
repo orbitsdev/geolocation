@@ -62,6 +62,34 @@ class ReportController extends GetxController {
     update();
   }
 
+   bool isLoadingAttendance = false;
+
+  Future<void> exportEventAttendance(int eventId) async {
+    isLoadingAttendance = true;
+    update();
+
+    final url = 'https://geolocation.me/api/report/event/attendance/export/$eventId';
+    await _openInBrowser(url);
+
+    isLoadingAttendance = false;
+    update();
+  }
+
+  Future<void> exportAttendanceByCouncilPosition({
+  required int councilId,
+  required int councilPositionId,
+}) async {
+  final url = 'https://geolocation.me/api/report/council/$councilId/position/$councilPositionId/attendance/export';
+  await _openInBrowser(url);
+}
+
+
+Future<void> exportTasksByCouncilPosition({required int councilPositionId}) async {
+  final url = 'https://geolocation.me/api/report/council-position/$councilPositionId/tasks/export';
+  await _openInBrowser(url);
+}
+
+
   // Open URL in Browser
   Future<void> _openInBrowser(String url) async {
     if (await canLaunchUrl(Uri.parse(url))) {
