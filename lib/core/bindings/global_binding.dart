@@ -26,6 +26,7 @@ class GlobalBinding extends Bindings {
   Get.put<ModalController>(ModalController(), permanent: true);
   Get.put<CouncilController>(CouncilController(), permanent: true);
   Get.put<CouncilPositionController>(CouncilPositionController(), permanent: true);
+  Get.put<TaskController>(TaskController(), permanent: true);
   Get.put<NotificationController>(NotificationController(), permanent: true);
   Get.put<ReportController>(ReportController(), permanent: true);
     
@@ -35,7 +36,7 @@ class GlobalBinding extends Bindings {
     // Get.lazyPut(() => CouncilPositionController(), fenix: true);
     Get.lazyPut(() => ProfileController(), fenix: true);
     Get.lazyPut(() => EventController(), fenix: true);
-    Get.lazyPut(() => TaskController(), fenix: true);
+    // Get.lazyPut(() => TaskController(), fenix: true);
     Get.lazyPut(() => PostController(), fenix: true);
     Get.lazyPut(() => CollectionController(), fenix: true);
     Get.lazyPut(() => FilesController(), fenix: true);

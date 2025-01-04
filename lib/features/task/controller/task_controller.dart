@@ -465,6 +465,7 @@ Widget _buildListTile({
             'remarks': remarks,
             'is_admin_action': isAdmin,
           };
+         
           Modal.loading();
           var response = await ApiService.putAuthenticatedResource(
               '/tasks/${selectedTask.value.id}/status', data);
@@ -484,7 +485,7 @@ Widget _buildListTile({
               Task taskDetails = Task.fromMap(data);
               selectedTask(taskDetails);
               update(); // Update UI
-
+              loadTask();
               Modal.success(
                 message: status == Task.STATUS_COMPLETED
                     ? 'Task successfully approved and marked as completed! 🎉'
