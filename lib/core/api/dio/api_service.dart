@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:geolocation/core/api/dio/failure.dart';
@@ -8,6 +10,7 @@ import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:get/get.dart';
 import 'package:dio/dio.dart' as D;
 import 'package:get/get.dart' as getX;
+import 'package:path_provider/path_provider.dart';
 // EitherModel typedef for response type
 typedef EitherModel<T> = Either<Failure, T>;
 
@@ -202,6 +205,34 @@ static Future<EitherModel<D.Response>> filePostAuthenticatedResource(
     return left(ErrorHandler.handleDio(e)); // Use ErrorHandler for consistent error handling
   }
 }
+
+static Future<Either<Failure, File?>> downloadFile({
+  required String endpoint,
+  required String fileName,
+  void Function(int, int)? onReceiveProgress,
+}) async {
+  try {
+    final response = await _dio.get(
+      endpoint,
+      options: Options(responseType: ResponseType.bytes),
+      onReceiveProgress: onReceiveProgress,
+    );
+
+    // Get the directory to save the file
+    final directory = await getApplicationDocumentsDirectory();
+    final filePath = '${directory.path}/$fileName';
+
+    // Save the file
+    final file = File(filePath);
+    await file.writeAsBytes(response.data);
+
+    return right(file); // Return the file on success
+  } on DioException catch (e) {
+    return left(ErrorHandler.handleDio(e)); // Return the error
+  }
+}
+
+
 
 
 }

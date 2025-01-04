@@ -176,6 +176,13 @@ class _DashboardPageState extends State<DashboardPage> {
             isLoading: MediaController.controller.isLoading.value,
             onTap: () => Get.toNamed('/files'),
           ),
+          _buildGridItem(
+          icon: FontAwesomeIcons.fileExport,
+          title: 'Reports',
+          count: '',
+          isLoading: false,
+          onTap: () => Get.toNamed('/reports'), // Navigate to the reports page
+        ),
         ]);
       }
 

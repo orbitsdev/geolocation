@@ -13,6 +13,7 @@ import 'package:geolocation/features/notification/controller/notification_contro
 import 'package:geolocation/features/officers/controller/officer_controller.dart';
 import 'package:geolocation/features/post/controller/post_controller.dart';
 import 'package:geolocation/features/profile/controller/profile_controller.dart';
+import 'package:geolocation/features/reports/report_controller.dart';
 
 import 'package:geolocation/features/task/controller/search_officer_controller.dart';
 import 'package:geolocation/features/task/controller/task_controller.dart';
@@ -39,6 +40,7 @@ class AppBinding  extends Bindings{
     Get.put(SearchOfficerController(), permanent: true);
     Get.put(OfficerController(), permanent: true);
     Get.put(MediaController(), permanent: true);
+    Get.put(ReportController(), permanent: true);
 
   }
 

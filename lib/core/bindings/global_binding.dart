@@ -14,6 +14,7 @@ import 'package:geolocation/features/post/controller/post_controller.dart';
 import 'package:geolocation/features/profile/controller/profile_controller.dart';
 import 'package:geolocation/features/auth/controller/login_controller.dart';
 import 'package:geolocation/features/auth/controller/signup_controller.dart';
+import 'package:geolocation/features/reports/report_controller.dart';
 import 'package:geolocation/features/task/controller/task_controller.dart';
 import 'package:get/get.dart';
 
@@ -26,6 +27,7 @@ class GlobalBinding extends Bindings {
   Get.put<CouncilController>(CouncilController(), permanent: true);
   Get.put<CouncilPositionController>(CouncilPositionController(), permanent: true);
   Get.put<NotificationController>(NotificationController(), permanent: true);
+  Get.put<ReportController>(ReportController(), permanent: true);
     
     
     // Controllers that might only be used on specific pages
@@ -39,5 +41,6 @@ class GlobalBinding extends Bindings {
     Get.lazyPut(() => FilesController(), fenix: true);
     Get.lazyPut(() => AttendanceController(), fenix: true);
     Get.lazyPut(() => SampleMapController(), fenix: true);
+    // Get.lazyPut(() => SampleMapController(), fenix: true);
   }
 }

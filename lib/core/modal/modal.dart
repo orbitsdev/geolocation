@@ -14,6 +14,7 @@ import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:geolocation/features/auth/model/council_position.dart';
 import 'package:geolocation/features/collections/create_or_edit_collection_page.dart';
 import 'package:geolocation/features/event/model/event.dart';
+import 'package:geolocation/features/files/model/media_resource.dart';
 import 'package:geolocation/features/post/create_or_edit_post_page.dart';
 import 'package:get/get.dart';
 import 'package:heroicons/heroicons.dart';
@@ -1238,6 +1239,51 @@ static void showMemberActionModal(
       isScrollControlled: true,
     );
   }
+
+static void showFileActionModal({
+  required MediaResource mediaResource,
+  required VoidCallback onView,
+  required VoidCallback onDownload,
+}) {
+  Get.bottomSheet(
+    Container(
+      padding: const EdgeInsets.all(16.0),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // View Option
+          ListTile(
+            leading: Icon(Icons.visibility, color: Colors.blue),
+            title: const Text('View File'),
+            onTap: () {
+              Get.back(); // Close modal
+              onView();
+            },
+          ),
+          const Divider(),
+
+          // Download Option
+          ListTile(
+            leading: Icon(Icons.download, color: Colors.green),
+            title: const Text('Download File'),
+            onTap: () {
+              Get.back(); // Close modal
+              onDownload();
+            },
+          ),
+        ],
+      ),
+    ),
+    isScrollControlled: true,
+  );
+}
+
+
 }
 
 

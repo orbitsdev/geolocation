@@ -167,10 +167,14 @@ class Task {
   return 'STATUS: ${status} - OFFICER: ${assignedCouncilPosition?.id} - LOGIN OFFICER: ${officerId}';
 }
 
-
+//owner
+bool isTaskOwner() {
+  int? officerId = AuthController.controller.user.value.defaultPosition?.id;
+  return (assignedCouncilPosition?.id == officerId);
  
 }
 
+}
 
 
  

@@ -38,19 +38,9 @@ class TaskDetailsPage extends StatelessWidget {
         actions: [
  GetBuilder<TaskController>(
   builder: (controller) {
-    final user = AuthController.controller.user.value;
-    final task = TaskController.controller.selectedTask.value;
+    
 
-    // Admin logic: Admin can always see "MANAGE"
-    final isAdmin = user.defaultPosition?.grantAccess == true;
-
-    // Officer logic: Officers can see "MANAGE" if they are assigned to the task
-    final isOfficerAssigned = user.defaultPosition?.id == task.assignedCouncilPosition?.id;
-
-    // Determine if the "MANAGE" button should be visible
-    final canManage = isAdmin || (isOfficerAssigned && task.status != Task.STATUS_COMPLETED);
-
-    if (canManage) {
+    if (controller.selectedTask.value.isTaskNotCompleteAndAssignedToCurrentOfficer() || AuthController.controller.user.value.defaultPosition?.grantAccess  ==true) {
       return TextButton(
         onPressed: () {
           controller.showApprovalModal();
@@ -59,10 +49,11 @@ class TaskDetailsPage extends StatelessWidget {
       );
     }
 
-    // Return an empty widget if the condition is not met
-    return const SizedBox.shrink();
+    // Show user id if they are the task owner
+    return Container();
   },
 ),
+
 
 
 
