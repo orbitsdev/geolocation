@@ -86,7 +86,7 @@ class LoginPage extends GetView<AuthController> {
                             Text('Email', style: Get.textTheme.bodyMedium),
                             const Gap(2),
                             FormBuilderTextField(
-                              initialValue: '@gmail.com',
+                              // initialValue: '@gmail.com',
                               name: 'email',
                               decoration: _inputDecoration('Enter your email'),
                               validator: FormBuilderValidators.compose([
@@ -98,7 +98,7 @@ class LoginPage extends GetView<AuthController> {
                             Text('Password', style: Get.textTheme.bodyMedium),
                             const Gap(2),
                             Obx(() => FormBuilderTextField(
-                                  initialValue: 'password',
+                                  // initialValue: 'password',
                                   name: 'password',
                                   obscureText: controller.obscureText.value,
                                   decoration: _inputDecoration(

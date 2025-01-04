@@ -79,7 +79,7 @@ class ForbiddenPage extends StatelessWidget {
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 24),
                           child: Text(
-                            'No default position found. Please switch to a valid position.',
+                            'Default position not set. Please reach out to the administrator for assistance.',
                             textAlign: TextAlign.center,
                             style: Get.textTheme.bodyMedium,
                           ),

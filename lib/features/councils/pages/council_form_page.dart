@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocation/core/constant/style.dart';
 import 'package:geolocation/core/formatters/academic_year_fomatter.dart';
+import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/councils/controller/council_controller.dart';
 import 'package:get/get.dart';
 
@@ -26,7 +27,10 @@ class CouncilFormPage extends StatelessWidget {
     }
 
     return Scaffold(
+      backgroundColor: Palette.FBG,
       appBar: AppBar(
+        surfaceTintColor: Colors.transparent,
+        backgroundColor: Colors.white,
         title: Text(isEdit ? 'Edit Council' : 'Add Council'),
       ),
       body: Padding(

@@ -121,6 +121,7 @@ class _DashboardPageState extends State<DashboardPage> {
         gridItems.add(_buildGridItem(
           icon: FontAwesomeIcons.users,
           title: 'Councils',
+           isLoading: councilController.isLoading.value,
           count: councilController.councils.length.toString(),
           onTap: () => Get.toNamed('/councils'),
         ));

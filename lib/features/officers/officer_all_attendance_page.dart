@@ -12,6 +12,7 @@ import 'package:geolocation/features/attendance/make_attendace_page.dart';
 import 'package:geolocation/features/attendance/model/attendance.dart';
 import 'package:geolocation/features/attendance/widgets/attendance_card.dart';
 import 'package:geolocation/features/attendance/widgets/attendance_card_shimmer.dart';
+import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:geolocation/features/collections/collection_details_page.dart';
 import 'package:geolocation/features/collections/controller/collection_controller.dart';
 import 'package:geolocation/features/collections/create_or_edit_collection_page.dart';
@@ -24,6 +25,7 @@ import 'package:geolocation/features/event/model/event.dart';
 import 'package:geolocation/features/event/model/event_attendance.dart';
 import 'package:geolocation/features/event/widgets/event_card.dart';
 import 'package:geolocation/features/event/widgets/event_card2.dart';
+import 'package:geolocation/features/reports/report_controller.dart';
 import 'package:get/get.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
@@ -76,7 +78,24 @@ class _OfficerAllAttendancePageState extends State<OfficerAllAttendancePage> {
                 shrinkWrap: true,
                 physics: const AlwaysScrollableScrollPhysics(),
                 slivers: [
-                  // Add spacing at the top
+                 if (!controller.isPageLoading.value && controller.attendances.isNotEmpty)
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: TextButton.icon(
+                        onPressed: () async {
+                          await ReportController.controller.exportAttendanceByCouncilPosition(
+                            councilId: AuthController.controller.user.value.defaultPosition!.councilId!,
+                            councilPositionId: AuthController.controller.user.value.defaultPosition!.id!, 
+                            
+                          );
+                        },
+                        icon: const Icon(Icons.download),
+                        label: const Text("Download Attendance "),
+                       
+                      ),
+                    ),
+                  ),
 
                   // Main content
                   controller.isPageLoading.value

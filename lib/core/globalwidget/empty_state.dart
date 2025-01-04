@@ -20,7 +20,12 @@ class EmptyState extends StatelessWidget {
   Widget build(BuildContext context){
     return   Container(
                     child: Column(
+                      
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
+                        Container(
+                          width: Get.size.width,
+                        ),
                         Gap(24),
                         LocalLottieImage(path: path?? lottiesPath('empty3.json') ),
                         Gap(8),

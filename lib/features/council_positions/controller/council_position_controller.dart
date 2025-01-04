@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:geolocation/core/api/dio/failure.dart';
 import 'package:geolocation/core/modal/modal.dart';
+import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:geolocation/features/auth/model/available_user.dart';
 import 'package:geolocation/features/auth/model/council_position.dart';
 import 'package:geolocation/core/api/dio/api_service.dart';
 import 'package:geolocation/features/auth/model/position_option.dart';
 import 'package:geolocation/features/council_positions/model/member.dart';
 import 'package:geolocation/features/council_positions/pages/council_member_position_list_page.dart';
+import 'package:geolocation/features/council_positions/pages/council_member_position_list_page_admin.dart';
 import 'package:geolocation/features/council_positions/pages/council_member_profile_page.dart';
 import 'package:get/get.dart';
 
@@ -71,6 +73,7 @@ void setCouncilId(int id){
   } 
    selectedCouncilId(id);
 }
+
 void selectAndNavigateToCouncilMemberPage(int id) {
   if(selectedCouncilId.value != id){
     councilMembers.clear();
@@ -78,6 +81,15 @@ void selectAndNavigateToCouncilMemberPage(int id) {
   selectedCouncilId(id);
   print('Selected Council ID: ${selectedCouncilId.value}');
   Get.to(() => CouncilMemberPositionListPage(), transition: Transition.cupertino);
+}
+
+void selectAndNavigateToCouncilMemberPageAdmin(int id) {
+  if(selectedCouncilId.value != id){
+    councilMembers.clear();
+  }
+  selectedCouncilId(id);
+  print('Selected Council ID: ${selectedCouncilId.value}');
+  Get.to(() => CouncilMemberPositionListAdmin(), transition: Transition.cupertino);
 }
 
 
@@ -213,8 +225,18 @@ Future<void> createCouncilPosition() async {
         clearSelectedUser();
         await fetchCouncilMembers(); // Refresh council members
         // No need to reset selectedCouncilId
-        Modal.showToast(msg: 'New Member was created successfully');         Get.offNamedUntil('/members', (route) => route.isFirst);
+      
         
+          if(AuthController.controller.user.value.isAdmin()){
+         Get.offNamedUntil('/members-admin', (route) => route.isFirst);
+
+          }else{
+         Get.offNamedUntil('/members', (route) => route.isFirst);
+
+          }
+
+            Modal.success(message:'New Member was created successfully');
+            
 
       },
     );

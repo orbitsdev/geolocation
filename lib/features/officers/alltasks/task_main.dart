@@ -6,12 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:geolocation/core/globalwidget/custom_indicator.dart';
 import 'package:geolocation/core/theme/palette.dart';
+import 'package:geolocation/features/auth/controller/auth_controller.dart';
 import 'package:geolocation/features/officers/alltasks/all_task.dart';
 import 'package:geolocation/features/officers/alltasks/completed_tasks.dart';
 import 'package:geolocation/features/officers/alltasks/need_revision_tasks.dart';
 import 'package:geolocation/features/officers/alltasks/rejected_tasks.dart';
 import 'package:geolocation/features/officers/alltasks/resubmit_tasks.dart';
 import 'package:geolocation/features/officers/alltasks/todo_tasks.dart';
+import 'package:geolocation/features/reports/report_controller.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:heroicons/heroicons.dart';
@@ -127,6 +129,35 @@ class _TaskMainState extends State<TaskMain> with   SingleTickerProviderStateMix
               //   text: 'Return Refund',
               // ),
             ]),
+            actions: [
+  TextButton(
+    onPressed: () async {
+      final councilPositionId = Get.find<AuthController>()
+          .user
+          .value
+          .defaultPosition
+          ?.id; // Retrieve council position ID
+
+      if (councilPositionId == null) {
+        Get.snackbar('Error', 'Council position ID not found.');
+        return;
+      }
+
+      await ReportController.controller.exportTasksByCouncilPosition(councilPositionId: councilPositionId);
+    },
+    child: Text(
+      'Download Tasks',
+      style: TextStyle(
+        color: Palette.DARK_PRIMARY,
+        fontWeight: FontWeight.bold,
+        //underline
+        
+        fontSize: 16,
+      ),
+    ),
+  ),
+],
+
       ),
       body: TabBarView(controller: tabController, children: page),
     );
