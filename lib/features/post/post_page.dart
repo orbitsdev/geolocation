@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:geolocation/core/globalwidget/empty_state.dart';
 import 'package:geolocation/core/globalwidget/sliver_gap.dart';
 import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/post/controller/post_controller.dart';
@@ -8,6 +9,7 @@ import 'package:geolocation/features/post/model/post.dart';
 import 'package:geolocation/features/post/widget/post_widget.dart';
 import 'package:geolocation/features/post/widget/shimmer_post_widget.dart';
 import 'package:get/get.dart';
+import 'package:googleapis/accessapproval/v1.dart';
 
 class PostPage extends StatefulWidget {
    PostPage({Key? key}) : super(key: key);
@@ -99,14 +101,8 @@ class _PostPageState extends State<PostPage> {
 
                 if (controller.posts.isEmpty) {
                   return  SliverToBoxAdapter(
-                    child: Center(
-                      child: Text(
-                        'No posts available',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey,
-                        ),
-                      ),
+                    child: EmptyState(
+                      label: 'No posts found',
                     ),
                   );
                 }

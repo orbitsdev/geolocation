@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geolocation/core/globalwidget/empty_state.dart';
 import 'package:geolocation/core/globalwidget/ripple_container.dart';
 import 'package:geolocation/core/globalwidget/sliver_gap.dart';
 import 'package:geolocation/core/globalwidget/to_sliver.dart';
@@ -11,6 +12,7 @@ import 'package:geolocation/features/collections/model/collection.dart';
 import 'package:geolocation/features/collections/widgets/collection_card.dart';
 import 'package:get/get.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:googleapis/accessapproval/v1.dart';
 
 class CollectionPage extends StatefulWidget {
   const CollectionPage({Key? key}) : super(key: key);
@@ -116,15 +118,9 @@ class _CollectionPageState extends State<CollectionPage> {
                                 );
                               },
                             )
-                          : const SliverToBoxAdapter(
-                              child: Center(
-                                child: Text(
-                                  'No collections found',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.black54,
-                                  ),
-                                ),
+                          :  SliverToBoxAdapter(
+                              child: EmptyState(
+                                label: 'No collections found',
                               ),
                             ),
 

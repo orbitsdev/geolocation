@@ -434,78 +434,244 @@ Widget _buildListTile({
     
   }
 
-  void updateTaskStatus(String status, {String? remarks}) async {
-    String actionText;
+  // void updateTaskStatus(String status, {String? remarks}) async {
 
-    // Define the action text based on the status
-    if (status == Task.STATUS_COMPLETED) {
-      actionText = "approve this task as completed";
-    } else if (status == Task.STATUS_APPROVE) {
-      actionText = "approve this task as completed";
+  //   String previusStatus = selectedTask.value.status as String;
+  //   String actionText;
 
-    } else if (status == Task.STATUS_NEED_REVISION) {
-      actionText = "mark this task as needing revision";
-    } else if (status == Task.STATUS_REJECTED) {
-      actionText = "reject this task";
-    } else {
-      actionText = "update this task status";
-    }
+  //   // Define the action text based on the status
+  //   if (status == Task.STATUS_COMPLETED) {
+  //     actionText = "approve this task as completed";
+  //   } else if (status == Task.STATUS_APPROVE) {
+  //     actionText = "approve this task as completed";
+
+  //   } else if (status == Task.STATUS_NEED_REVISION) {
+  //     actionText = "mark this task as needing revision";
+  //   } else if (status == Task.STATUS_REJECTED) {
+  //     actionText = "reject this task";
+  //   } else {
+  //     actionText = "update this task status";
+  //   }
   
 
-    Modal.confirmation(
-      titleText: "Confirm Action",
-      contentText:
-          "Are you sure you want to $actionText? This action will update the task's status and notify relevant users.",
-      onConfirm: () async {
-        try {
-     bool isAdmin = AuthController.controller.user.value.defaultPosition?.grantAccess ?? false;
+  //   Modal.confirmation(
+  //     titleText: "Confirm Action",
+  //     contentText:
+  //         "Are you sure you want to $actionText? This action will update the task's status and notify relevant users.",
+  //     onConfirm: () async {
+  //       try {
+  //    bool isAdmin = AuthController.controller.user.value.defaultPosition?.grantAccess ?? false;
 
-          var data = {
-            'status': status,
-            'remarks': remarks,
-            'is_admin_action': isAdmin,
-          };
+  //         var data = {
+  //           'status': status,
+  //           'remarks': remarks,
+  //           'is_admin_action': isAdmin,
+  //         };
          
-          Modal.loading();
-          var response = await ApiService.putAuthenticatedResource(
-              '/tasks/${selectedTask.value.id}/status', data);
+  //         Modal.loading();
+  //         var response = await ApiService.putAuthenticatedResource(
+  //             '/tasks/${selectedTask.value.id}/status', data);
 
-          response.fold(
-            (failure) {
-              Get.back(); // Close modal
-              Get.back(); // Close modal
-              Modal.errorDialog(failure: failure); // Display error
-            },
-            (success) {
-              Get.back(); // Close modal
-              Get.back(); // Close modal
-              isLoading(false);
-               loadByOfficerTask();
-              var data = success.data['data'];
-              Task taskDetails = Task.fromMap(data);
-              selectedTask(taskDetails);
-              update(); // Update UI
-              loadTask();
-              Modal.success(
-                message: status == Task.STATUS_COMPLETED
-                    ? 'Task successfully approved and marked as completed! 🎉'
-                    : status == Task.STATUS_NEED_REVISION
-                        ? 'Task marked as needing revision. Please provide further guidance. 🛠️'
-                        : status == Task.STATUS_REJECTED
-                            ? 'Task has been rejected. 🛑'
-                            : 'Task status updated successfully!',
-              );
-            },
-          );
-        } catch (e) {
-          Get.snackbar("Error", "Something went wrong: $e");
-        }
-      },
-      onCancel: () {
-        Get.back(); // Close modal on cancel
-      },
-    );
+  //         response.fold(
+  //           (failure) {
+  //             Get.back(); // Close modal
+  //             Get.back(); // Close modal
+  //             Modal.errorDialog(failure: failure); // Display error
+  //           },
+  //           (success) {
+  //             Get.back(); // Close modal
+  //             Get.back(); // Close modal
+  //             isLoading(false);
+  //              loadByOfficerTask();
+  //             var data = success.data['data'];
+  //             Task taskDetails = Task.fromMap(data);
+  //             selectedTask(taskDetails);
+  //             update(); // Update UI
+             
+  //            // load previous task and load new task
+
+
+
+  //            if(isAdmin){
+  //               loadTask();
+  //            }else{
+  //                switch (status) {
+  //              case Task.STATUS_TODO:
+  //                loadToDoTask();
+  //                break;
+  //              case Task.STATUS_NEED_REVISION:
+  //                loadNeedRevisionTask();
+  //                break;
+  //              case Task.STATUS_REJECTED:
+  //                loadResubmitTask();
+  //                break;
+  //              case Task.STATUS_RESUBMIT:
+  //                loadResubmitTask();
+  //                break;
+  //              case Task.STATUS_COMPLETED:
+  //                loadCompletedTask();
+  //                break;
+  //              default: 
+  //            }
+
+  //            }
+
+
+
+  //             Modal.success(
+  //               message: status == Task.STATUS_COMPLETED
+  //                   ? 'Task successfully approved and marked as completed! 🎉'
+  //                   : status == Task.STATUS_NEED_REVISION
+  //                       ? 'Task marked as needing revision. Please provide further guidance. 🛠️'
+  //                       : status == Task.STATUS_REJECTED
+  //                           ? 'Task has been rejected. 🛑'
+  //                           : 'Task status updated successfully!',
+  //             );
+  //           },
+  //         );
+  //       } catch (e) {
+  //         Get.snackbar("Error", "Something went wrong: $e");
+  //       }
+  //     },
+  //     onCancel: () {
+  //       Get.back(); // Close modal on cancel
+  //     },
+  //   );
+  // }
+
+  void updateTaskStatus(String status, {String? remarks}) async {
+  String previousStatus = selectedTask.value.status as String;
+  String actionText;
+
+  // Define the action text based on the status
+  switch (status) {
+    case Task.STATUS_COMPLETED:
+    case Task.STATUS_APPROVE:
+      actionText = "approve this task as completed";
+      break;
+    case Task.STATUS_NEED_REVISION:
+      actionText = "mark this task as needing revision";
+      break;
+    case Task.STATUS_REJECTED:
+      actionText = "reject this task";
+      break;
+    default:
+      actionText = "update this task status";
   }
+
+  Modal.confirmation(
+    titleText: "Confirm Action",
+    contentText:
+        "Are you sure you want to $actionText? This action will update the task's status and notify relevant users.",
+    onConfirm: () async {
+      try {
+        bool isAdmin =
+            AuthController.controller.user.value.defaultPosition?.grantAccess ??
+                false;
+
+        var data = {
+          'status': status,
+          'remarks': remarks,
+          'is_admin_action': isAdmin,
+        };
+
+        Modal.loading(); // Show loading modal
+        var response = await ApiService.putAuthenticatedResource(
+          '/tasks/${selectedTask.value.id}/status',
+          data,
+        );
+
+        response.fold(
+          (failure) {
+            Get.back(); // Close loading modal
+            Modal.errorDialog(failure: failure); // Display error modal
+          },
+          (success) {
+            Get.back(); 
+            Get.back(); 
+            // Close loading modal
+            isLoading(false);
+
+            // Update selected task
+            var taskData = success.data['data'];
+            Task updatedTask = Task.fromMap(taskData);
+            selectedTask(updatedTask);
+            update(); // Update UI
+
+          if(isAdmin){
+            loadTask();
+          }else{
+             loadMyTask(); 
+          }
+          print('Previous Status: $previousStatus');
+            // Reload previous task list
+            switch (previousStatus) {
+              case Task.STATUS_TODO:
+                loadToDoTask();
+              
+              case Task.STATUS_NEED_REVISION:
+                loadNeedRevisionTask();
+              
+              case Task.STATUS_REJECTED:
+                loadRejectTask();
+              
+              case Task.STATUS_RESUBMIT:
+                loadResubmitTask();
+              
+              case Task.STATUS_COMPLETED:
+                loadCompletedTask();
+              
+              default:
+                loadMyTask(); // Fallback for undefined status
+            }
+
+
+            print('New Status: $status');
+
+            // Reload new task list
+            switch (status) {
+              case Task.STATUS_TODO:
+                loadToDoTask();
+                break;
+              case Task.STATUS_NEED_REVISION:
+                loadNeedRevisionTask();
+                break;
+              case Task.STATUS_REJECTED:
+                loadRejectTask();
+                break;
+              case Task.STATUS_RESUBMIT:
+                loadResubmitTask();
+                break;
+              case Task.STATUS_COMPLETED:
+                loadCompletedTask();
+                break;
+              default:
+                loadTask(); // Fallback for undefined status
+            }
+
+            // Show success modal with appropriate message
+            Modal.success(
+              message: status == Task.STATUS_COMPLETED
+                  ? 'Task successfully approved and marked as completed! 🎉'
+                  : status == Task.STATUS_NEED_REVISION
+                      ? 'Task marked as needing revision. Please provide further guidance. 🛠️'
+                      : status == Task.STATUS_REJECTED
+                          ? 'Task has been rejected. 🛑'
+                          : 'Task status updated successfully!',
+            );
+          },
+        );
+      } catch (e) {
+        Get.back(); // Close loading modal
+        Get.snackbar("Error", "Something went wrong: $e");
+      }
+    },
+    onCancel: () {
+      Get.back(); // Close confirmation modal
+    },
+  );
+}
+
 
   Future<void> deleteMediaFromServer(int mediaId) async {
     try {
@@ -1104,27 +1270,33 @@ Widget _buildListTile({
 
 
   
-  Future<void> reload(String status) async {
-    switch (status) {
-      case Task.ALL:
-        loadByOfficerTask();
+  Future<void> reload(String status, {bool isAdmin = false}) async {
+
+    if(isAdmin){
+      loadTask();
+      return;
+    }else{
+switch (status) {
       case Task.STATUS_TODO:
         loadToDoTask();
-      case Task.STATUS_IN_PROGRESS:
-       
+        break;
+      case Task.STATUS_NEED_REVISION:
+        loadNeedRevisionTask();
+        break;
+      case Task.STATUS_REJECTED:
+        loadRejectTask();
+        break;
+      case Task.STATUS_RESUBMIT:
+        
+        loadResubmitTask();
         break;
       case Task.STATUS_COMPLETED:
-       
-      case Task.STATUS_APPROVE:
- 
-      case Task.STATUS_NEED_REVISION:
-     
-      case Task.STATUS_REJECTED:
-      
-      case Task.STATUS_RESUBMIT:
-       
-
+        loadCompletedTask();
+        break;
       default:
+    }
+    
+    
       //loadToShipOrders(context);
     }
   }

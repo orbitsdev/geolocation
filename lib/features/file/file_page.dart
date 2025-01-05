@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:geolocation/core/globalwidget/empty_state.dart';
 import 'package:geolocation/core/theme/game_pallete.dart';
 import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/file/controller/files_controller.dart';
@@ -27,14 +28,9 @@ class FilesPage extends StatelessWidget {
       ),
       body: Obx(() {
         if (controller.files.isEmpty) {
-          return Center(
-            child: Text(
-              'No files available.',
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.grey[600],
-              ),
-            ),
+          return EmptyState(
+            label: 'No files found',
+           
           );
         }
 

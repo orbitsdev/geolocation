@@ -31,6 +31,8 @@ final CollectionController controller = Get.find<CollectionController>();
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        surfaceTintColor: Colors.transparent,
+        backgroundColor: Colors.white,
         title: Text(isEditMode ? 'Edit Collection' : 'Create Collection'),
         actions: [
           GetBuilder<CollectionController>(

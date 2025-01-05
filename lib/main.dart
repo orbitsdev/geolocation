@@ -47,7 +47,6 @@ import 'package:geolocation/features/auth/pages/login_page.dart';
 import 'package:geolocation/features/auth/pages/signup_page.dart';
 import 'package:geolocation/features/settings/profile_page.dart';
 import 'package:geolocation/features/task/member_task_page.dart';
-import 'package:geolocation/features/task/task_page.dart';
 import 'package:get/get.dart';
 
 @pragma('vm:entry-point') 

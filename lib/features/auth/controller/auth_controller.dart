@@ -36,6 +36,7 @@ class AuthController extends GetxController {
   var user = User().obs;
   var token = ''.obs;
   var isTokenLoaded = false.obs;
+  var isUpdating  =false.obs;
 
 int? selectedPositionId; 
 
@@ -90,6 +91,7 @@ int? selectedPositionId;
 Future<void> updateProfile() async {
   if (formKey.currentState?.saveAndValidate() ?? false) {
     // Show loading modal
+    isUpdating(true);
     Modal.loading();
 
     try {
@@ -142,10 +144,14 @@ Future<void> updateProfile() async {
 
       response.fold(
         (failure) {
+              isUpdating(false);
+
           uploadProgress.value = 0.0; // Reset progress on failure
           Modal.errorDialog(message: 'Failed to update profile', failure: failure);
         },
         (success) async {
+              isUpdating(false);
+
           print('-------------------- SUCCESS DATA');
           print(success.data);
           uploadProgress.value = 0.0; // Reset progress on success
@@ -167,6 +173,8 @@ Future<void> updateProfile() async {
         },
       );
     } catch (e) {
+          isUpdating(false);
+
       // Handle any unexpected errors
       uploadProgress.value = 0.0;
       update();

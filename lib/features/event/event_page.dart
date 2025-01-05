@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:geolocation/core/globalwidget/empty_state.dart';
 import 'package:geolocation/core/globalwidget/ripple_container.dart';
 import 'package:geolocation/core/globalwidget/sliver_gap.dart';
 import 'package:geolocation/core/globalwidget/to_sliver.dart';
@@ -164,12 +165,8 @@ class _EventPageState extends State<EventPage> {
                               },
                             )
                           : ToSliver(
-                              child: Center(
-                                child: Text(
-                                  'No events found',
-                                  style: TextStyle(
-                                      fontSize: 16, color: Colors.black54),
-                                ),
+                              child: EmptyState(
+                                label: 'No events found',
                               ),
                             ),
                   if (controller.isScrollLoading.value)

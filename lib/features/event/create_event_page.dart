@@ -52,6 +52,8 @@ class _CreateEventPageState extends State<CreateEventPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        surfaceTintColor: Colors.transparent,
+        backgroundColor: Colors.white,
         leading: IconButton(
             onPressed: () {
               if (isEditMode == true) {

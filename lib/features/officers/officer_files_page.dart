@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:geolocation/core/api/dio/api_service.dart';
+import 'package:geolocation/core/globalwidget/empty_state.dart';
 import 'package:geolocation/core/globalwidget/sliver_gap.dart';
 import 'package:geolocation/core/globalwidget/to_sliver.dart';
 import 'package:geolocation/core/modal/modal.dart';
@@ -116,13 +117,9 @@ Modal.showFileActionModal(
                     },
                   )
                           : ToSliver(
-                              child: Center(
-                                child: Text(
-                                  'No media found',
-                                  style: TextStyle(
-                                      fontSize: 16, color: Colors.black54),
-                                ),
-                              ),
+                              child:EmptyState(
+                                label: 'No files found',
+                              ),  
                             ),
                   if (controller.isScrollLoading.value)
                      SliverAlignedGrid.count(
