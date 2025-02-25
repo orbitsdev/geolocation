@@ -3,6 +3,7 @@
 import 'package:geolocation/core/globalcontroller/modal_controller.dart';
 import 'package:geolocation/features/attendance/controller/attendance_controller.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
+import 'package:geolocation/features/chat/chat_room_controller.dart';
 import 'package:geolocation/features/collections/controller/collection_controller.dart';
 import 'package:geolocation/features/councils/controller/council_controller.dart';
 import 'package:geolocation/features/event/controller/event_controller.dart';
@@ -29,6 +30,7 @@ class GlobalBinding extends Bindings {
   Get.put<TaskController>(TaskController(), permanent: true);
   Get.put<NotificationController>(NotificationController(), permanent: true);
   Get.put<ReportController>(ReportController(), permanent: true);
+  Get.put<ChatRoomController>(ChatRoomController(), permanent: true);
     
     
     // Controllers that might only be used on specific pages

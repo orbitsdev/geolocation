@@ -58,13 +58,14 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 Future<void> main() async  {
    WidgetsFlutterBinding.ensureInitialized();
     NotificationsService.init();
-   GlobalBinding().dependencies();   
+  
    await FirebaseService.initializeApp().then((value){
     print(value);
    }).catchError((e){
     print(e.toString());
     Modal.showToast(msg: e.toString());
    });
+    GlobalBinding().dependencies();   
    await AuthController.controller.loadTokenAndUser(showModal: false);
    ModalController.controller.setDialog(false);
    await NotificationsService().requestNotification();

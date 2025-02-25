@@ -70,7 +70,7 @@ class SignupPage extends GetView<AuthController> {
                             FormBuilderTextField(
                               // initialValue: 'Angila',
                               name: 'first_name',
-                              decoration: _inputDecoration('Enter your first name'),
+                              decoration: _inputDecoration(''),
                               validator: FormBuilderValidators.required(),
                             ),
                             const Gap(16),
@@ -79,7 +79,7 @@ class SignupPage extends GetView<AuthController> {
                             FormBuilderTextField(
                               // initialValue: 'Tirado',
                               name: 'last_name',
-                              decoration: _inputDecoration('Enter your last name'),
+                              decoration: _inputDecoration(''),
                               validator: FormBuilderValidators.required(),
                             ),
                             const Gap(16),
@@ -88,7 +88,7 @@ class SignupPage extends GetView<AuthController> {
                             FormBuilderTextField(
                               // initialValue: '@gmail.com',
                               name: 'email',
-                              decoration: _inputDecoration('Enter your email'),
+                              decoration: _inputDecoration(''),
                               validator: FormBuilderValidators.compose([
                                 FormBuilderValidators.required(),
                                 FormBuilderValidators.email(),
@@ -103,7 +103,7 @@ class SignupPage extends GetView<AuthController> {
                                   obscureText:
                                       controller.obscurePassword.value,
                                   decoration:
-                                      _inputDecoration('Enter your password')
+                                      _inputDecoration('')
                                           .copyWith(
                                     suffixIcon: IconButton(
                                       icon: Icon(controller.obscurePassword.value
@@ -126,7 +126,7 @@ class SignupPage extends GetView<AuthController> {
                                   obscureText:
                                       controller.obscureConfirm.value,
                                   decoration: _inputDecoration(
-                                          'Confirm your password')
+                                          '')
                                       .copyWith(
                                     suffixIcon: IconButton(
                                       icon: Icon(controller.obscureConfirm.value

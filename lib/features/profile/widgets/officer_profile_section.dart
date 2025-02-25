@@ -4,10 +4,12 @@ import 'package:geolocation/core/globalwidget/notification_global.dart';
 import 'package:geolocation/core/globalwidget/ripple_container.dart';
 import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
+import 'package:geolocation/features/chat/chat_room_page.dart';
 import 'package:geolocation/features/notification/controller/notification_controller.dart';
 import 'package:geolocation/features/notification/notification_page.dart';
 import 'package:geolocation/features/settings/profile_page.dart';
 import 'package:get/get.dart';
+import 'package:heroicons/heroicons.dart';
 
 class OfficerProfileSection extends StatelessWidget {
   const OfficerProfileSection({Key? key}) : super(key: key);
@@ -66,7 +68,21 @@ class OfficerProfileSection extends StatelessWidget {
                 // Notification and Profile Picture Section
                 Row(
                   children: [
-                    // Notification Icon with Badge
+                    IconButton(
+      icon: HeroIcon(HeroIcons.chatBubbleBottomCenterText,  size: 28), // Chat icon
+      onPressed: () {
+        // Navigate to Chat Page using Council ID
+        Get.to(() => ChatRoomPage(
+          councilId: user.defaultPosition!.councilId.toString(),
+          councilName: user.defaultPosition!.councilName ?? "Council Chat",
+          userId: user.id.toString(),
+          userName: user.fullName ?? "Unknown",
+          userImage: user.image,
+        ), transition: Transition.cupertino);
+      },
+    ),
+                    // Notification Icon 
+                    //Testwith Badge
                     GetBuilder<NotificationController>(
                       builder: (notificationController) {
                         final unreadCount = notificationController.notifications

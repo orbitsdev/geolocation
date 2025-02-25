@@ -88,7 +88,7 @@ class LoginPage extends GetView<AuthController> {
                             FormBuilderTextField(
                               //  initialValue: '@gmail.com',
                               name: 'email',
-                              decoration: _inputDecoration('Enter your email'),
+                              decoration: _inputDecoration(''),
                               validator: FormBuilderValidators.compose([
                                 FormBuilderValidators.required(),
                                 FormBuilderValidators.email(),
@@ -102,7 +102,7 @@ class LoginPage extends GetView<AuthController> {
                                   name: 'password',
                                   obscureText: controller.obscureText.value,
                                   decoration: _inputDecoration(
-                                          'Enter your password')
+                                          '')
                                       .copyWith(
                                     suffixIcon: IconButton(
                                       icon: Icon(controller.obscureText.value

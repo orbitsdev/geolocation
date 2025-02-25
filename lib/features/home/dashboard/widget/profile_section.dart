@@ -6,10 +6,12 @@ import 'package:geolocation/core/globalwidget/ripple_container.dart';
 import 'package:geolocation/core/globalwidget/to_sliver.dart';
 import 'package:geolocation/core/theme/palette.dart';
 import 'package:geolocation/features/auth/controller/auth_controller.dart';
+import 'package:geolocation/features/chat/chat_room_page.dart';
 import 'package:geolocation/features/notification/controller/notification_controller.dart';
 import 'package:geolocation/features/notification/notification_page.dart';
 import 'package:geolocation/features/settings/profile_page.dart';
 import 'package:get/get.dart';
+import 'package:heroicons/heroicons.dart';
 
 class ProfileSection extends StatefulWidget {
   const ProfileSection({Key? key}) : super(key: key);
@@ -37,6 +39,7 @@ class _ProfileSectionState extends State<ProfileSection> {
         final fullName = authController.user.value.fullName ?? 'User';
         final position =
             authController.user.value.defaultPosition?.position ?? 'Super Admin';
+         final user = authController.user.value;
 
         return ToSliver(
           child: Container(
@@ -48,12 +51,13 @@ class _ProfileSectionState extends State<ProfileSection> {
             ),
             child: Column(
               children: [
+                
                 const SizedBox(height: 24),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // Profile Section
+         // Profile Section
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -85,9 +89,27 @@ class _ProfileSectionState extends State<ProfileSection> {
                         ),
                       ],
                     ),
+
+                    
                     // Notification and Profile Section
                     Row(
                       children: [
+                            
+                         IconButton(
+      icon: HeroIcon(HeroIcons.chatBubbleBottomCenterText,  size: 28), // Chat icon
+      onPressed: () {
+        // Navigate to Chat Page using Council ID
+        Get.to(() => ChatRoomPage(
+          councilId: user.defaultPosition!.councilId.toString(),
+          councilName: user.defaultPosition!.councilName ?? "Council Chat",
+          userId: user.id.toString(),
+          userName: user.fullName ?? "Unknown",
+          userImage: user.image,
+        ), transition: Transition.cupertino);
+      },
+    ),
+             
+                        
                         GetBuilder<NotificationController>(
                           builder: (notificationController) {
                             final unreadCount = notificationController.notifications
